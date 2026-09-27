@@ -4,6 +4,8 @@ import { generatePreviewCode } from 'lesson-core';
 export interface EditorState {
   /** Mã bài đang sửa; null nếu là bài mới chưa lưu. */
   originalId: string | null;
+  /** Phiên bản bai.md lúc mở, để server phát hiện bài bị sửa ở nơi khác. */
+  baseVersion: string | null;
   /** Mã phiên soạn: file tải lên được giữ tạm dưới mã này tới khi lưu. */
   draftKey: string;
   /** File vừa tải lên, chưa lưu vào bài. */
@@ -18,6 +20,7 @@ export interface EditorState {
 export function createEditorState(): EditorState {
   return {
     originalId: null,
+    baseVersion: null,
     draftKey: generatePreviewCode(16),
     stagedFiles: new Set(),
     lessonFiles: new Set(),

@@ -74,7 +74,7 @@ function renderFileChips() {
     const chip = document.createElement('li');
     const used = text.includes(`](${name})`);
     chip.className = `file-chip${used ? '' : ' file-chip--unused'}`;
-    chip.textContent = `${used ? '📎' : '⚪'} ${name}${used ? '' : ' (chưa dùng, sẽ bị bỏ khi lưu)'}`;
+    chip.textContent = `${used ? '📎' : '⚪'} ${name}${used ? '' : ' (chưa dùng trong bài)'}`;
     list.append(chip);
   }
 }
@@ -95,6 +95,7 @@ async function openLesson(id: string) {
   Object.assign(state, createEditorState(), {
     activeTextarea: deBaiInput,
     originalId: lesson.id,
+    baseVersion: lesson.version,
     lessonFiles: new Set(lesson.files.map((file) => file.name)),
   });
   titleInput.value = lesson.frontmatter.tieu_de ?? '';
@@ -237,7 +238,13 @@ async function save(publish: boolean) {
   setBusy(true);
   saveResult.textContent = publish ? '⏳ Đang lưu và đăng…' : '⏳ Đang lưu nháp…';
   try {
-    const result = await editorApi.save({ ...values, originalId: state.originalId, draftKey: state.draftKey, nhap: !publish });
+    const result = await editorApi.save({
+      ...values,
+      originalId: state.originalId,
+      baseVersion: state.baseVersion,
+      draftKey: state.draftKey,
+      nhap: !publish,
+    });
     const link = result.linkXemTruoc ? ` Xem trước: ${result.linkXemTruoc}` : '';
     await openLessonAfterSave(result.id);
     const headline = !publish ? '💾 Đã lưu nháp.' : result.git.pushed ? '🚀 Đã đăng!' : '✅ Đã lưu bài ở chế độ đăng.';

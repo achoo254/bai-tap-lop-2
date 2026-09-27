@@ -7,7 +7,7 @@ import {
   LESSON_SUBJECTS,
   type LessonIssue,
 } from 'lesson-core';
-import { base64ToBytes } from '../github/github-content-store';
+import { base64ToBytes, ContentConflictError, GitHubApiError } from '../github/github-content-store';
 import { fetchMediaFromUrl, MediaFetchError } from '../github/media-fetcher';
 import { LessonServiceError, subjectLabel, type LessonRecord, type LessonService } from '../lessons/lesson-service';
 
@@ -121,7 +121,7 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
     'list_lessons',
     {
       title: 'Danh sách bài',
-      description: 'Liệt kê tối đa 40 bài mới nhất, lọc theo khoảng ngày, môn, trạng thái nháp/đã đăng.',
+      description: 'Liệt kê tối đa 40 bài mới nhất (theo ngày học), lọc theo khoảng ngày, môn, trạng thái nháp/đã đăng.',
       inputSchema: {
         tu_ngay: isoDate.optional(),
         den_ngay: isoDate.optional(),
@@ -132,17 +132,15 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
     },
     (filter) =>
       run(async () => {
-        const lessons = await service.list(filter);
-        if (lessons.length === 0) return text('Chưa có bài nào khớp điều kiện.');
-        return text(
-          lessons
-            .map(
-              (lesson) =>
-                `- ${lesson.id} · ${lesson.frontmatter.tieu_de} · ${subjectLabel(lesson.frontmatter.mon)} · ` +
-                `${lesson.frontmatter.nhap ? 'nháp' : 'đã đăng'}`,
-            )
-            .join('\n'),
+        const { lessons, broken } = await service.list(filter);
+        const lines = lessons.map(
+          (lesson) =>
+            `- ${lesson.id} · ${lesson.frontmatter.tieu_de} · ngày ${lesson.frontmatter.ngay} · ` +
+            `${subjectLabel(lesson.frontmatter.mon)} · ${lesson.frontmatter.nhap ? 'nháp' : 'đã đăng'}`,
         );
+        if (lines.length === 0) lines.push('Chưa có bài nào khớp điều kiện.');
+        if (broken.length > 0) lines.push(`⚠️ Không đọc được các bài: ${broken.join(', ')} (file bài bị hỏng).`);
+        return text(lines.join('\n'));
       }),
   );
 
@@ -237,7 +235,9 @@ async function run(task: () => Promise<CallToolResult>): Promise<CallToolResult>
     if (error instanceof LessonServiceError) {
       return { isError: true, content: [{ type: 'text', text: `${error.message}\n${formatIssues(error.issues)}`.trim() }] };
     }
-    if (error instanceof MediaFetchError) return { isError: true, content: [{ type: 'text', text: error.message }] };
+    if (error instanceof MediaFetchError || error instanceof ContentConflictError || error instanceof GitHubApiError) {
+      return { isError: true, content: [{ type: 'text', text: error.message }] };
+    }
     console.error('[mcp] lỗi', error);
     return { isError: true, content: [{ type: 'text', text: 'Có lỗi khi làm việc với kho bài. Thử lại sau ít phút.' }] };
   }

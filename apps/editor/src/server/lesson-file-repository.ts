@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
@@ -19,6 +20,9 @@ import { LESSON_FILE_NAME, readAllLessonFolders, readLessonFolder } from 'lesson
 /** Đọc/ghi thư mục bài trên đĩa cho trang Soạn bài. */
 
 export const DRAFT_KEY_PATTERN = /^[a-z0-9]{8,32}$/;
+
+/** Bài trên đĩa đã khác bản phụ huynh mở (vd. Claude vừa sửa qua MCP). */
+export class EditorConflictError extends Error {}
 
 export class EditorInputError extends Error {
   constructor(
@@ -44,11 +48,15 @@ export interface LessonDetail {
   deBai: string;
   loiGiai: string;
   files: { name: string; size: number }[];
+  /** Dấu vân tay nội dung bai.md lúc mở, gửi lại khi lưu để phát hiện bài bị sửa ở nơi khác. */
+  version: string;
 }
 
 export interface SaveLessonInput {
   /** Mã bài đang sửa; null khi tạo bài mới. */
   originalId: string | null;
+  /** `version` nhận được lúc mở bài; bỏ trống với bài mới. */
+  baseVersion?: string | null;
   /** Mã phiên soạn, trỏ tới thư mục tạm chứa file vừa tải lên. */
   draftKey: string;
   tieu_de: string;
@@ -99,6 +107,7 @@ export class LessonFileRepository {
       deBai: split.sections['de-bai']?.markdown ?? '',
       loiGiai: split.sections['loi-giai']?.markdown ?? '',
       files: folder.files,
+      version: contentVersion(folder.source),
     };
   }
 
@@ -131,6 +140,11 @@ export class LessonFileRepository {
       const existing = await readLessonFolder(this.contentDir, input.originalId);
       if (!existing) throw new EditorInputError('Không tìm thấy bài đang sửa.');
       id = input.originalId;
+      if (input.baseVersion && contentVersion(existing.source) !== input.baseVersion) {
+        throw new EditorConflictError(
+          'Bài này vừa được sửa ở nơi khác (có thể Claude qua MCP). Hãy mở lại bài để xem bản mới rồi sửa tiếp.',
+        );
+      }
       const raw = (splitLessonSource(existing.source).rawFrontmatter ?? {}) as Record<string, unknown>;
       previewCode = typeof raw.ma_xem_truoc === 'string' ? raw.ma_xem_truoc : generatePreviewCode();
     } else {
@@ -177,10 +191,7 @@ export class LessonFileRepository {
     for (const name of stagedFiles) {
       if (referenced.has(name)) await rename(path.join(stagingDir, name), path.join(lessonDir, name));
     }
-    // Xoá file không còn được dùng để repo gọn; lịch sử git vẫn giữ bản cũ.
-    for (const name of lessonFiles) {
-      if (!referenced.has(name)) await rm(path.join(lessonDir, name), { force: true });
-    }
+    // Không xoá file đính kèm cũ: có thể nơi khác (Claude qua MCP) vừa thêm và bài bản mới đang dùng.
     await writeFile(path.join(lessonDir, LESSON_FILE_NAME), source, 'utf8');
     await rm(stagingDir, { recursive: true, force: true });
     return { id, frontmatter, warnings: validation.warnings };
@@ -207,6 +218,10 @@ export class LessonFileRepository {
       if (!taken.has(candidate)) return candidate;
     }
   }
+}
+
+export function contentVersion(source: string): string {
+  return createHash('sha256').update(source).digest('hex').slice(0, 16);
 }
 
 async function listFileNames(dir: string, exclude?: string): Promise<string[]> {

@@ -17,10 +17,12 @@ export interface LessonDetail {
   deBai: string;
   loiGiai: string;
   files: { name: string; size: number }[];
+  version: string;
 }
 
 export interface SaveLessonRequest {
   originalId: string | null;
+  baseVersion: string | null;
   draftKey: string;
   tieu_de: string;
   ngay: string;

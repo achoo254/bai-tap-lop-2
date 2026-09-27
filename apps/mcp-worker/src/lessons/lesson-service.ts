@@ -77,6 +77,7 @@ export class LessonService {
 
   async create(rawInput: LessonContentInput): Promise<LessonRecord> {
     const input = normalizeText(rawInput);
+    const baseSha = await this.store.headSha();
     const lessons = await this.store.listLessonFiles();
     const id = uniqueId(buildLessonId(input.ngay, input.tieu_de), lessons);
     const frontmatter = this.parseFrontmatter({ ...input, nhap: true, ma_xem_truoc: generatePreviewCode() });
@@ -86,12 +87,17 @@ export class LessonService {
       message: `content: Claude tạo bài nháp ${id}`,
       upserts: [{ path: pathOf(id, LESSON_FILE), content: source }],
       deletes: [],
+      ...guard(baseSha, id),
     });
     return this.record(id, frontmatter, input.de_bai, input.loi_giai ?? '', [], warnings);
   }
 
   async get(id: string): Promise<LessonRecord> {
     const { files, source } = await this.load(id);
+    return this.fromSource(id, files, source);
+  }
+
+  private fromSource(id: string, files: string[], source: string): LessonRecord {
     const split = splitLessonSource(source);
     const validation = validateLessonSource(source, { availableFiles: files });
     const frontmatter = lessonFrontmatterSchema.safeParse(split.rawFrontmatter);
@@ -106,19 +112,32 @@ export class LessonService {
     );
   }
 
-  async list(filter: LessonListFilter = {}): Promise<LessonRecord[]> {
-    const ids = [...(await this.store.listLessonFiles()).keys()]
-      .filter((id) => (!filter.tu_ngay || id.slice(0, 10) >= filter.tu_ngay) && (!filter.den_ngay || id.slice(0, 10) <= filter.den_ngay))
-      .sort()
-      .reverse()
-      .slice(0, MAX_LISTED_LESSONS);
-    const lessons = await Promise.all(ids.map((id) => this.get(id).catch(() => null)));
-    return lessons.filter(
-      (lesson): lesson is LessonRecord =>
-        lesson !== null &&
-        (filter.mon === undefined || lesson.frontmatter.mon === filter.mon) &&
-        (filter.nhap === undefined || lesson.frontmatter.nhap === filter.nhap),
+  /** Danh sách bài: 1 lần đọc cây thư mục + 1 lần đọc hàng loạt nội dung. Bài hỏng được báo, không bị bỏ qua. */
+  async list(filter: LessonListFilter = {}): Promise<{ lessons: LessonRecord[]; broken: string[] }> {
+    const lessonFiles = await this.store.listLessonFiles();
+    const ids = [...lessonFiles.keys()].filter((id) => lessonFiles.get(id)?.includes(LESSON_FILE));
+    const sources = await this.store.readTexts(ids.map((id) => pathOf(id, LESSON_FILE)));
+    const lessons: LessonRecord[] = [];
+    const broken: string[] = [];
+    for (const id of ids) {
+      const source = sources.get(pathOf(id, LESSON_FILE));
+      try {
+        if (source == null) throw new Error('không đọc được');
+        const files = (lessonFiles.get(id) ?? []).filter((file) => file !== LESSON_FILE);
+        lessons.push(this.fromSource(id, files, source));
+      } catch {
+        broken.push(id);
+      }
+    }
+    const matches = lessons.filter(
+      ({ frontmatter }) =>
+        (!filter.tu_ngay || frontmatter.ngay >= filter.tu_ngay) &&
+        (!filter.den_ngay || frontmatter.ngay <= filter.den_ngay) &&
+        (filter.mon === undefined || frontmatter.mon === filter.mon) &&
+        (filter.nhap === undefined || frontmatter.nhap === filter.nhap),
     );
+    matches.sort((a, b) => b.frontmatter.ngay.localeCompare(a.frontmatter.ngay) || b.id.localeCompare(a.id));
+    return { lessons: matches.slice(0, MAX_LISTED_LESSONS), broken };
   }
 
   /** Kiểm tra nội dung chưa lưu (không ghi gì). */
@@ -130,6 +149,7 @@ export class LessonService {
 
   async update(id: string, rawChanges: Partial<LessonContentInput>): Promise<LessonRecord> {
     const changes = normalizeText(rawChanges);
+    const baseSha = await this.store.headSha();
     const current = await this.get(id);
     const frontmatter = this.parseFrontmatter({
       ...current.frontmatter,
@@ -145,11 +165,13 @@ export class LessonService {
       message: `content: Claude sửa bài ${frontmatter.nhap ? 'nháp' : 'đã đăng'} ${id}`,
       upserts: [{ path: pathOf(id, LESSON_FILE), content: source }],
       deletes: [],
+      ...guard(baseSha, id),
     });
     return this.record(id, frontmatter, deBai, loiGiai, current.files, warnings);
   }
 
   async publish(id: string): Promise<LessonRecord> {
+    const baseSha = await this.store.headSha();
     const current = await this.get(id);
     const frontmatter = { ...current.frontmatter, nhap: false };
     const source = serializeLesson({ frontmatter, deBai: current.deBai, loiGiai: current.loiGiai });
@@ -159,12 +181,14 @@ export class LessonService {
       message: `content: đăng bài ${id}`,
       upserts: [{ path: pathOf(id, LESSON_FILE), content: source }],
       deletes: [],
+      ...guard(baseSha, id),
     });
     return this.record(id, frontmatter, current.deBai, current.loiGiai, current.files, warnings);
   }
 
   /** Mô tả việc xoá (khi chưa xác nhận) hoặc xoá thật. */
   async remove(id: string, confirmed: boolean): Promise<{ deleted: boolean; summary: string }> {
+    const baseSha = await this.store.headSha();
     const current = await this.get(id);
     const summary = `Bài "${current.frontmatter.tieu_de}" (${current.frontmatter.ngay}, ${
       current.frontmatter.nhap ? 'nháp' : 'ĐÃ ĐĂNG — bé đang thấy bài này'
@@ -174,6 +198,7 @@ export class LessonService {
       message: `content: Claude xoá bài ${id}`,
       upserts: [],
       deletes: [LESSON_FILE, ...current.files].map((file) => pathOf(id, file)),
+      ...guard(baseSha, id),
     });
     return { deleted: true, summary };
   }
@@ -184,6 +209,7 @@ export class LessonService {
     }
     const safeName = toSafeMediaFileName(media.fileName);
     if (!safeName) throw new LessonServiceError('Chỉ nhận ảnh (jpg, png, webp, gif) hoặc video (mp4, webm).');
+    const baseSha = await this.store.headSha();
     const current = await this.get(id);
     const fileName = uniqueFileName(safeName, current.files);
     const markdown = markdownForMedia(fileName, media.moTa);
@@ -198,7 +224,7 @@ export class LessonService {
       upserts.push({ path: pathOf(id, LESSON_FILE), content: source });
       record = this.record(id, current.frontmatter, deBai, loiGiai, record.files, warnings);
     }
-    await this.store.commit({ message: `content: Claude thêm ${fileName} vào bài ${id}`, upserts, deletes: [] });
+    await this.store.commit({ message: `content: Claude thêm ${fileName} vào bài ${id}`, upserts, deletes: [], ...guard(baseSha, id) });
     return { record, fileName, markdown };
   }
 
@@ -252,6 +278,11 @@ export class LessonService {
 
 export function subjectLabel(subject: LessonSubject): string {
   return LESSON_SUBJECT_LABELS[subject];
+}
+
+/** Chặn ghi nếu thư mục bài đã bị sửa ở nơi khác kể từ lúc đọc (`baseSha`). */
+function guard(baseSha: string, id: string) {
+  return { baseSha, guardPaths: [`content/${id}/`] };
 }
 
 function uniqueId(baseId: string, lessons: Map<string, string[]>): string {

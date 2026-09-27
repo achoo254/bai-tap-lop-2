@@ -1,6 +1,7 @@
 import path from 'node:path';
 import {
   LESSON_SUBJECT_LABELS,
+  splitLessonSource,
   type LessonFrontmatter,
   type LessonSubject,
 } from 'lesson-core';
@@ -64,9 +65,13 @@ async function buildCatalog(): Promise<LessonCatalog> {
   return { all, published: all.filter((lesson) => !lesson.frontmatter.nhap) };
 }
 
-/** Bài không đọc được thông tin đầu bài vẫn bị coi là đã đăng để không lặng lẽ biến mất. */
+/**
+ * Chỉ bỏ qua bài có `nhap: true` hợp lệ. Bài không đọc được thông tin đầu bài bị coi là đã đăng
+ * (làm dừng build) để không lặng lẽ biến mất khỏi web của bé.
+ */
 function isDraftSource(folder: LessonFolder): boolean {
-  return /^nhap:\s*true\s*$/m.test(folder.source);
+  const raw = splitLessonSource(folder.source).rawFrontmatter as { nhap?: unknown } | undefined;
+  return raw?.nhap === true;
 }
 
 function toSiteLesson(folder: LessonFolder): SiteLesson {

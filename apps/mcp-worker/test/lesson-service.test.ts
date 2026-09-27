@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import type { CommitRequest, LessonFileStore } from '../src/github/github-content-store';
+import { ContentConflictError, type CommitRequest, type LessonFileStore } from '../src/github/github-content-store';
 import { isPrivateHost } from '../src/github/media-fetcher';
 import { LessonService, LessonServiceError } from '../src/lessons/lesson-service';
 
-/** Kho giả trong bộ nhớ, ghi lại từng commit. */
+/** Kho giả trong bộ nhớ, ghi lại từng commit và phát hiện xung đột giống GitHubContentStore. */
 class MemoryStore implements LessonFileStore {
   files = new Map<string, string | Uint8Array>();
   commits: CommitRequest[] = [];
+  /** Đường dẫn bị đổi ở mỗi phiên bản (phiên bản = số commit). */
+  private changes: string[][] = [];
 
+  async headSha() {
+    return String(this.changes.length);
+  }
   async listLessonFiles() {
     const lessons = new Map<string, string[]>();
     for (const path of this.files.keys()) {
@@ -20,10 +25,23 @@ class MemoryStore implements LessonFileStore {
     const value = this.files.get(path);
     return typeof value === 'string' ? value : null;
   }
+  async readTexts(paths: string[]) {
+    return new Map(await Promise.all(paths.map(async (path) => [path, await this.readText(path)] as const)));
+  }
   async commit(request: CommitRequest) {
+    if (request.baseSha !== undefined && request.guardPaths) {
+      const changedSince = this.changes.slice(Number(request.baseSha)).flat();
+      const touched = changedSince.filter((path) => request.guardPaths!.some((guard) => path.startsWith(guard)));
+      if (touched.length > 0) throw new ContentConflictError(touched);
+    }
     this.commits.push(request);
-    for (const file of request.upserts) this.files.set(file.path, file.content);
-    for (const path of request.deletes) this.files.delete(path);
+    this.write(request.upserts, request.deletes);
+  }
+  /** Mô phỏng nơi khác (trang Soạn bài) ghi thẳng vào repo. */
+  write(upserts: { path: string; content: string | Uint8Array }[], deletes: string[] = []) {
+    for (const file of upserts) this.files.set(file.path, file.content);
+    for (const path of deletes) this.files.delete(path);
+    this.changes.push([...upserts.map((file) => file.path), ...deletes]);
   }
 }
 
@@ -137,9 +155,46 @@ describe('LessonService', () => {
     const a = await service.create({ ...input, ngay: '2026-09-01', tieu_de: 'Bài A' });
     await service.create({ ...input, ngay: '2026-09-20', tieu_de: 'Bài B' });
     await service.publish(a.id);
-    expect((await service.list()).map((l) => l.frontmatter.tieu_de)).toEqual(['Bài B', 'Bài A']);
-    expect((await service.list({ nhap: false })).map((l) => l.id)).toEqual([a.id]);
-    expect(await service.list({ tu_ngay: '2026-09-10' })).toHaveLength(1);
+    expect((await service.list()).lessons.map((l) => l.frontmatter.tieu_de)).toEqual(['Bài B', 'Bài A']);
+    expect((await service.list({ nhap: false })).lessons.map((l) => l.id)).toEqual([a.id]);
+    expect((await service.list({ tu_ngay: '2026-09-10' })).lessons).toHaveLength(1);
+  });
+
+  it('danh sách lọc theo ngày học trong bài, không theo mã bài; báo bài hỏng', async () => {
+    const { store, service } = setup();
+    const lesson = await service.create({ ...input, ngay: '2026-09-01' });
+    await service.update(lesson.id, { ngay: '2026-10-15' });
+    store.write([{ path: 'content/2026-09-02-hong/bai.md', content: 'không phải bài' }]);
+    const result = await service.list({ tu_ngay: '2026-10-01' });
+    expect(result.lessons.map((l) => l.id)).toEqual([lesson.id]);
+    expect(result.broken).toEqual(['2026-09-02-hong']);
+  });
+
+  it('không ghi đè khi bài vừa bị sửa ở nơi khác giữa lúc đọc và lúc ghi', async () => {
+    const { store, service } = setup();
+    const created = await service.create(input);
+    const path = `content/${created.id}/bai.md`;
+    // Trang Soạn bài sửa bài ngay khi Claude đang chuẩn bị ghi.
+    const realGet = service.get.bind(service);
+    service.get = async (id) => {
+      const record = await realGet(id);
+      store.write([{ path, content: (store.files.get(path) as string).replace('Đáp số: 62.', 'Đáp số: 62 (phụ huynh sửa).') }]);
+      return record;
+    };
+    await expect(service.update(created.id, { loi_giai: 'Đáp số: 62 (Claude sửa).' })).rejects.toBeInstanceOf(ContentConflictError);
+    expect(store.files.get(path)).toContain('phụ huynh sửa');
+  });
+
+  it('bài khác thay đổi thì vẫn ghi bình thường', async () => {
+    const { store, service } = setup();
+    const created = await service.create(input);
+    const realGet = service.get.bind(service);
+    service.get = async (id) => {
+      const record = await realGet(id);
+      store.write([{ path: 'content/2026-10-01-bai-khac/bai.md', content: 'x' }]);
+      return record;
+    };
+    await expect(service.publish(created.id)).resolves.toMatchObject({ frontmatter: { nhap: false } });
   });
 });
 

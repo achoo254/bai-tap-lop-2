@@ -113,7 +113,7 @@ describe('trang Soạn bài', () => {
     expect(response.status).toBe(422);
   });
 
-  it('sửa bài giữ nguyên mã xem trước và bỏ file không còn dùng', async () => {
+  it('sửa bài giữ nguyên mã xem trước và giữ file đính kèm cũ', async () => {
     await upload('hinh-bai-1.png');
     const first = await (await app.request('/api/bai', saveBody())).json();
     const updated = await app.request(
@@ -123,11 +123,24 @@ describe('trang Soạn bài', () => {
     const second = await updated.json();
     expect(second.id).toBe(first.id);
     expect(second.frontmatter.ma_xem_truoc).toBe(first.frontmatter.ma_xem_truoc);
-    expect(existsSync(path.join(paths.contentDir, first.id, 'hinh-bai-1.png'))).toBe(false);
+    expect(existsSync(path.join(paths.contentDir, first.id, 'hinh-bai-1.png'))).toBe(true);
 
     const detail = await (await app.request(`/api/bai/${first.id}`)).json();
     expect(detail.frontmatter.nhap).toBe(true);
     expect(detail.deBai).toBe('Bài 1. Tính 37 + 25.');
+  });
+
+  it('không lưu đè khi bài vừa bị sửa ở nơi khác sau lúc mở', async () => {
+    const first = await (await app.request('/api/bai', saveBody({ deBai: 'Bài 1. Tính.' }))).json();
+    const opened = await (await app.request(`/api/bai/${first.id}`)).json();
+    const file = path.join(paths.contentDir, first.id, 'bai.md');
+    writeFileSync(file, readFileSync(file, 'utf8').replace('Bài 1. Tính.', 'Bài 1. Claude vừa sửa.'));
+    const response = await app.request(
+      '/api/bai',
+      saveBody({ originalId: first.id, baseVersion: opened.version, deBai: 'Bài 1. Phụ huynh sửa.' }),
+    );
+    expect(response.status).toBe(409);
+    expect(readFileSync(file, 'utf8')).toContain('Claude vừa sửa');
   });
 
   it('tên trùng thì thêm hậu tố cho mã bài', async () => {

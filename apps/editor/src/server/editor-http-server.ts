@@ -3,7 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { EDITOR_MAX_MEDIA_BYTES, isValidLessonId } from 'lesson-core';
 import type { EditorPaths } from './editor-paths';
 import type { GitSyncService } from './git-sync-service';
-import { EditorInputError, type LessonFileRepository, type SaveLessonInput } from './lesson-file-repository';
+import { EditorConflictError, EditorInputError, type LessonFileRepository, type SaveLessonInput } from './lesson-file-repository';
 import { staticFileResponse } from './static-file-response';
 
 export const EDITOR_PORT = 4321;
@@ -40,6 +40,7 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
 
   app.onError((error, c) => {
     if (error instanceof EditorInputError) return c.json({ loi: error.message, chiTiet: error.issues }, 422);
+    if (error instanceof EditorConflictError) return c.json({ loi: error.message, xungDot: true }, 409);
     console.error('[soan-bai]', error);
     return c.json({ loi: 'Có lỗi không mong muốn, xem cửa sổ dòng lệnh.' }, 500);
   });
@@ -77,6 +78,9 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
   app.put('/api/bai', async (c) => {
     const input = (await c.req.json()) as SaveLessonInput;
     const pulled = await git.pull();
+    if (!pulled.ok) {
+      throw new EditorInputError(`${pulled.message}. Chưa lưu để tránh ghi đè bài mới trên GitHub. Kiểm tra mạng rồi bấm lưu lại.`);
+    }
     const result = await repository.save(input);
     const action = input.originalId ? 'cập nhật' : 'thêm';
     const state = result.frontmatter.nhap ? 'nháp' : 'đăng';

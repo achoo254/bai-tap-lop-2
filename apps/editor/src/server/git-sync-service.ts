@@ -49,7 +49,7 @@ export class GitSyncService {
         return {
           committed,
           pushed: false,
-          message: `Đã lưu trên máy nhưng chưa gửi lên GitHub được (${shortError(error)}). Lần lưu sau sẽ tự gửi lại.`,
+          message: `Đã lưu trên máy nhưng chưa gửi lên GitHub được (${shortError(error)}). Kiểm tra mạng rồi lưu lại một lần nữa; nếu vẫn lỗi hãy nhờ người cài đặt xem giúp.`,
         };
       }
     });

@@ -14,13 +14,28 @@ export interface CommitRequest {
   message: string;
   upserts: FileUpsert[];
   deletes: string[];
+  /** Commit mà nội dung đã đọc dựa trên; dùng để phát hiện nơi khác vừa sửa cùng bài. */
+  baseSha?: string;
+  /** Thư mục/file không được phép thay đổi kể từ `baseSha` (vd. `content/<mã-bài>/`). */
+  guardPaths?: string[];
+}
+
+/** Nơi khác (trang Soạn bài, lần gọi trước) vừa sửa đúng bài đang ghi. */
+export class ContentConflictError extends Error {
+  constructor(readonly paths: string[]) {
+    super('Bài vừa được sửa ở nơi khác (trang Soạn bài hoặc một lần sửa khác). Hãy đọc lại bài bằng get_lesson rồi làm lại.');
+  }
 }
 
 /** Giao diện tối thiểu mà lớp nghiệp vụ cần; test dùng bản giả trong bộ nhớ. */
 export interface LessonFileStore {
+  /** Commit mới nhất của nhánh; lấy TRƯỚC khi đọc để ghi có thể phát hiện xung đột. */
+  headSha(): Promise<string>;
   /** Mã bài → danh sách tên file trong thư mục bài. */
   listLessonFiles(): Promise<Map<string, string[]>>;
   readText(path: string): Promise<string | null>;
+  /** Đọc nhiều file chữ trong một lần gọi. */
+  readTexts(paths: string[]): Promise<Map<string, string | null>>;
   commit(request: CommitRequest): Promise<void>;
 }
 
@@ -51,6 +66,10 @@ export class GitHubContentStore implements LessonFileStore {
     this.fetchImpl = config.fetchImpl ?? fetch.bind(globalThis);
   }
 
+  headSha(): Promise<string> {
+    return this.headCommitSha();
+  }
+
   async listLessonFiles(): Promise<Map<string, string[]>> {
     const headSha = await this.headCommitSha();
     const tree = await this.api<{ tree: { path: string; type: string }[]; truncated: boolean }>(
@@ -77,13 +96,46 @@ export class GitHubContentStore implements LessonFileStore {
     return response.text();
   }
 
+  /** Đọc nhiều file bằng một truy vấn GraphQL (tránh gọi API từng file). */
+  async readTexts(paths: string[]): Promise<Map<string, string | null>> {
+    const result = new Map<string, string | null>();
+    if (paths.length === 0) return result;
+    const { owner, repo, branch, token } = this.config;
+    const fields = paths
+      .map((path, index) => `f${index}: object(expression: ${JSON.stringify(`${branch}:${path}`)}) { ... on Blob { text } }`)
+      .join(' ');
+    const response = await this.fetchImpl('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'user-agent': 'bai-tap-lop-2-mcp' },
+      body: JSON.stringify({
+        query: `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`,
+        variables: { owner, name: repo },
+      }),
+    });
+    if (!response.ok) throw await toApiError(response);
+    const body = (await response.json()) as {
+      data?: { repository?: Record<string, { text?: string | null } | null> };
+      errors?: { message: string }[];
+    };
+    if (!body.data?.repository) {
+      throw new GitHubApiError(502, `GitHub GraphQL lỗi: ${body.errors?.map((e) => e.message).join('; ') ?? 'không rõ'}`);
+    }
+    paths.forEach((path, index) => result.set(path, body.data!.repository![`f${index}`]?.text ?? null));
+    return result;
+  }
+
   async commit(request: CommitRequest): Promise<void> {
     // Tạo blob một lần; nếu nhánh vừa có commit khác (vd. trang Soạn bài) thì dựng lại tree trên commit mới.
     const blobs = await Promise.all(
       request.upserts.map(async (file) => ({ path: file.path, sha: await this.createBlob(file.content) })),
     );
+    let checkedSha = request.baseSha;
     for (let attempt = 1; ; attempt++) {
       const parentSha = await this.headCommitSha();
+      if (checkedSha && checkedSha !== parentSha && request.guardPaths?.length) {
+        await this.assertUntouched(checkedSha, parentSha, request.guardPaths);
+        checkedSha = parentSha;
+      }
       const parent = await this.api<{ tree: { sha: string } }>(`git/commits/${parentSha}`);
       const tree = await this.api<{ sha: string }>('git/trees', {
         method: 'POST',
@@ -106,6 +158,17 @@ export class GitHubContentStore implements LessonFileStore {
       if (update.ok) return;
       if (update.status !== 422 || attempt >= MAX_COMMIT_ATTEMPTS) throw await toApiError(update);
     }
+  }
+
+  /** Ném ContentConflictError nếu giữa hai commit có file nằm trong `guardPaths` bị đổi. */
+  private async assertUntouched(fromSha: string, toSha: string, guardPaths: string[]): Promise<void> {
+    const comparison = await this.api<{ files?: { filename: string; previous_filename?: string }[] }>(
+      `compare/${fromSha}...${toSha}`,
+    );
+    const touched = (comparison.files ?? [])
+      .flatMap((file) => [file.filename, file.previous_filename ?? ''])
+      .filter((name) => name && guardPaths.some((guard) => name === guard || name.startsWith(guard)));
+    if (touched.length > 0) throw new ContentConflictError(touched);
   }
 
   private async headCommitSha(): Promise<string> {

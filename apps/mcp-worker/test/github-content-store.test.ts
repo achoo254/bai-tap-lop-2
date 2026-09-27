@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { base64ToBytes, bytesToBase64, GitHubContentStore } from '../src/github/github-content-store';
+import { base64ToBytes, bytesToBase64, ContentConflictError, GitHubContentStore } from '../src/github/github-content-store';
 
 interface Call {
   method: string;
@@ -90,6 +90,40 @@ describe('GitHubContentStore', () => {
     const { store } = fakeGitHub({ 'GET contents/content/a/bai.md': () => json({ message: 'Bad credentials' }, 401) });
     await expect(store.readText('content/a/bai.md')).rejects.toThrow('thiếu quyền');
     expect(await store.readText('content/khong/bai.md')).toBeNull();
+  });
+
+  it('nhánh đã có commit đụng tới bài đang ghi thì báo xung đột, không ghi', async () => {
+    const { calls, store } = fakeGitHub({
+      'POST git/blobs': () => json({ sha: 'blob' }),
+      'GET git/ref/heads/main': () => json({ object: { sha: 'head2' } }),
+      'GET compare/head1...head2': () => json({ files: [{ filename: 'content/x/bai.md' }] }),
+    });
+    await expect(
+      store.commit({
+        message: 'm',
+        upserts: [{ path: 'content/x/bai.md', content: 'a' }],
+        deletes: [],
+        baseSha: 'head1',
+        guardPaths: ['content/x/'],
+      }),
+    ).rejects.toBeInstanceOf(ContentConflictError);
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
+
+  it('đọc nhiều file bằng một truy vấn GraphQL', async () => {
+    let body: { query: string; variables: unknown } | undefined;
+    const fetchImpl = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+      body = JSON.parse(String(init?.body));
+      return json({ data: { repository: { f0: { text: 'bài A' }, f1: null } } });
+    }) as typeof fetch;
+    const store = new GitHubContentStore({ token: 't', owner: 'me', repo: 'bai', branch: 'main', fetchImpl });
+    const result = await store.readTexts(['content/a/bai.md', 'content/b/bai.md']);
+    expect([...result.entries()]).toEqual([
+      ['content/a/bai.md', 'bài A'],
+      ['content/b/bai.md', null],
+    ]);
+    expect(body?.query).toContain('"main:content/a/bai.md"');
+    expect(body?.variables).toEqual({ owner: 'me', name: 'bai' });
   });
 
   it('mã hoá base64 hai chiều', () => {

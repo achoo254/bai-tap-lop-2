@@ -2,10 +2,10 @@
  * Service worker của web cho bé.
  * - Trang: lấy bản mới từ mạng trước (bài mới luôn hiện), mất mạng thì dùng bản đã lưu hoặc trang /offline/.
  * - Tài nguyên tĩnh (CSS/JS có mã băm, font, hình minh hoạ): dùng bản lưu, rất nhanh.
- * - Ảnh trong bài: hiện bản lưu ngay rồi cập nhật ngầm.
+ * - Ảnh trong bài: lấy bản mới từ mạng (ảnh có thể được thay cùng tên), mất mạng thì dùng bản đã lưu.
  * - Video và nội dung ngoài trang (YouTube): không lưu.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const PAGE_CACHE = `trang-${VERSION}`;
 const ASSET_CACHE = `tai-nguyen-${VERSION}`;
 const MEDIA_CACHE = `anh-bai-${VERSION}`;
@@ -43,7 +43,7 @@ self.addEventListener('fetch', (event) => {
   } else if (/^\/(_astro|fonts|illustrations|icons)\//.test(url.pathname)) {
     event.respondWith(cacheFirst(request, ASSET_CACHE));
   } else if (url.pathname.startsWith('/media/')) {
-    event.respondWith(staleWhileRevalidate(request, MEDIA_CACHE));
+    event.respondWith(networkFirst(request, MEDIA_CACHE));
   }
 });
 
@@ -70,14 +70,13 @@ async function cacheFirst(request, cacheName) {
   return response;
 }
 
-async function staleWhileRevalidate(request, cacheName) {
+async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  const refresh = fetch(request)
-    .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
-      return response;
-    })
-    .catch(() => cached ?? Response.error());
-  return cached ?? refresh;
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    return (await cache.match(request)) ?? Response.error();
+  }
 }
