@@ -3,7 +3,7 @@ import KidPageLayout from '../layouts/kid-page-layout.astro';
 import MascotKitten from '../components/mascot-kitten.astro';
 import LessonCard from '../components/lesson-card.astro';
 import { loadLessonCatalog } from '../lib/lesson-catalog';
-import { GREETINGS } from '../lib/today-lesson-picker';
+import { greetingFor } from '../lib/family-messages';
 
 const { published } = await loadLessonCatalog();
 const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.frontmatter.ngay }));
@@ -12,8 +12,9 @@ const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.fr
 <KidPageLayout title="Bài hôm nay" showToolbar={false}>
   <div class="mascot-row">
     <MascotKitten pose="chao" label="Mèo con vẫy chào" />
-    <p class="speech-bubble" data-greeting>{GREETINGS['hom-nay']}</p>
+    <p class="speech-bubble" data-greeting>{greetingFor('hom-nay', 8)}</p>
   </div>
+  <p class="birthday-banner" data-birthday hidden></p>
 
   <ul class="lesson-grid" data-today-list>
     {published.map((lesson) => <LessonCard lesson={lesson} hidden />)}
@@ -34,12 +35,20 @@ const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.fr
 </KidPageLayout>
 
 <script>
-  import { GREETINGS, pickLessonsForToday, todayInVietnam, type DatedLesson } from '../lib/today-lesson-picker';
+  import { birthdayMessage, greetingFor } from '../lib/family-messages';
+  import { hourInVietnam, pickLessonsForToday, todayInVietnam, type DatedLesson } from '../lib/today-lesson-picker';
 
   const lessons = JSON.parse(document.getElementById('du-lieu-bai')?.textContent ?? '[]') as DatedLesson[];
-  const pick = pickLessonsForToday(lessons, todayInVietnam());
+  const today = todayInVietnam();
+  const pick = pickLessonsForToday(lessons, today);
   const greeting = document.querySelector('[data-greeting]');
-  if (greeting) greeting.textContent = GREETINGS[pick.mode];
+  if (greeting) greeting.textContent = greetingFor(pick.mode, hourInVietnam());
+  const birthday = birthdayMessage(today);
+  const banner = document.querySelector<HTMLElement>('[data-birthday]');
+  if (banner && birthday) {
+    banner.textContent = birthday;
+    banner.hidden = false;
+  }
   for (const card of document.querySelectorAll<HTMLElement>('[data-card]')) {
     card.hidden = !pick.ids.includes(card.dataset.id ?? '');
   }

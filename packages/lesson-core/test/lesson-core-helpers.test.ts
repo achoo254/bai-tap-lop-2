@@ -206,3 +206,13 @@ describe('chống chèn mã độc qua Markdown', () => {
     expect(validateLessonSource(source).errors.map((issue) => issue.code)).toContain('link-khong-an-toan');
   });
 });
+
+describe('hồ sơ của bé', () => {
+  it('nhận ra ngày sinh nhật và gợi ý tên người thân trong prompt', async () => {
+    const { CHILD_PROFILE, isBirthdayOn, buildLessonAuthoringPrompt } = await import('../src/index');
+    expect(isBirthdayOn('2026-12-15', CHILD_PROFILE.birthday)).toBe(true);
+    expect(isBirthdayOn('2026-12-16', CHILD_PROFILE.birthday)).toBe(false);
+    expect(isBirthdayOn('2027-03-19', CHILD_PROFILE.sibling.birthday)).toBe(true);
+    expect(buildLessonAuthoringPrompt()).toContain('bé Miu');
+  });
+});

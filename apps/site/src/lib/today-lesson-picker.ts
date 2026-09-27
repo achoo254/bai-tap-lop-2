@@ -40,9 +40,7 @@ export function pickLessonsForToday(lessons: DatedLesson[], today: string): Toda
   return { mode: 'trong', ngay: null, ids: [] };
 }
 
-export const GREETINGS: Record<TodayPickMode, string> = {
-  'hom-nay': 'Chào bé! Bài hôm nay đây, mình cùng chép thật đẹp nhé!',
-  'gan-nhat': 'Hôm nay chưa có bài mới. Bé ôn lại bài gần nhất nhé!',
-  'sap-toi': 'Bài mới sắp tới rồi! Bé xem trước nhé!',
-  trong: 'Chưa có bài nào. Bé chờ bố mẹ thêm bài nhé!',
-};
+/** Giờ hiện tại (0–23) theo giờ Việt Nam. */
+export function hourInVietnam(now: Date = new Date()): number {
+  return Number(new Intl.DateTimeFormat('en-GB', { timeZone: VIETNAM_TIME_ZONE, hour: '2-digit', hourCycle: 'h23' }).format(now));
+}

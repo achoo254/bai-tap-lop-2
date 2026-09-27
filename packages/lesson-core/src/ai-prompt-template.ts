@@ -1,3 +1,4 @@
+import { familyNamesHint } from './child-profile';
 import { ILLUSTRATION_CATALOG, ILLUSTRATION_NAMES, MAX_ILLUSTRATION_COUNT } from './illustration-catalog';
 
 /**
@@ -39,6 +40,8 @@ MÔN: <toan | tieng-viet | khac>
 
 Quy tắc trình bày:
 ${LESSON_FORMAT_GUIDE}
+
+${familyNamesHint()}
 
 Các loại hình minh hoạ có sẵn: ${illustrationListText()}.`;
 }

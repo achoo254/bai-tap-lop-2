@@ -1,6 +1,8 @@
 ---
 import MascotKitten from './mascot-kitten.astro';
 import { formatVietnameseDate, type SiteLesson } from '../lib/lesson-catalog';
+import { CHILD_PROFILE } from 'lesson-core';
+import { PRAISES } from '../lib/family-messages';
 
 /** Toàn bộ nội dung một bài: tiêu đề, Đề bài, nút xem Lời giải, chuyển bài trước/sau. */
 interface Props {
@@ -30,9 +32,10 @@ const { frontmatter } = lesson;
       <details class="solution" data-solution>
         <summary>
           <MascotKitten pose="goi-y" />
-          <span class="label-open">Xem lời giải</span>
+          <span class="label-open">{CHILD_PROFILE.nickname} xem lời giải</span>
           <span class="label-close">Ẩn lời giải</span>
         </summary>
+        <p class="praise" data-praise data-praises={JSON.stringify(PRAISES)} aria-live="polite" />
         <section aria-labelledby="nhan-loi-giai">
           <h2 class="section-label section-label--solution" id="nhan-loi-giai">
             🌟 Lời giải
@@ -67,3 +70,16 @@ const { frontmatter } = lesson;
     )
   }
 </article>
+
+<script>
+  // Mỗi lần mở lời giải, mèo con khen bé một câu khác nhau.
+  for (const details of document.querySelectorAll<HTMLDetailsElement>('[data-solution]')) {
+    const praise = details.querySelector<HTMLElement>('[data-praise]');
+    const praises = JSON.parse(praise?.dataset.praises ?? '[]') as string[];
+    details.addEventListener('toggle', () => {
+      if (details.open && praise && praises.length) {
+        praise.textContent = praises[Math.floor(Math.random() * praises.length)] ?? '';
+      }
+    });
+  }
+</script>

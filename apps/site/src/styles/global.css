@@ -16,7 +16,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--color-paper);
-  background-image: radial-gradient(var(--color-paper-deep) 2px, transparent 2.5px);
+  background-image: radial-gradient(#ffd6e5 2px, transparent 2.5px);
   background-size: 28px 28px;
   font-size: 22px;
   line-height: 1.5;
@@ -419,4 +419,37 @@ img {
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-3);
+}
+
+/* Cá nhân hoá cho Miu */
+.birthday-banner {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  background: repeating-linear-gradient(-45deg, #ffe0ec, #ffe0ec 18px, #fff3b0 18px, #fff3b0 36px);
+  border: var(--border-comic-thick);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-comic);
+}
+.praise {
+  margin: 0 auto var(--space-5);
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-5);
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  background: #ffe0ec;
+  border: var(--border-comic);
+  border-radius: var(--radius-pill);
+}
+.praise:empty {
+  display: none;
+}
+.family-love {
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+  color: #c2185b;
 }

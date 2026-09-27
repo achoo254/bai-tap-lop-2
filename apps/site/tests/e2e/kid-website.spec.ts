@@ -7,6 +7,7 @@ test.describe('trang chủ', () => {
   test('hiện bài của hôm nay theo giờ Việt Nam', async ({ page }) => {
     await page.clock.setFixedTime(setToday('2026-09-26'));
     await page.goto('/');
+    await expect(page.locator('[data-greeting]')).toContainText('Chào Miu buổi sáng');
     await expect(page.locator('[data-greeting]')).toContainText('Bài hôm nay');
     const visibleCards = page.locator('[data-card]:not([hidden])');
     await expect(visibleCards).toHaveCount(1);
@@ -17,7 +18,17 @@ test.describe('trang chủ', () => {
     await page.clock.setFixedTime(setToday('2026-10-05'));
     await page.goto('/');
     await expect(page.locator('[data-greeting]')).toContainText('bài gần nhất');
+    await expect(page.locator('[data-birthday]')).toBeHidden();
     await expect(page.locator('[data-card]:not([hidden])')).toContainText('Xem giờ trên đồng hồ');
+  });
+
+  test('sinh nhật Miu và em Bo hiện lời chúc', async ({ page }) => {
+    await page.clock.setFixedTime(setToday('2026-12-15'));
+    await page.goto('/');
+    await expect(page.locator('[data-birthday]')).toContainText('Chúc mừng sinh nhật Miu');
+    await page.clock.setFixedTime(setToday('2027-03-19'));
+    await page.goto('/');
+    await expect(page.locator('[data-birthday]')).toContainText('sinh nhật em Bo');
   });
 
   test('không hiện bài nháp ở trang chủ và danh sách', async ({ page }) => {
@@ -32,9 +43,10 @@ test.describe('trang bài', () => {
     await page.goto('/bai/2026-09-25-cong-co-nho/');
     const solution = page.locator('[data-solution]');
     await expect(solution.locator('.lesson-blocks')).toBeHidden();
-    await page.getByText('Xem lời giải').click();
+    await page.getByText('Miu xem lời giải').click();
     await expect(solution.locator('.lesson-blocks')).toBeVisible();
     await expect(solution).toContainText('Đáp số: 8 quả táo.');
+    await expect(solution.locator('[data-praise]')).toContainText('Miu');
     await page.getByText('Ẩn lời giải').click();
     await expect(solution.locator('.lesson-blocks')).toBeHidden();
   });
@@ -46,11 +58,20 @@ test.describe('trang bài', () => {
     await expect(illustration.locator('img')).toHaveCount(5);
   });
 
-  test('chưa có font chữ mẫu tiểu học thì ẩn nút chữ viết tay và bỏ qua lựa chọn cũ', async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('kieu-chu', 'viet-tay'));
+  test('mặc định hiện chữ viết tay mẫu tiểu học, chọn chữ in thì được nhớ', async ({ page }) => {
     await page.goto('/bai/2026-09-26-dien-van-an-ang/');
-    await expect(page.locator('[data-font-toggle]')).toHaveCount(0);
-    await expect(page.locator('html')).not.toHaveAttribute('data-font', 'viet-tay');
+    const html = page.locator('html');
+    const toggle = page.locator('[data-font-toggle]');
+    await expect(html).toHaveAttribute('data-font', 'viet-tay');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    const fontFamily = await page.locator('.lesson-text').first().evaluate((el) => getComputedStyle(el).fontFamily);
+    expect(fontFamily).toContain('Chu Mau Tieu Hoc');
+    expect(await page.evaluate(() => document.fonts.check('700 40px "Chu Mau Tieu Hoc"', 'Miu'))).toBe(true);
+    await toggle.click();
+    await expect(html).not.toHaveAttribute('data-font', 'viet-tay');
+    await page.reload();
+    await expect(html).not.toHaveAttribute('data-font', 'viet-tay');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('nút A+ tăng cỡ chữ và được nhớ', async ({ page }) => {
@@ -77,7 +98,7 @@ test.describe('trang bài', () => {
   test('video và YouTube được nhúng', async ({ page }) => {
     await page.goto('/bai/2026-09-27-xem-gio-dong-ho/');
     await expect(page.locator('iframe[src*="youtube-nocookie.com/embed/dQw4w9WgXcQ"]')).toHaveCount(1);
-    await page.getByText('Xem lời giải').click();
+    await page.getByText('Miu xem lời giải').click();
     await expect(page.locator('video[src$="clip.mp4"]')).toHaveCount(1);
   });
 
@@ -117,7 +138,7 @@ test.describe('khả năng tiếp cận', () => {
 test.describe('PWA', () => {
   test('có manifest hợp lệ và service worker hoạt động', async ({ page, request }) => {
     const manifest = await (await request.get('/manifest.webmanifest')).json();
-    expect(manifest).toMatchObject({ short_name: 'Học bài', display: 'standalone', start_url: '/?nguon=pwa' });
+    expect(manifest).toMatchObject({ short_name: 'Miu học bài', display: 'standalone', start_url: '/?nguon=pwa' });
     for (const icon of manifest.icons) expect((await request.get(icon.src)).ok()).toBe(true);
 
     await page.goto('/');

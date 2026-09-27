@@ -9,6 +9,7 @@ import ReadingPreferencesToolbar from '../components/reading-preferences-toolbar
 import ImageZoomDialog from '../components/image-zoom-dialog.astro';
 import PwaInstallButton from '../components/pwa-install-button.astro';
 import { hasHandwritingFont } from '../lib/handwriting-font';
+import { FAMILY_FOOTER, SITE_TITLE } from '../lib/family-messages';
 
 interface Props {
   title: string;
@@ -25,16 +26,16 @@ const handwritingAvailable = hasHandwritingFont();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffcf3f" />
+    <meta name="theme-color" content="#ff9fc0" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Học bài" />
+    <meta name="apple-mobile-web-app-title" content="Miu học bài" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>{title} · Góc học tập của bé</title>
+    <title>{title} · {SITE_TITLE}</title>
     <script is:inline define:vars={{ handwritingAvailable }}>
       // Áp dụng kiểu chữ và cỡ chữ đã chọn trước khi vẽ trang để không bị nháy.
       try {
@@ -54,7 +55,7 @@ const handwritingAvailable = hasHandwritingFont();
       <header class="top-bar">
         <a class="brand" href="/">
           <MascotKitten pose="vui" />
-          <span>Góc học tập của bé</span>
+          <span>{SITE_TITLE}</span>
         </a>
         <div class="top-bar__right">
           <PwaInstallButton />
@@ -65,6 +66,7 @@ const handwritingAvailable = hasHandwritingFont();
         <slot />
       </main>
       <footer class="page-footer">
+        <p class="family-love">{FAMILY_FOOTER}</p>
         <a href="/cac-bai/">Tất cả bài</a> · <a href="/ghi-nguon/">Ghi nguồn hình ảnh</a>
       </footer>
     </div>

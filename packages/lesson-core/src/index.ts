@@ -7,3 +7,4 @@ export * from './lesson-markdown-serializer';
 export * from './lesson-validator';
 export * from './lesson-media-rules';
 export * from './ai-prompt-template';
+export * from './child-profile';
