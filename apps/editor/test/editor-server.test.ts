@@ -56,7 +56,7 @@ afterEach(() => {
   rmSync(workDir, { recursive: true, force: true });
 });
 
-async function upload(name: string, bytes: Uint8Array = PNG, draftKey = DRAFT) {
+async function upload(name: string, bytes: Uint8Array<ArrayBuffer> = PNG, draftKey = DRAFT) {
   const form = new FormData();
   form.set('file', new File([bytes], name));
   form.set('draftKey', draftKey);
