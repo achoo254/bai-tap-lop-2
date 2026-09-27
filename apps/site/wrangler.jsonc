@@ -1,0 +1,15 @@
+/**
+ * Web của bé: Worker chỉ phục vụ file tĩnh do Astro build ra (dist/).
+ * Deploy: `pnpm --filter site deploy` (máy) hoặc GitHub Actions mỗi khi có bài mới.
+ */
+{
+  "name": "bai-tap-lop-2-web",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "baitap.inetdev.io.vn", "custom_domain": true }],
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,22 @@
+# Kiểm tra mã nguồn (lint, kiểu, test) khi sửa code; không chạy khi chỉ thêm bài.
+name: Kiểm tra mã nguồn
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['content/**']
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm ci:all

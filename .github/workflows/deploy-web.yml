@@ -1,0 +1,41 @@
+# Mỗi khi có bài mới/sửa (từ trang Soạn bài hoặc Claude qua MCP), build lại web của bé và đưa lên Cloudflare.
+# Cần 2 secret của repo: CLOUDFLARE_API_TOKEN (quyền Workers Scripts: Edit) và CLOUDFLARE_ACCOUNT_ID.
+name: Cập nhật web của bé
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'apps/site/**'
+      - 'packages/lesson-core/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Kiểm tra lõi định dạng bài
+        run: pnpm --filter lesson-core test
+      - name: Build web (dừng nếu bài đã đăng còn lỗi)
+        run: pnpm --filter site build
+      - name: Đưa lên Cloudflare
+        working-directory: apps/site
+        run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

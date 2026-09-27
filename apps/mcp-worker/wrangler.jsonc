@@ -19,12 +19,13 @@
     { "binding": "OAUTH_KV", "id": "00000000000000000000000000000000" }
   ],
   "vars": {
-    "GITHUB_OWNER": "dien-sau-khi-tao-repo",
+    "GITHUB_OWNER": "achoo254",
     "GITHUB_REPO": "bai-tap-lop-2",
     "GITHUB_BRANCH": "main",
-    "ALLOWED_GITHUB_LOGIN": "dien-sau-khi-tao-repo",
-    "SITE_URL": "https://bai-tap-lop-2.pages.dev"
+    "ALLOWED_GITHUB_LOGIN": "achoo254",
+    "SITE_URL": "https://baitap.inetdev.io.vn"
   },
+  "routes": [{ "pattern": "mcp-baitap.inetdev.io.vn", "custom_domain": true }],
   "observability": { "enabled": true },
   "dev": { "port": 8788 }
 }
