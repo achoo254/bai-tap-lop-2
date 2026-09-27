@@ -1,0 +1,30 @@
+/**
+ * Remote MCP cho Claude soạn và đăng bài. Hướng dẫn cài đặt: docs/deployment-guide.md.
+ * Secret (đặt bằng `npx wrangler secret put <TÊN>`, không ghi vào file này):
+ *   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET   — GitHub OAuth App để phụ huynh đăng nhập
+ *   COOKIE_ENCRYPTION_KEY                    — chuỗi ngẫu nhiên ký cookie OAuth
+ *   GITHUB_CONTENT_TOKEN                     — fine-grained token, chỉ repo bài tập, quyền Contents: read/write
+ */
+{
+  "name": "bai-tap-lop-2-mcp",
+  "main": "src/worker-entry.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LessonMcpAgent"] }],
+  "durable_objects": {
+    "bindings": [{ "class_name": "LessonMcpAgent", "name": "MCP_OBJECT" }]
+  },
+  "kv_namespaces": [
+    // Điền id thật sau khi chạy: npx wrangler kv namespace create OAUTH_KV
+    { "binding": "OAUTH_KV", "id": "00000000000000000000000000000000" }
+  ],
+  "vars": {
+    "GITHUB_OWNER": "dien-sau-khi-tao-repo",
+    "GITHUB_REPO": "bai-tap-lop-2",
+    "GITHUB_BRANCH": "main",
+    "ALLOWED_GITHUB_LOGIN": "dien-sau-khi-tao-repo",
+    "SITE_URL": "https://bai-tap-lop-2.pages.dev"
+  },
+  "observability": { "enabled": true },
+  "dev": { "port": 8788 }
+}

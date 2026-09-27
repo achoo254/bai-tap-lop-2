@@ -1,0 +1,5 @@
+# Chép thành .dev.vars khi chạy `pnpm dev` trên máy. KHÔNG commit file .dev.vars.
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+COOKIE_ENCRYPTION_KEY=
+GITHUB_CONTENT_TOKEN=
