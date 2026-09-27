@@ -118,3 +118,31 @@ test.describe('khả năng tiếp cận', () => {
     });
   }
 });
+
+test.describe('PWA', () => {
+  test('có manifest hợp lệ và service worker hoạt động', async ({ page, request }) => {
+    const manifest = await (await request.get('/manifest.webmanifest')).json();
+    expect(manifest).toMatchObject({ short_name: 'Học bài', display: 'standalone', start_url: '/?nguon=pwa' });
+    for (const icon of manifest.icons) expect((await request.get(icon.src)).ok()).toBe(true);
+
+    await page.goto('/');
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.webmanifest');
+    const scope = await page.evaluate(async () => (await navigator.serviceWorker.ready).scope);
+    expect(scope).toMatch(/\/$/);
+  });
+
+  test('mất mạng vẫn mở lại được bài đã xem, trang lạ thì hiện trang ngoại tuyến', async ({ page, context }) => {
+    await page.goto('/');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    await page.reload();
+    await page.goto('/bai/2026-09-25-cong-co-nho/');
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.locator('.lesson-title')).toHaveText('Cộng có nhớ trong phạm vi 100');
+    await page.goto('/bai/2026-09-26-dien-van-an-ang/');
+    await expect(page.locator('.speech-bubble')).toContainText('mất mạng');
+    await context.setOffline(false);
+  });
+});

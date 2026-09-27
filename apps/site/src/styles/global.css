@@ -412,3 +412,11 @@ img {
 [data-today-list] .lesson-card__title {
   font-size: 32px;
 }
+
+.top-bar__right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

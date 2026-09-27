@@ -1,0 +1,14 @@
+---
+import KidPageLayout from '../layouts/kid-page-layout.astro';
+import MascotKitten from '../components/mascot-kitten.astro';
+---
+
+<KidPageLayout title="Mất mạng" showToolbar={false} noindex>
+  <div class="mascot-row">
+    <MascotKitten pose="goi-y" label="Mèo con đang chờ" />
+    <p class="speech-bubble">Ôi, mất mạng rồi! Bé nhờ bố mẹ kiểm tra wifi rồi bấm tải lại nhé.</p>
+  </div>
+  <p class="empty-state">
+    <button type="button" class="comic-button comic-button--sun" onclick="location.reload()">🔄 Tải lại</button>
+  </p>
+</KidPageLayout>

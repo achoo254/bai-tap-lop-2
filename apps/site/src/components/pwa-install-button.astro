@@ -1,0 +1,59 @@
+---
+/**
+ * Đăng ký service worker và hiện nút "Cài lên màn hình" khi trình duyệt cho phép cài PWA.
+ * iPad/iPhone (Safari) không có sự kiện cài tự động nên hiện hướng dẫn "Thêm vào Màn hình chính".
+ */
+---
+
+<button type="button" class="comic-button comic-button--small pwa-install" data-pwa-install hidden>
+  📲 Cài lên màn hình
+</button>
+<p class="pwa-ios-hint" data-pwa-ios-hint hidden>
+  Trên iPad: bấm nút Chia sẻ <span aria-hidden="true">⬆️</span> rồi chọn “Thêm vào MH chính”.
+</p>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        // Không đăng ký được thì web vẫn chạy bình thường, chỉ không có chế độ ngoại tuyến.
+      });
+    });
+  }
+
+  type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+  let deferred: InstallPromptEvent | null = null;
+  const button = document.querySelector<HTMLButtonElement>('[data-pwa-install]');
+  const iosHint = document.querySelector<HTMLElement>('[data-pwa-ios-hint]');
+  const standalone =
+    window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone;
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferred = event as InstallPromptEvent;
+    if (button) button.hidden = false;
+  });
+
+  button?.addEventListener('click', async () => {
+    if (!deferred) return;
+    await deferred.prompt();
+    await deferred.userChoice;
+    deferred = null;
+    button.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    if (button) button.hidden = true;
+  });
+
+  const isAppleTouch = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (iosHint && isAppleTouch && !standalone) iosHint.hidden = false;
+</script>
+
+<style>
+  .pwa-ios-hint {
+    margin: 0;
+    font-size: 16px;
+    color: var(--color-ink-soft);
+  }
+</style>

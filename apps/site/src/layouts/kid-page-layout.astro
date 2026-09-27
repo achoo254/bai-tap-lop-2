@@ -8,6 +8,7 @@ import '../styles/global.css';
 import MascotKitten from '../components/mascot-kitten.astro';
 import ReadingPreferencesToolbar from '../components/reading-preferences-toolbar.astro';
 import ImageZoomDialog from '../components/image-zoom-dialog.astro';
+import PwaInstallButton from '../components/pwa-install-button.astro';
 
 interface Props {
   title: string;
@@ -26,6 +27,12 @@ const { title, noindex = false, showToolbar = true } = Astro.props;
     <meta name="theme-color" content="#ffcf3f" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Học bài" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>{title} · Góc học tập của bé</title>
     <script is:inline>
       // Áp dụng kiểu chữ và cỡ chữ đã chọn trước khi vẽ trang để không bị nháy.
@@ -47,7 +54,10 @@ const { title, noindex = false, showToolbar = true } = Astro.props;
           <MascotKitten pose="vui" />
           <span>Góc học tập của bé</span>
         </a>
-        {showToolbar && <ReadingPreferencesToolbar />}
+        <div class="top-bar__right">
+          <PwaInstallButton />
+          {showToolbar && <ReadingPreferencesToolbar />}
+        </div>
       </header>
       <main>
         <slot />
