@@ -1,0 +1,61 @@
+---
+import '@fontsource/andika/400.css';
+import '@fontsource/andika/700.css';
+import '@fontsource/dancing-script/400.css';
+import '../styles/design-tokens.css';
+import '../styles/lesson-content.css';
+import '../styles/global.css';
+import MascotKitten from '../components/mascot-kitten.astro';
+import ReadingPreferencesToolbar from '../components/reading-preferences-toolbar.astro';
+import ImageZoomDialog from '../components/image-zoom-dialog.astro';
+
+interface Props {
+  title: string;
+  /** Trang xem trước bài nháp không được lập chỉ mục. */
+  noindex?: boolean;
+  showToolbar?: boolean;
+}
+const { title, noindex = false, showToolbar = true } = Astro.props;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffcf3f" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · Góc học tập của bé</title>
+    <script is:inline>
+      // Áp dụng kiểu chữ và cỡ chữ đã chọn trước khi vẽ trang để không bị nháy.
+      try {
+        const root = document.documentElement;
+        const font = localStorage.getItem('kieu-chu');
+        if (font === 'viet-tay') root.dataset.font = 'viet-tay';
+        const size = Number(localStorage.getItem('co-chu'));
+        if (size >= 24 && size <= 60) root.style.setProperty('--text-size', size + 'px');
+      } catch (_error) {
+        // Trình duyệt chặn bộ nhớ: dùng mặc định.
+      }
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <header class="top-bar">
+        <a class="brand" href="/">
+          <MascotKitten pose="vui" />
+          <span>Góc học tập của bé</span>
+        </a>
+        {showToolbar && <ReadingPreferencesToolbar />}
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer class="page-footer">
+        <a href="/cac-bai/">Tất cả bài</a> · <a href="/ghi-nguon/">Ghi nguồn hình ảnh</a>
+      </footer>
+    </div>
+    <ImageZoomDialog />
+  </body>
+</html>

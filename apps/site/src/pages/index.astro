@@ -1,0 +1,46 @@
+---
+import KidPageLayout from '../layouts/kid-page-layout.astro';
+import MascotKitten from '../components/mascot-kitten.astro';
+import LessonCard from '../components/lesson-card.astro';
+import { loadLessonCatalog } from '../lib/lesson-catalog';
+import { GREETINGS } from '../lib/today-lesson-picker';
+
+const { published } = await loadLessonCatalog();
+const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.frontmatter.ngay }));
+---
+
+<KidPageLayout title="Bài hôm nay" showToolbar={false}>
+  <div class="mascot-row">
+    <MascotKitten pose="chao" label="Mèo con vẫy chào" />
+    <p class="speech-bubble" data-greeting>{GREETINGS['hom-nay']}</p>
+  </div>
+
+  <ul class="lesson-grid" data-today-list>
+    {published.map((lesson) => <LessonCard lesson={lesson} hidden />)}
+  </ul>
+  <noscript>
+    <style>
+      [data-card] {
+        display: block !important;
+      }
+    </style>
+  </noscript>
+
+  <p class="empty-state">
+    <a class="comic-button comic-button--sky" href="/cac-bai/">Xem tất cả bài</a>
+  </p>
+
+  <script type="application/json" id="du-lieu-bai" set:html={JSON.stringify(datedLessons)} />
+</KidPageLayout>
+
+<script>
+  import { GREETINGS, pickLessonsForToday, todayInVietnam, type DatedLesson } from '../lib/today-lesson-picker';
+
+  const lessons = JSON.parse(document.getElementById('du-lieu-bai')?.textContent ?? '[]') as DatedLesson[];
+  const pick = pickLessonsForToday(lessons, todayInVietnam());
+  const greeting = document.querySelector('[data-greeting]');
+  if (greeting) greeting.textContent = GREETINGS[pick.mode];
+  for (const card of document.querySelectorAll<HTMLElement>('[data-card]')) {
+    card.hidden = !pick.ids.includes(card.dataset.id ?? '');
+  }
+</script>

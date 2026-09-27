@@ -1,0 +1,60 @@
+---
+/** Nút chuyển Chữ in / Chữ viết tay và nút A− / A+ đổi cỡ chữ. Lựa chọn được nhớ trên máy. */
+---
+
+<div class="toolbar" role="toolbar" aria-label="Cách hiển thị chữ">
+  <button type="button" class="comic-button" data-font-toggle aria-pressed="false">
+    <span data-font-label>Chữ viết tay</span>
+  </button>
+  <button type="button" class="comic-button comic-button--small" data-size-step="-1" aria-label="Chữ nhỏ hơn">A−</button>
+  <button type="button" class="comic-button comic-button--small" data-size-step="1" aria-label="Chữ to hơn">A+</button>
+</div>
+
+<script>
+  const SIZES = [28, 34, 40, 48, 56];
+  const DEFAULT_SIZE = 34;
+  const root = document.documentElement;
+
+  function remember(key: string, value: string) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Không lưu được thì chỉ áp dụng cho lần xem này.
+    }
+  }
+
+  function currentSize(): number {
+    const value = parseInt(getComputedStyle(root).getPropertyValue('--text-size'), 10);
+    return SIZES.includes(value) ? value : DEFAULT_SIZE;
+  }
+
+  function syncFontButton() {
+    const handwriting = root.dataset.font === 'viet-tay';
+    for (const button of document.querySelectorAll<HTMLButtonElement>('[data-font-toggle]')) {
+      button.setAttribute('aria-pressed', String(handwriting));
+      const label = button.querySelector('[data-font-label]');
+      if (label) label.textContent = handwriting ? 'Chữ in' : 'Chữ viết tay';
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('[data-font-toggle]')) {
+      const handwriting = root.dataset.font !== 'viet-tay';
+      if (handwriting) root.dataset.font = 'viet-tay';
+      else delete root.dataset.font;
+      remember('kieu-chu', handwriting ? 'viet-tay' : 'in');
+      syncFontButton();
+      return;
+    }
+    const stepButton = target.closest<HTMLElement>('[data-size-step]');
+    if (stepButton) {
+      const index = SIZES.indexOf(currentSize());
+      const next = SIZES[Math.min(SIZES.length - 1, Math.max(0, index + Number(stepButton.dataset.sizeStep)))];
+      root.style.setProperty('--text-size', `${next}px`);
+      remember('co-chu', String(next));
+    }
+  });
+
+  syncFontButton();
+</script>

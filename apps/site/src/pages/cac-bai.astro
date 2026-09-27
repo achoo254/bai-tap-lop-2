@@ -1,0 +1,47 @@
+---
+import KidPageLayout from '../layouts/kid-page-layout.astro';
+import LessonCard from '../components/lesson-card.astro';
+import { LESSON_SUBJECT_LABELS, LESSON_SUBJECTS } from 'lesson-core';
+import { loadLessonCatalog } from '../lib/lesson-catalog';
+
+const { published } = await loadLessonCatalog();
+const newestFirst = [...published].reverse();
+---
+
+<KidPageLayout title="Tất cả bài" showToolbar={false}>
+  <h1 class="lesson-title">📚 Tất cả bài</h1>
+  <div class="filter-bar" role="group" aria-label="Lọc theo môn">
+    <button type="button" class="comic-button" data-filter="" aria-pressed="true">Tất cả</button>
+    {
+      LESSON_SUBJECTS.map((subject) => (
+        <button type="button" class="comic-button" data-filter={subject} aria-pressed="false">
+          {LESSON_SUBJECT_LABELS[subject]}
+        </button>
+      ))
+    }
+  </div>
+  {
+    newestFirst.length > 0 ? (
+      <ul class="lesson-grid">
+        {newestFirst.map((lesson) => (
+          <LessonCard lesson={lesson} />
+        ))}
+      </ul>
+    ) : (
+      <p class="empty-state">Chưa có bài nào.</p>
+    )
+  }
+</KidPageLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const subject = button.dataset.filter ?? '';
+      for (const other of buttons) other.setAttribute('aria-pressed', String(other === button));
+      for (const card of document.querySelectorAll<HTMLElement>('[data-card]')) {
+        card.hidden = subject !== '' && card.dataset.mon !== subject;
+      }
+    });
+  }
+</script>

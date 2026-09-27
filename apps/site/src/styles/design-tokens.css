@@ -1,0 +1,61 @@
+/*
+ * Token thiết kế phong cách truyện tranh cho trẻ em: viền mực đậm, bóng đổ cứng,
+ * màu pastel tươi. Mọi màu/khoảng cách trong site lấy từ đây.
+ */
+:root {
+  /* Màu nền và mực */
+  --color-paper: #fff8e7;
+  --color-paper-deep: #ffefc7;
+  --color-card: #ffffff;
+  --color-ink: #1f1a33;
+  --color-ink-soft: #4a4463;
+
+  /* Màu nhấn */
+  --color-sun: #ffcf3f;
+  --color-sky: #7cc8ff;
+  --color-grass: #7fdc8c;
+  --color-berry: #ff7aa8;
+  --color-grape: #b99cff;
+  --color-orange: #ff9f45;
+
+  /* Màu theo môn */
+  --color-subject-toan: #7cc8ff;
+  --color-subject-tieng-viet: #ff9fc0;
+  --color-subject-khac: #b8e986;
+
+  /* Vở ô li: nét kẻ tím nhạt như vở học sinh */
+  --color-notebook-bg: #fffdf6;
+  --color-notebook-line: rgba(128, 104, 196, 0.22);
+  --color-notebook-line-bold: rgba(128, 104, 196, 0.55);
+  --color-notebook-margin: rgba(240, 90, 120, 0.55);
+
+  /* Viền và bóng kiểu comic */
+  --border-comic: 3px solid var(--color-ink);
+  --border-comic-thick: 4px solid var(--color-ink);
+  --shadow-comic: 5px 5px 0 var(--color-ink);
+  --shadow-comic-small: 3px 3px 0 var(--color-ink);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-pill: 999px;
+
+  /* Khoảng cách (thang 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Chữ */
+  --font-print: 'Andika', 'Segoe UI', system-ui, sans-serif;
+  --font-handwriting: 'Chu Mau Tieu Hoc', 'Dancing Script', 'Andika', cursive;
+  --font-ui: 'Andika', 'Segoe UI', system-ui, sans-serif;
+  /* Cỡ chữ bài tập; nút A−/A+ đổi giá trị này. */
+  --text-size: 34px;
+  /* Một ô li = 1/4 cỡ chữ, dòng chữ cao 2 dòng kẻ (8 ô li) để dấu tiếng Việt không bị chạm. */
+  --oli: calc(var(--text-size) / 4);
+  --line-height-notebook: calc(var(--oli) * 8);
+
+  --touch-target: 56px;
+}

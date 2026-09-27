@@ -1,0 +1,27 @@
+{
+  "name": "site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync-media": "node scripts/sync-lesson-media.ts",
+    "dev": "pnpm sync-media && astro dev",
+    "build": "pnpm sync-media && astro build",
+    "preview": "astro preview --port 4330",
+    "typecheck": "astro check",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource/andika": "^5.3.0",
+    "@fontsource/dancing-script": "^5.3.0",
+    "astro": "^7.3.5",
+    "lesson-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.2"
+  }
+}

@@ -23,5 +23,20 @@
     "prettier": "^3.9.9",
     "typescript": "^7.0.2",
     "typescript-eslint": "^8.70.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "sharp"
+    ],
+    "packageExtensions": {
+      "@astrojs/astro2tsx": {
+        "dependencies": {
+          "@napi-rs/wasm-runtime": "1.2.4",
+          "@emnapi/core": "1.11.3"
+        }
+      }
+    }
   }
 }

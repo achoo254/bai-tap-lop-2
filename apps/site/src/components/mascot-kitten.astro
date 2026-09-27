@@ -1,0 +1,123 @@
+---
+/**
+ * Mèo con — linh vật của web. Vẽ bằng SVG gốc, 3 tư thế:
+ * - chao: giơ tay vẫy chào
+ * - goi-y: chống cằm suy nghĩ (dùng cho nút xem lời giải)
+ * - vui: nhắm mắt cười
+ */
+interface Props {
+  pose?: 'chao' | 'goi-y' | 'vui';
+  class?: string;
+  label?: string;
+}
+const { pose = 'chao', class: className = '', label } = Astro.props;
+const ink = '#1f1a33';
+const fur = '#ffb45c';
+const furDark = '#f08a24';
+const pink = '#ff8fb1';
+---
+
+<svg
+  class:list={['mascot', className]}
+  viewBox="0 0 200 200"
+  xmlns="http://www.w3.org/2000/svg"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  data-pose={pose}
+>
+  <!-- Đuôi -->
+  <path d="M146 168 C182 164 190 128 170 112" fill="none" stroke={ink} stroke-width="16" stroke-linecap="round" />
+  <path d="M146 168 C182 164 190 128 170 112" fill="none" stroke={fur} stroke-width="8" stroke-linecap="round" />
+  <!-- Thân -->
+  <ellipse cx="100" cy="160" rx="50" ry="34" fill={fur} stroke={ink} stroke-width="5" />
+  <ellipse cx="100" cy="166" rx="26" ry="18" fill="#fff3e0" />
+  <!-- Chân -->
+  <ellipse cx="78" cy="190" rx="15" ry="9" fill={fur} stroke={ink} stroke-width="4" />
+  <ellipse cx="122" cy="190" rx="15" ry="9" fill={fur} stroke={ink} stroke-width="4" />
+  <!-- Tai -->
+  <path d="M44 70 L40 16 L88 44 Z" fill={fur} stroke={ink} stroke-width="5" stroke-linejoin="round" />
+  <path d="M52 58 L50 30 L76 46 Z" fill={pink} />
+  <path d="M156 70 L160 16 L112 44 Z" fill={fur} stroke={ink} stroke-width="5" stroke-linejoin="round" />
+  <path d="M148 58 L150 30 L124 46 Z" fill={pink} />
+  <!-- Đầu -->
+  <ellipse cx="100" cy="92" rx="68" ry="56" fill={fur} stroke={ink} stroke-width="5" />
+  <!-- Vằn trán -->
+  <path d="M100 38 L100 54 M86 40 L90 54 M114 40 L110 54" stroke={furDark} stroke-width="5" stroke-linecap="round" />
+  <!-- Mắt -->
+  {
+    pose === 'vui' ? (
+      <g fill="none" stroke={ink} stroke-width="5" stroke-linecap="round">
+        <path d="M64 96 Q76 80 88 96" />
+        <path d="M112 96 Q124 80 136 96" />
+      </g>
+    ) : (
+      <g>
+        <ellipse cx="76" cy={pose === 'goi-y' ? 88 : 92} rx="10" ry="13" fill={ink} />
+        <ellipse cx="124" cy={pose === 'goi-y' ? 88 : 92} rx="10" ry="13" fill={ink} />
+        <circle cx={pose === 'goi-y' ? 79 : 72} cy={pose === 'goi-y' ? 82 : 86} r="4" fill="#fff" />
+        <circle cx={pose === 'goi-y' ? 127 : 120} cy={pose === 'goi-y' ? 82 : 86} r="4" fill="#fff" />
+      </g>
+    )
+  }
+  <!-- Má hồng -->
+  <ellipse cx="58" cy="112" rx="11" ry="7" fill={pink} opacity="0.75" />
+  <ellipse cx="142" cy="112" rx="11" ry="7" fill={pink} opacity="0.75" />
+  <!-- Mũi và miệng -->
+  <path d="M94 104 L106 104 L100 111 Z" fill={pink} stroke={ink} stroke-width="3" stroke-linejoin="round" />
+  {
+    pose === 'vui' ? (
+      <path d="M86 114 Q100 134 114 114 Z" fill="#e2445c" stroke={ink} stroke-width="4" stroke-linejoin="round" />
+    ) : (
+      <path d="M88 114 Q94 122 100 114 Q106 122 112 114" fill="none" stroke={ink} stroke-width="4" stroke-linecap="round" />
+    )
+  }
+  <!-- Ria -->
+  <g stroke={ink} stroke-width="3" stroke-linecap="round">
+    <path d="M40 104 L64 108 M40 118 L64 116" />
+    <path d="M160 104 L136 108 M160 118 L136 116" />
+  </g>
+  <!-- Tay theo tư thế -->
+  {
+    pose === 'chao' && (
+      <g class="mascot-wave">
+        <path d="M146 150 Q172 128 176 96" fill="none" stroke={ink} stroke-width="20" stroke-linecap="round" />
+        <path d="M146 150 Q172 128 176 96" fill="none" stroke={fur} stroke-width="11" stroke-linecap="round" />
+        <circle cx="176" cy="92" r="14" fill={fur} stroke={ink} stroke-width="5" />
+      </g>
+    )
+  }
+  {
+    pose === 'goi-y' && (
+      <g>
+        <circle cx="118" cy="140" r="14" fill={fur} stroke={ink} stroke-width="5" />
+        <text x="164" y="44" font-family="Andika, sans-serif" font-size="40" font-weight="700" fill="#5a3fc0">?</text>
+      </g>
+    )
+  }
+  {
+    pose === 'vui' && (
+      <g fill="#ffcf3f" stroke={ink} stroke-width="3">
+        <path d="M24 44 l5 10 11 2 -8 8 2 11 -10 -5 -10 5 2 -11 -8 -8 11 -2 z" />
+        <path d="M172 150 l4 8 9 1 -6 6 1 9 -8 -4 -8 4 1 -9 -6 -6 9 -1 z" />
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .mascot {
+    display: block;
+    overflow: visible;
+  }
+  .mascot-wave {
+    transform-origin: 146px 150px;
+    animation: wave 2.4s ease-in-out infinite;
+  }
+  @keyframes wave {
+    0%, 60%, 100% { transform: rotate(0deg); }
+    70% { transform: rotate(-14deg); }
+    80% { transform: rotate(8deg); }
+    90% { transform: rotate(-8deg); }
+  }
+</style>

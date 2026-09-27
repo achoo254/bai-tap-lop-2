@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from 'astro';
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import LessonView from '../../components/lesson-view.astro';
+import { loadLessonCatalog, type SiteLesson } from '../../lib/lesson-catalog';
+
+export const getStaticPaths = (async () => {
+  const { published } = await loadLessonCatalog();
+  return published.map((lesson, index) => ({
+    params: { id: lesson.id },
+    props: { lesson, previousId: published[index - 1]?.id, nextId: published[index + 1]?.id },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  lesson: SiteLesson;
+  previousId?: string;
+  nextId?: string;
+}
+const { lesson, previousId, nextId } = Astro.props;
+---
+
+<KidPageLayout title={lesson.frontmatter.tieu_de}>
+  <LessonView lesson={lesson} previousId={previousId} nextId={nextId} />
+</KidPageLayout>

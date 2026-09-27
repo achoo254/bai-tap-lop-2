@@ -1,0 +1,17 @@
+---
+import { formatVietnameseDate, type SiteLesson } from '../lib/lesson-catalog';
+
+interface Props {
+  lesson: SiteLesson;
+  hidden?: boolean;
+}
+const { lesson, hidden = false } = Astro.props;
+---
+
+<li hidden={hidden} data-card data-id={lesson.id} data-ngay={lesson.frontmatter.ngay} data-mon={lesson.frontmatter.mon}>
+  <a class="lesson-card" href={`/bai/${lesson.id}/`}>
+    <span class="subject-badge" data-subject={lesson.frontmatter.mon}>{lesson.subjectLabel}</span>
+    <span class="lesson-card__title">{lesson.frontmatter.tieu_de}</span>
+    <span class="lesson-card__date">{formatVietnameseDate(lesson.frontmatter.ngay)}</span>
+  </a>
+</li>

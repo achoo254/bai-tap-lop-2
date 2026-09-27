@@ -1,0 +1,69 @@
+---
+import MascotKitten from './mascot-kitten.astro';
+import { formatVietnameseDate, type SiteLesson } from '../lib/lesson-catalog';
+
+/** Toàn bộ nội dung một bài: tiêu đề, Đề bài, nút xem Lời giải, chuyển bài trước/sau. */
+interface Props {
+  lesson: SiteLesson;
+  previousId?: string | undefined;
+  nextId?: string | undefined;
+  showNavigation?: boolean;
+}
+const { lesson, previousId, nextId, showNavigation = true } = Astro.props;
+const { frontmatter } = lesson;
+---
+
+<article class="lesson" data-lesson-id={lesson.id}>
+  <header class="lesson-header">
+    <h1 class="lesson-title">{frontmatter.tieu_de}</h1>
+    <span class="subject-badge" data-subject={frontmatter.mon}>{lesson.subjectLabel}</span>
+    <span class="lesson-date">{formatVietnameseDate(frontmatter.ngay)}</span>
+  </header>
+
+  <section aria-labelledby="nhan-de-bai">
+    <h2 class="section-label" id="nhan-de-bai">✏️ Đề bài</h2>
+    <div class="lesson-blocks" set:html={lesson.deBaiHtml} />
+  </section>
+
+  {
+    lesson.loiGiaiHtml && (
+      <details class="solution" data-solution>
+        <summary>
+          <MascotKitten pose="goi-y" />
+          <span class="label-open">Xem lời giải</span>
+          <span class="label-close">Ẩn lời giải</span>
+        </summary>
+        <section aria-labelledby="nhan-loi-giai">
+          <h2 class="section-label section-label--solution" id="nhan-loi-giai">
+            🌟 Lời giải
+          </h2>
+          <div class="lesson-blocks" set:html={lesson.loiGiaiHtml} />
+        </section>
+      </details>
+    )
+  }
+
+  {
+    showNavigation && (
+      <nav class="lesson-nav" aria-label="Chuyển bài">
+        <a
+          class="comic-button comic-button--sky"
+          href={previousId ? `/bai/${previousId}/` : undefined}
+          aria-disabled={previousId ? undefined : 'true'}
+          data-nav="truoc"
+        >
+          ◀ Bài trước
+        </a>
+        <a class="comic-button" href="/cac-bai/">Tất cả bài</a>
+        <a
+          class="comic-button comic-button--sky"
+          href={nextId ? `/bai/${nextId}/` : undefined}
+          aria-disabled={nextId ? undefined : 'true'}
+          data-nav="sau"
+        >
+          Bài sau ▶
+        </a>
+      </nav>
+    )
+  }
+</article>

@@ -1,0 +1,25 @@
+---
+/** Chạm vào ảnh trong bài để xem to toàn màn hình; chạm bất kỳ đâu hoặc Esc để đóng. */
+---
+
+<dialog class="zoom-dialog" data-zoom-dialog aria-label="Ảnh phóng to">
+  <img alt="" data-zoom-image />
+  <button type="button" class="comic-button comic-button--sun zoom-close" data-zoom-close>Đóng ✕</button>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-zoom-dialog]');
+  const image = dialog?.querySelector<HTMLImageElement>('[data-zoom-image]');
+
+  document.addEventListener('click', (event) => {
+    if (!dialog || !image) return;
+    const trigger = (event.target as HTMLElement).closest<HTMLElement>('.zoomable');
+    if (trigger) {
+      image.src = trigger.dataset.zoomSrc ?? '';
+      image.alt = trigger.dataset.zoomAlt ?? '';
+      dialog.showModal();
+      return;
+    }
+    if (dialog.open && dialog.contains(event.target as Node)) dialog.close();
+  });
+</script>

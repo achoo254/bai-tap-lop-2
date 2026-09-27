@@ -1,0 +1,31 @@
+---
+import type { GetStaticPaths } from 'astro';
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import LessonView from '../../components/lesson-view.astro';
+import { loadLessonCatalog, type SiteLesson } from '../../lib/lesson-catalog';
+
+/**
+ * Link xem trước theo mã ngẫu nhiên của bài (cả nháp lẫn đã đăng) để phụ huynh duyệt
+ * trước khi đăng. Không có trang nào liên kết tới đây và trang được gắn noindex.
+ */
+export const getStaticPaths = (async () => {
+  const { all } = await loadLessonCatalog();
+  return all.map((lesson) => ({ params: { ma: lesson.frontmatter.ma_xem_truoc }, props: { lesson } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  lesson: SiteLesson;
+}
+const { lesson } = Astro.props;
+---
+
+<KidPageLayout title={`Xem trước: ${lesson.frontmatter.tieu_de}`} noindex>
+  {
+    lesson.frontmatter.nhap ? (
+      <p class="draft-banner">BẢN NHÁP — bé chưa nhìn thấy bài này. Nhờ AI "đăng bài" hoặc bấm Đăng ở trang Soạn bài.</p>
+    ) : (
+      <p class="draft-banner">Bài này đã được đăng.</p>
+    )
+  }
+  <LessonView lesson={lesson} showNavigation={false} />
+</KidPageLayout>
