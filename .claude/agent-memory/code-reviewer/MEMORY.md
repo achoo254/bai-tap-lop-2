@@ -1,0 +1,1 @@
+- [Review environment quirks](reference-review-environment.md) — node_modules blocked in Bash (use Grep), tsx probe via apps/editor, e2e port 4331

@@ -15,8 +15,7 @@
     "bindings": [{ "class_name": "LessonMcpAgent", "name": "MCP_OBJECT" }]
   },
   "kv_namespaces": [
-    // Điền id thật sau khi chạy: npx wrangler kv namespace create OAUTH_KV
-    { "binding": "OAUTH_KV", "id": "00000000000000000000000000000000" }
+    { "binding": "OAUTH_KV", "id": "d98670f7fb8e4e96aa20cfed3f04b7d3" }
   ],
   "vars": {
     "GITHUB_OWNER": "achoo254",
