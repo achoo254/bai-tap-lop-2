@@ -185,6 +185,12 @@ function checkTextLines(lines: SourceLine[], add: AddIssue): void {
       continue;
     }
     if (inFence || text.trim() === '') continue;
+    // Link chỉ được là http(s); ảnh chèn giữa câu chỉ được là https hoặc tên file trong bài.
+    for (const match of text.matchAll(/(!?)\[[^\]]*\]\(\s*<?([^)\s>]*)/g)) {
+      const href = match[2] ?? '';
+      const safe = match[1] ? /^https:\/\//i.test(href) || SAFE_FILE_NAME_PATTERN.test(href) : /^https?:\/\//i.test(href);
+      if (!safe) add('loi', 'link-khong-an-toan', `Link "${previewText(href)}" phải bắt đầu bằng https://.`, line);
+    }
     const cleaned = maskIgnoredSpans(text);
 
     const body = cleaned.replace(LEADING_MARKERS, '');

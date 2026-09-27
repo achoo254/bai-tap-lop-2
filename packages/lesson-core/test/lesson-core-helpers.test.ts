@@ -167,3 +167,42 @@ describe('prompt mẫu và tách câu trả lời AI', () => {
     expect(parseAiLessonReply('Tính nhẩm: 5 + 5.')).toMatchObject({ deBai: 'Tính nhẩm: 5 + 5.', loiGiai: '', tieuDe: null });
   });
 });
+
+describe('chống chèn mã độc qua Markdown', () => {
+  const options = {
+    resolveMediaUrl: (file: string) => `/media/bai/${file}`,
+    resolveIllustrationUrl: (code: string) => `/illustrations/${code}.svg`,
+  };
+  const render = (markdown: string) => {
+    const { lesson } = validateLessonSource(
+      serializeLesson({
+        frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'khac', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+        deBai: markdown,
+        loiGiai: '',
+      }),
+    );
+    return renderLessonBlocksToHtml(lesson!.deBai.blocks, options);
+  };
+
+  it('link javascript: chỉ hiện thành chữ, link https giữ nguyên', () => {
+    const html = render('Bé [bấm](javascript:alert(1)) hoặc [xem](https://vi.wikipedia.org).');
+    expect(html).not.toContain('javascript:');
+    expect(html).toContain('bấm');
+    expect(html).toContain('href="https://vi.wikipedia.org"');
+    expect(html).toContain('rel="noopener noreferrer"');
+  });
+
+  it('ảnh giữa câu chỉ nhận file trong bài hoặc https', () => {
+    expect(render('Hình ![mèo](meo.png) nè.')).toContain('src="/media/bai/meo.png"');
+    expect(render('Hình ![x](javascript:alert(1)) nè.')).not.toContain('javascript:');
+  });
+
+  it('validator chặn link không phải http(s)', () => {
+    const source = serializeLesson({
+      frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'khac', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+      deBai: 'Bé [bấm](javascript:alert(1)) nhé.',
+      loiGiai: '',
+    });
+    expect(validateLessonSource(source).errors.map((issue) => issue.code)).toContain('link-khong-an-toan');
+  });
+});

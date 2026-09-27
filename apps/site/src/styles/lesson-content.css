@@ -161,3 +161,19 @@
   aspect-ratio: 1;
   user-select: none;
 }
+
+/* Phép đặt tính theo cột (khối ``` trong bài): giữ nguyên khoảng trắng, chữ số đều nhau để thẳng hàng. */
+.lesson-text pre {
+  white-space: pre;
+  overflow-x: auto;
+  /* Font đơn cách để chữ số và dấu +, – thẳng cột như khi đặt tính trong vở. */
+  font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+  font-weight: 700;
+  line-height: calc(var(--oli) * 5);
+  display: inline-block;
+  margin: 0 calc(var(--oli) * 6) var(--oli) 0;
+}
+.lesson-text pre code {
+  background: none;
+  padding: 0;
+}

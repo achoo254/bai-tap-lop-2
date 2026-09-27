@@ -1,5 +1,5 @@
 import { Marked } from 'marked';
-import { ILLUSTRATION_CATALOG, isIllustrationName } from '../illustration-catalog';
+import { ILLUSTRATION_CATALOG, isIllustrationName, MAX_ILLUSTRATION_COUNT } from '../illustration-catalog';
 import type { LessonBlock } from '../lesson-markdown-parser';
 
 /**
@@ -13,22 +13,41 @@ export interface LessonRenderOptions {
   resolveIllustrationUrl: (openmojiCode: string) => string;
 }
 
-// HTML thô trong Markdown bị hiển thị thành chữ, không được chèn vào trang.
-const markdown = new Marked({
-  gfm: true,
-  breaks: true,
-  renderer: {
-    html({ text }) {
-      return escapeHtml(text);
-    },
-  },
-});
-
-export function renderLessonBlocksToHtml(blocks: LessonBlock[], options: LessonRenderOptions): string {
-  return blocks.map((block) => renderBlock(block, options)).join('\n');
+/** Link chỉ được trỏ tới trang web thường; mọi scheme khác (javascript:, data:...) hiện thành chữ. */
+export function isSafeLinkHref(href: string): boolean {
+  return /^https?:\/\//i.test(href.trim());
 }
 
-function renderBlock(block: LessonBlock, options: LessonRenderOptions): string {
+/** Tạo bộ chuyển Markdown cho một lần render: chặn HTML thô, link nguy hiểm và ảnh chèn giữa câu. */
+function createMarkdown(options: LessonRenderOptions): Marked {
+  return new Marked({
+    gfm: true,
+    breaks: true,
+    renderer: {
+      html({ text }) {
+        return escapeHtml(text);
+      },
+      link({ href, tokens }) {
+        const text = this.parser.parseInline(tokens);
+        if (!isSafeLinkHref(href)) return text;
+        return `<a href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+      },
+      image({ href, text }) {
+        // Ảnh chèn giữa đoạn chữ: chỉ nhận file trong bài hoặc link https; còn lại hiện mô tả.
+        const src = /^https:\/\//i.test(href) ? href : /^[\p{L}\p{N}][\p{L}\p{N}._-]*$/u.test(href) ? options.resolveMediaUrl(href) : '';
+        if (!src) return escapeHtml(text);
+        return `<img class="lesson-inline-image" src="${escapeAttribute(src)}" alt="${escapeAttribute(text)}" loading="lazy">`;
+      },
+    },
+  });
+}
+
+export function renderLessonBlocksToHtml(blocks: LessonBlock[], options: LessonRenderOptions): string {
+  const markdown = createMarkdown(options);
+  return blocks.map((block) => renderBlock(block, options, markdown)).join('\n');
+}
+
+function renderBlock(block: LessonBlock, options: LessonRenderOptions, markdown: Marked): string {
   switch (block.kind) {
     case 'text':
       return `<div class="lesson-text">${markdown.parse(block.markdown, { async: false })}</div>`;
@@ -59,7 +78,7 @@ function renderBlock(block: LessonBlock, options: LessonRenderOptions): string {
         `</div></figure>`
       );
     case 'illustration': {
-      if (!isIllustrationName(block.name) || !Number.isInteger(block.count) || block.count < 1) return '';
+      if (!isIllustrationName(block.name) || !Number.isInteger(block.count) || block.count < 1 || block.count > MAX_ILLUSTRATION_COUNT) return '';
       const entry = ILLUSTRATION_CATALOG[block.name];
       const url = escapeAttribute(options.resolveIllustrationUrl(entry.openmoji));
       const items = Array.from(
