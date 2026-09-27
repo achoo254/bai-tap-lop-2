@@ -7,6 +7,10 @@ export default tseslint.config(
     // ESLint luôn bỏ qua thư mục cài gói; chỉ cần liệt kê output build và nội dung bài.
     ignores: [
       '**/dist/**',
+      '**/dist-ui/**',
+      'apps/site/public/**',
+      '**/test-results/**',
+      '**/playwright-report/**',
       '**/.astro/**',
       '**/.wrangler/**',
       '**/worker-configuration.d.ts',

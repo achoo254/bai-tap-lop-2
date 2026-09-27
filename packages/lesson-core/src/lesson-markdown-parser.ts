@@ -75,7 +75,7 @@ function sectionKeyFromHeading(headingText: string): LessonSectionKey | null {
 
 /** Tách frontmatter và hai phần của bài. Không ném lỗi; lỗi được trả về để validator báo. */
 export function splitLessonSource(source: string): SplitLessonSource {
-  const lines = source.replace(/^﻿/, '').replace(/\r\n?/g, '\n').split('\n');
+  const lines = source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n');
   const result: SplitLessonSource = {
     rawFrontmatter: undefined,
     sections: {},

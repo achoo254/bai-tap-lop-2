@@ -128,3 +128,42 @@ describe('render HTML', () => {
     expect(html).toContain('aria-label="3 ngôi sao"');
   });
 });
+
+describe('prompt mẫu và tách câu trả lời AI', () => {
+  it('prompt có danh sách hình minh hoạ', async () => {
+    const { buildLessonAuthoringPrompt } = await import('../src/index');
+    const prompt = buildLessonAuthoringPrompt('bảng nhân 2');
+    expect(prompt).toContain('bảng nhân 2');
+    expect(prompt).toContain('tao (quả táo)');
+  });
+
+  it('tách tiêu đề, môn và hai phần', async () => {
+    const { parseAiLessonReply } = await import('../src/index');
+    const reply = [
+      'Dưới đây là bài tập:',
+      '```markdown',
+      '**TIÊU ĐỀ:** Bảng nhân 2',
+      'MÔN: toán',
+      '',
+      '## Đề bài',
+      '',
+      'Tính: 2 x 3 = ?',
+      '',
+      '## Lời giải',
+      '',
+      '2 x 3 = 6.',
+      '```',
+    ].join('\n');
+    expect(parseAiLessonReply(reply)).toEqual({
+      tieuDe: 'Bảng nhân 2',
+      mon: 'toan',
+      deBai: 'Tính: 2 x 3 = ?',
+      loiGiai: '2 x 3 = 6.',
+    });
+  });
+
+  it('không có tiêu đề phần thì coi toàn bộ là đề bài', async () => {
+    const { parseAiLessonReply } = await import('../src/index');
+    expect(parseAiLessonReply('Tính nhẩm: 5 + 5.')).toMatchObject({ deBai: 'Tính nhẩm: 5 + 5.', loiGiai: '', tieuDe: null });
+  });
+});

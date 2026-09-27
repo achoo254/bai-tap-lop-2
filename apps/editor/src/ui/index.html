@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/illustrations/270F.svg" type="image/svg+xml" />
+    <title>Soạn bài · Góc học tập của bé</title>
+  </head>
+  <body>
+    <header class="editor-top">
+      <h1>✏️ Soạn bài cho bé</h1>
+      <div class="editor-top__actions">
+        <span class="sync-state" data-sync-state>Đang kiểm tra kết nối…</span>
+        <button type="button" class="btn" data-action="bai-moi">＋ Bài mới</button>
+      </div>
+    </header>
+
+    <main class="editor-layout">
+      <section class="editor-panel" aria-label="Soạn nội dung">
+        <details class="helper-box" data-ai-helper>
+          <summary>🤖 Nhờ AI soạn bài (ChatGPT / Claude)</summary>
+          <ol>
+            <li>
+              Nhập chủ đề rồi bấm <b>Sao chép prompt mẫu</b>, dán vào ChatGPT hoặc Claude.
+              <div class="row">
+                <input type="text" data-prompt-topic placeholder="vd. bảng nhân 2, điền vần an/ang" />
+                <button type="button" class="btn" data-action="sao-chep-prompt">Sao chép prompt mẫu</button>
+              </div>
+            </li>
+            <li>
+              Dán toàn bộ câu trả lời của AI vào đây rồi bấm <b>Điền vào bài</b>.
+              <textarea data-ai-reply rows="5" placeholder="Dán câu trả lời của AI…"></textarea>
+              <button type="button" class="btn" data-action="dien-tu-ai">Điền vào bài</button>
+            </li>
+          </ol>
+        </details>
+
+        <form class="lesson-form" data-lesson-form autocomplete="off">
+          <label class="field field--wide">
+            <span>Tiêu đề</span>
+            <input name="tieu_de" required maxlength="120" placeholder="vd. Cộng có nhớ trong phạm vi 100" />
+          </label>
+          <label class="field">
+            <span>Ngày học</span>
+            <input name="ngay" type="date" required />
+          </label>
+          <label class="field">
+            <span>Môn</span>
+            <select name="mon">
+              <option value="toan">Toán</option>
+              <option value="tieng-viet">Tiếng Việt</option>
+              <option value="khac">Khác</option>
+            </select>
+          </label>
+
+          <div class="insert-toolbar" role="toolbar" aria-label="Chèn vào bài">
+            <span class="insert-toolbar__hint">Chèn vào ô đang chọn:</span>
+            <button type="button" class="btn btn--small" data-action="chon-file">🖼️ Ảnh / Video</button>
+            <button type="button" class="btn btn--small" data-action="mo-youtube">▶️ YouTube</button>
+            <button type="button" class="btn btn--small" data-action="mo-minh-hoa">🍎 Hình đếm</button>
+            <input type="file" data-file-input accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" multiple hidden />
+          </div>
+          <div class="insert-popover" data-popover="youtube" hidden>
+            <input type="url" data-youtube-url placeholder="Dán link YouTube…" />
+            <button type="button" class="btn btn--small" data-action="chen-youtube">Chèn</button>
+          </div>
+          <div class="insert-popover" data-popover="minh-hoa" hidden>
+            <select data-illustration-name></select>
+            <input type="number" data-illustration-count min="1" max="20" value="5" aria-label="Số lượng" />
+            <button type="button" class="btn btn--small" data-action="chen-minh-hoa">Chèn</button>
+          </div>
+
+          <label class="field field--wide">
+            <span>Đề bài</span>
+            <textarea name="deBai" rows="12" data-markdown-input placeholder="Viết đề bài ở đây. Kéo thả ảnh/video vào ô này."></textarea>
+          </label>
+          <label class="field field--wide">
+            <span>Lời giải <small>(bé bấm nút mới thấy)</small></span>
+            <textarea name="loiGiai" rows="8" data-markdown-input placeholder="Viết lời giải ở đây."></textarea>
+          </label>
+          <ul class="file-chips" data-file-chips aria-label="File đính kèm"></ul>
+        </form>
+
+        <details class="helper-box" data-lesson-list-box>
+          <summary>📚 Bài đã có</summary>
+          <ul class="lesson-list" data-lesson-list></ul>
+        </details>
+      </section>
+
+      <section class="preview-panel" aria-label="Xem trước">
+        <h2 class="preview-panel__title">👀 Bé sẽ thấy như thế này</h2>
+        <div class="preview-sheet">
+          <h3 class="preview-lesson-title" data-preview-title></h3>
+          <p class="preview-label">✏️ Đề bài</p>
+          <div class="lesson-blocks" data-preview-de-bai></div>
+          <p class="preview-label preview-label--solution">🌟 Lời giải</p>
+          <div class="lesson-blocks" data-preview-loi-giai></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="action-bar">
+      <div class="validation" data-validation aria-live="polite"></div>
+      <div class="action-bar__buttons">
+        <button type="button" class="btn" data-action="sua-tu-dong">🪄 Sửa tự động</button>
+        <button type="button" class="btn" data-action="luu-nhap">💾 Lưu nháp</button>
+        <button type="button" class="btn btn--primary" data-action="luu-dang">🚀 Lưu &amp; đăng</button>
+      </div>
+      <p class="save-result" data-save-result aria-live="polite"></p>
+    </footer>
+
+    <div class="drop-overlay" data-drop-overlay hidden>Thả ảnh / video vào đây</div>
+    <script type="module" src="./editor-page.ts"></script>
+  </body>
+</html>
