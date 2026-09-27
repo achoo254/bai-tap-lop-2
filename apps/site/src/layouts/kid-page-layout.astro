@@ -40,7 +40,8 @@ const handwritingAvailable = hasHandwritingFont();
       try {
         const root = document.documentElement;
         const font = localStorage.getItem('kieu-chu');
-        if (handwritingAvailable && font === 'viet-tay') root.dataset.font = 'viet-tay';
+        // Có font chữ mẫu tiểu học thì mặc định hiện chữ viết tay, trừ khi bé đã chọn "Chữ in".
+        if (handwritingAvailable && font !== 'in') root.dataset.font = 'viet-tay';
         const size = Number(localStorage.getItem('co-chu'));
         if (size >= 24 && size <= 60) root.style.setProperty('--text-size', size + 'px');
       } catch (_error) {

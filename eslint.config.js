@@ -8,6 +8,7 @@ export default tseslint.config(
     ignores: [
       '**/dist/**',
       '**/dist-ui/**',
+      '**/dist-e2e/**',
       'apps/site/public/**',
       '**/test-results/**',
       '**/playwright-report/**',

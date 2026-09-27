@@ -17,7 +17,8 @@ export default defineConfig({
     { name: 'laptop', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 1024 } } },
   ],
   webServer: {
-    command: `pnpm build && pnpm exec astro preview --port ${port} --host 127.0.0.1`,
+    // Build vào thư mục riêng để không đè lên dist/ (bản thật dùng khi deploy).
+    command: `pnpm sync-media && pnpm exec astro build --outDir dist-e2e && pnpm exec astro preview --outDir dist-e2e --port ${port} --host 127.0.0.1`,
     url: `http://127.0.0.1:${port}/`,
     env: { CONTENT_DIR: 'tests/fixtures/content' },
     reuseExistingServer: false,

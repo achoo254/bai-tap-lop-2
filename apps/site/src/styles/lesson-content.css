@@ -2,10 +2,19 @@
  * Kiểu hiển thị nội dung bài (chữ trên vở ô li, ảnh, video, hình minh hoạ).
  * Dùng chung cho web của bé và khung xem trước ở trang Soạn bài.
  */
+/* Font chữ mẫu tiểu học: bản thường (400) và bản nét thanh nét đậm (700). */
 @font-face {
   font-family: 'Chu Mau Tieu Hoc';
+  font-weight: 400;
   src: url('/fonts/chu-mau-tieu-hoc.woff2') format('woff2'),
     url('/fonts/chu-mau-tieu-hoc.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Chu Mau Tieu Hoc';
+  font-weight: 700;
+  src: url('/fonts/chu-mau-tieu-hoc-dam.woff2') format('woff2'),
+    url('/fonts/chu-mau-tieu-hoc-dam.ttf') format('truetype');
   font-display: swap;
 }
 
@@ -45,6 +54,7 @@
 :root[data-font='viet-tay'] .lesson-text {
   font-family: var(--font-handwriting);
   font-size: calc(var(--text-size) * 1.15);
+  font-weight: 700;
 }
 
 .lesson-text p,
