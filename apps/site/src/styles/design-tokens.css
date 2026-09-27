@@ -52,7 +52,7 @@
   --font-handwriting: 'Chu Mau Tieu Hoc', 'Andika', cursive;
   --font-ui: 'Andika', 'Segoe UI', system-ui, sans-serif;
   /* Cỡ chữ bài tập; nút A−/A+ đổi giá trị này. */
-  --text-size: 34px;
+  --text-size: 44px;
   /* Một ô li = 1/4 cỡ chữ, dòng chữ cao 2 dòng kẻ (8 ô li) để dấu tiếng Việt không bị chạm. */
   --oli: calc(var(--text-size) / 4);
   --line-height-notebook: calc(var(--oli) * 8);

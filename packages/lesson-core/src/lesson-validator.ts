@@ -134,6 +134,21 @@ function checkBlock(
       return;
     case 'youtube':
       return;
+    case 'column-arithmetic':
+      for (const item of block.items) {
+        const numbers = [item.first, item.second, ...(item.result === null ? [] : [item.result])];
+        if (!numbers.every((value) => /^\d{1,5}$/.test(value)) || !['+', '–'].includes(item.operator)) {
+          add('loi', 'dat-tinh-sai', `Phép đặt tính chưa đúng cú pháp: ${item.raw} (vd. ::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}).`, item.line);
+          continue;
+        }
+        if (item.result !== null) {
+          const expected = item.operator === '+' ? Number(item.first) + Number(item.second) : Number(item.first) - Number(item.second);
+          if (Number(item.result) !== expected) {
+            add('loi', 'dat-tinh-sai-ket-qua', `Kết quả sai: ${item.first} ${item.operator} ${item.second} = ${expected}, không phải ${item.result}.`, item.line);
+          }
+        }
+      }
+      return;
   }
 }
 

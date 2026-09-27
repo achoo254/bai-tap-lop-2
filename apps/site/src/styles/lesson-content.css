@@ -24,10 +24,24 @@
   gap: var(--space-5);
 }
 
-/* Đoạn chữ trên nền vở ô li: dòng mảnh mỗi ô li, dòng đậm mỗi 4 ô li, lề đỏ bên trái. */
+/*
+ * Đoạn chữ trên nền vở ô li: dòng mảnh mỗi ô li, dòng đậm mỗi 4 ô li, lề đỏ bên trái.
+ * Canh chữ như vở tập viết: chữ thường cao đúng 2 ô li, chân chữ nằm trên dòng kẻ đậm.
+ * Mỗi font khai báo 2 tỉ lệ đo bằng trình duyệt (theo cỡ chữ):
+ *   --x-ratio        chiều cao chữ "x"
+ *   --baseline-ratio độ lệch chân chữ so với giữa dòng
+ */
 .lesson-text {
+  --x-ratio: 0.5;
+  --baseline-ratio: 0.41;
+  --notebook-font-size: calc(var(--oli) * 2 / var(--x-ratio));
+  --notebook-pad-top: calc(var(--oli) * 2);
+  /* Vị trí chân chữ dòng đầu, tính từ mép trên (trừ 1px để dòng kẻ đậm 2px nằm giữa chân chữ). */
+  --notebook-baseline: calc(
+    var(--notebook-pad-top) + var(--line-height-notebook) / 2 + var(--notebook-font-size) * var(--baseline-ratio) - 1px
+  );
   font-family: var(--font-print);
-  font-size: var(--text-size);
+  font-size: var(--notebook-font-size);
   line-height: var(--line-height-notebook);
   color: var(--color-ink);
   background-color: var(--color-notebook-bg);
@@ -42,18 +56,19 @@
     100% var(--oli),
     calc(var(--oli) * 4) 100%;
   background-repeat: no-repeat, repeat, repeat, repeat;
-  /* Dịch lưới để chân chữ ngồi gần dòng kẻ đậm. */
-  background-position: 0 0, 0 calc(var(--oli) * -0.35), 0 calc(var(--oli) * -0.35), 0 0;
+  background-position: 0 0, 0 var(--notebook-baseline), 0 var(--notebook-baseline), 0 0;
   border: var(--border-comic);
   border-radius: var(--radius-md);
-  padding: calc(var(--oli) * 2) calc(var(--oli) * 3) calc(var(--oli) * 2) calc(var(--oli) * 7);
+  padding: var(--notebook-pad-top) calc(var(--oli) * 3) calc(var(--oli) * 2) calc(var(--oli) * 7);
   box-shadow: var(--shadow-comic-small);
   overflow-wrap: anywhere;
 }
 
+/* Font chữ mẫu tiểu học HP001: chữ thường 0,41 cỡ chữ, chữ cao/chữ hoa gấp 2,5 lần (5 ô li). */
 :root[data-font='viet-tay'] .lesson-text {
+  --x-ratio: 0.41;
+  --baseline-ratio: 0.2;
   font-family: var(--font-handwriting);
-  font-size: calc(var(--text-size) * 1.15);
   font-weight: 700;
 }
 
@@ -179,11 +194,46 @@
   /* Font đơn cách để chữ số và dấu +, – thẳng cột như khi đặt tính trong vở. */
   font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
   font-weight: 700;
-  line-height: calc(var(--oli) * 5);
+  font-size: var(--text-size);
+  /* Mỗi dòng phép tính cao 4 ô li để khối 4 dòng vẫn khớp lưới vở. */
+  line-height: calc(var(--oli) * 4);
   display: inline-block;
-  margin: 0 calc(var(--oli) * 6) var(--oli) 0;
+  vertical-align: top;
+  margin: 0 calc(var(--oli) * 6) 0 0;
 }
 .lesson-text pre code {
   background: none;
   padding: 0;
+}
+
+/*
+ * Đặt tính theo cột (::dat-tinh), nằm trong trang vở cùng đoạn chữ. Mỗi hàng số chiếm đúng một dòng
+ * như chữ thường nên chân số tự nằm trên dòng kẻ đậm; khối luôn cao 3 dòng để phần sau vẫn khớp lưới.
+ * Dấu phép tính đứng cạnh số thứ hai, gạch ngang dưới số thứ hai.
+ */
+.lesson-dat-tinh {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: calc(var(--oli) * 12);
+}
+.dat-tinh {
+  display: grid;
+  grid-template-columns: auto auto;
+  font-variant-numeric: tabular-nums;
+}
+.dat-tinh__op {
+  grid-column: 1;
+  grid-row: 2;
+  /* Khoảng cách nằm trong ô dấu để gạch ngang liền một nét từ dấu tới số. */
+  padding-right: calc(var(--oli) * 1.5);
+}
+.dat-tinh__so {
+  grid-column: 2;
+  text-align: right;
+  min-height: var(--line-height-notebook);
+}
+.dat-tinh__op,
+.dat-tinh__so--gach {
+  /* Gạch ngang bằng bóng trong để không làm cao hàng, giữ chân số đúng dòng kẻ. */
+  box-shadow: inset 0 -3px 0 var(--color-ink);
 }

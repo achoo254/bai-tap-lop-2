@@ -33,7 +33,19 @@ export type LessonBlock =
   | { kind: 'image'; line: number; src: string; alt: string }
   | { kind: 'video'; line: number; src: string; alt: string }
   | { kind: 'youtube'; line: number; videoId: string; url: string }
-  | { kind: 'illustration'; line: number; name: string; count: number; raw: string };
+  | { kind: 'illustration'; line: number; name: string; count: number; raw: string }
+  | { kind: 'column-arithmetic'; line: number; items: ColumnArithmetic[] };
+
+/** Một phép đặt tính theo cột: `::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}`. */
+export interface ColumnArithmetic {
+  line: number;
+  first: string;
+  operator: string;
+  second: string;
+  /** Bỏ trống ở đề bài để bé tự điền. */
+  result: string | null;
+  raw: string;
+}
 
 export interface LessonSection {
   key: LessonSectionKey;
@@ -57,6 +69,7 @@ const MEDIA_LINE_PATTERN = /^!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\
 const YOUTUBE_LINE_PATTERN =
   /^https?:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:\S*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})\S*$/;
 const ILLUSTRATION_LINE_PATTERN = /^::hinh\{(.*)\}$/;
+const COLUMN_ARITHMETIC_LINE_PATTERN = /^::dat-tinh\{(.*)\}$/;
 const ATTRIBUTE_PATTERN = /([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"']+))/g;
 const FENCE_PATTERN = /^(```|~~~)/;
 const SECTION_HEADING_PATTERN = /^##\s+(.+?)\s*#*\s*$/;
@@ -157,6 +170,19 @@ export function parseLessonBlocks(body: SourceLine[]): LessonBlock[] {
   for (const sourceLine of body) {
     const trimmed = sourceLine.text.trim();
     if (FENCE_PATTERN.test(trimmed)) inFence = !inFence;
+    const arithmetic = inFence ? null : parseColumnArithmetic(trimmed, sourceLine.line);
+    if (arithmetic) {
+      const previous = blocks.at(-1);
+      const onlyBlankBetween = paragraph.every((line) => line.text.trim() === '');
+      if (previous?.kind === 'column-arithmetic' && onlyBlankBetween) {
+        previous.items.push(arithmetic);
+        paragraph = [];
+      } else {
+        flushParagraph();
+        blocks.push({ kind: 'column-arithmetic', line: sourceLine.line, items: [arithmetic] });
+      }
+      continue;
+    }
     const special = inFence ? null : parseSpecialLine(trimmed, sourceLine.line);
     if (special) {
       flushParagraph();
@@ -194,6 +220,21 @@ function parseSpecialLine(trimmed: string, line: number): LessonBlock | null {
     };
   }
   return null;
+}
+
+function parseColumnArithmetic(trimmed: string, line: number): ColumnArithmetic | null {
+  const match = COLUMN_ARITHMETIC_LINE_PATTERN.exec(trimmed);
+  if (!match) return null;
+  const attributes = parseAttributes(match[1] ?? '');
+  const result = attributes['ket-qua'] ?? '';
+  return {
+    line,
+    first: attributes['so-1'] ?? '',
+    operator: (attributes['phep'] ?? '').replace('-', '–'),
+    second: attributes['so-2'] ?? '',
+    result: result === '' ? null : result,
+    raw: trimmed,
+  };
 }
 
 function parseAttributes(text: string): Record<string, string> {

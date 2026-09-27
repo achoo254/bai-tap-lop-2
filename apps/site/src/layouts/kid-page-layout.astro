@@ -44,7 +44,7 @@ const handwritingAvailable = hasHandwritingFont();
         // Có font chữ mẫu tiểu học thì mặc định hiện chữ viết tay, trừ khi bé đã chọn "Chữ in".
         if (handwritingAvailable && font !== 'in') root.dataset.font = 'viet-tay';
         const size = Number(localStorage.getItem('co-chu'));
-        if (size >= 24 && size <= 60) root.style.setProperty('--text-size', size + 'px');
+        if (size >= 36 && size <= 68) root.style.setProperty('--text-size', size + 'px');
       } catch (_error) {
         // Trình duyệt chặn bộ nhớ: dùng mặc định.
       }

@@ -14,6 +14,7 @@ export const LESSON_FORMAT_GUIDE = [
   'Ảnh hoặc video (mp4) đứng riêng một dòng: ![mô tả](ten-file.jpg).',
   'Video YouTube: dán link đứng riêng một dòng.',
   `Hình minh hoạ đếm được: dòng riêng ::hinh{loai=<tên> so-luong=<1-${MAX_ILLUSTRATION_COUNT}>}, vd. ::hinh{loai=tao so-luong=5}.`,
+  'Đặt tính theo cột (cộng/trừ): mỗi phép một dòng riêng ::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}; ở Đề bài bỏ ket-qua để bé tự tính.',
 ].join('\n');
 
 export function illustrationListText(): string {

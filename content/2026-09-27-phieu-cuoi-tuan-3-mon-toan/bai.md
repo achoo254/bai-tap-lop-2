@@ -77,33 +77,10 @@ c) Tổng của số bé nhất có hai chữ số và số lớn nhất có m�
 
 ### Bài 2:
 
-```
-  45
-+ 54
-────
-  99
-```
-
-```
-  36
-+ 43
-────
-  79
-```
-
-```
-  72
-– 11
-────
-  61
-```
-
-```
-  84
-– 31
-────
-  53
-```
+::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}
+::dat-tinh{so-1=36 phep=+ so-2=43 ket-qua=79}
+::dat-tinh{so-1=72 phep=- so-2=11 ket-qua=61}
+::dat-tinh{so-1=84 phep=- so-2=31 ket-qua=53}
 
 ### Bài 3:
 

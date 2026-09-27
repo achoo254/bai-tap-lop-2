@@ -216,3 +216,35 @@ describe('hồ sơ của bé', () => {
     expect(buildLessonAuthoringPrompt()).toContain('bé Miu');
   });
 });
+
+describe('đặt tính theo cột', () => {
+  const options = {
+    resolveMediaUrl: (file: string) => file,
+    resolveIllustrationUrl: (code: string) => code,
+  };
+  const parse = (deBai: string) =>
+    validateLessonSource(
+      serializeLesson({
+        frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'toan', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+        deBai,
+        loiGiai: '',
+      }),
+    );
+
+  it('gom các phép liền nhau thành một hàng và render đúng', () => {
+    const result = parse('::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}\n\n::dat-tinh{so-1=72 phep=- so-2=11}');
+    expect(result.errors).toEqual([]);
+    const blocks = result.lesson!.deBai.blocks;
+    expect(blocks).toHaveLength(1);
+    const html = renderLessonBlocksToHtml(blocks, options);
+    expect(html.match(/class="dat-tinh"/g)).toHaveLength(2);
+    expect(html).toContain('aria-label="45 cộng 54 bằng 99"');
+    expect(html).toContain('aria-label="72 trừ 11"');
+    expect(html).toContain('>–</span>');
+  });
+
+  it('báo lỗi cú pháp và kết quả sai', () => {
+    expect(parse('::dat-tinh{so-1=45 phep=x so-2=54}').errors.map((e) => e.code)).toContain('dat-tinh-sai');
+    expect(parse('::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=98}').errors.map((e) => e.code)).toContain('dat-tinh-sai-ket-qua');
+  });
+});

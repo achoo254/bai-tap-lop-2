@@ -1,6 +1,6 @@
 import { Marked } from 'marked';
 import { ILLUSTRATION_CATALOG, isIllustrationName, MAX_ILLUSTRATION_COUNT } from '../illustration-catalog';
-import type { LessonBlock } from '../lesson-markdown-parser';
+import type { ColumnArithmetic, LessonBlock } from '../lesson-markdown-parser';
 
 /**
  * Render các khối của một phần bài ra HTML. Dùng chung cho web của bé và khung xem trước
@@ -44,7 +44,41 @@ function createMarkdown(options: LessonRenderOptions): Marked {
 
 export function renderLessonBlocksToHtml(blocks: LessonBlock[], options: LessonRenderOptions): string {
   const markdown = createMarkdown(options);
-  return blocks.map((block) => renderBlock(block, options, markdown)).join('\n');
+  // Đoạn chữ và phép đặt tính liền nhau nằm chung một trang vở để dòng kẻ liền mạch.
+  const parts: string[] = [];
+  let notebook: string[] = [];
+  const closeNotebook = () => {
+    if (notebook.length) parts.push(`<div class="lesson-text">${notebook.join('')}</div>`);
+    notebook = [];
+  };
+  for (const block of blocks) {
+    if (block.kind === 'text') notebook.push(markdown.parse(block.markdown, { async: false }));
+    else if (block.kind === 'column-arithmetic') notebook.push(renderColumnArithmetic(block.items));
+    else {
+      closeNotebook();
+      parts.push(renderBlock(block, options, markdown));
+    }
+  }
+  closeNotebook();
+  return parts.join('\n');
+}
+
+function renderColumnArithmetic(items: ColumnArithmetic[]): string {
+  const html = items
+    .map((item) => {
+      const operatorName = item.operator === '+' ? 'cộng' : 'trừ';
+      const label = `${item.first} ${operatorName} ${item.second}${item.result === null ? '' : ` bằng ${item.result}`}`;
+      return (
+        `<div class="dat-tinh" role="img" aria-label="${escapeAttribute(label)}">` +
+        `<span class="dat-tinh__op" aria-hidden="true">${escapeHtml(item.operator)}</span>` +
+        `<span class="dat-tinh__so" aria-hidden="true">${escapeHtml(item.first)}</span>` +
+        `<span class="dat-tinh__so dat-tinh__so--gach" aria-hidden="true">${escapeHtml(item.second)}</span>` +
+        `<span class="dat-tinh__so" aria-hidden="true">${escapeHtml(item.result ?? '')}</span>` +
+        `</div>`
+      );
+    })
+    .join('');
+  return `<div class="lesson-dat-tinh">${html}</div>`;
 }
 
 function renderBlock(block: LessonBlock, options: LessonRenderOptions, markdown: Marked): string {
@@ -77,6 +111,8 @@ function renderBlock(block: LessonBlock, options: LessonRenderOptions, markdown:
         `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>` +
         `</div></figure>`
       );
+    case 'column-arithmetic':
+      return `<div class="lesson-text">${renderColumnArithmetic(block.items)}</div>`;
     case 'illustration': {
       if (!isIllustrationName(block.name) || !Number.isInteger(block.count) || block.count < 1 || block.count > MAX_ILLUSTRATION_COUNT) return '';
       const entry = ILLUSTRATION_CATALOG[block.name];
