@@ -49,7 +49,7 @@
 
   /* Chữ */
   --font-print: 'Andika', 'Segoe UI', system-ui, sans-serif;
-  --font-handwriting: 'Chu Mau Tieu Hoc', 'Dancing Script', 'Andika', cursive;
+  --font-handwriting: 'Chu Mau Tieu Hoc', 'Andika', cursive;
   --font-ui: 'Andika', 'Segoe UI', system-ui, sans-serif;
   /* Cỡ chữ bài tập; nút A−/A+ đổi giá trị này. */
   --text-size: 34px;

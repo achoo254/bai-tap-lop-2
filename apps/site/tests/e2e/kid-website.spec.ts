@@ -46,15 +46,10 @@ test.describe('trang bài', () => {
     await expect(illustration.locator('img')).toHaveCount(5);
   });
 
-  test('chuyển font viết tay và nhớ sau khi tải lại', async ({ page }) => {
+  test('chưa có font chữ mẫu tiểu học thì ẩn nút chữ viết tay và bỏ qua lựa chọn cũ', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('kieu-chu', 'viet-tay'));
     await page.goto('/bai/2026-09-26-dien-van-an-ang/');
-    const toggle = page.locator('[data-font-toggle]');
-    await toggle.click();
-    await expect(page.locator('html')).toHaveAttribute('data-font', 'viet-tay');
-    await page.reload();
-    await expect(page.locator('html')).toHaveAttribute('data-font', 'viet-tay');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await toggle.click();
+    await expect(page.locator('[data-font-toggle]')).toHaveCount(0);
     await expect(page.locator('html')).not.toHaveAttribute('data-font', 'viet-tay');
   });
 

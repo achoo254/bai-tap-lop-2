@@ -1,11 +1,22 @@
 ---
-/** Nút chuyển Chữ in / Chữ viết tay và nút A− / A+ đổi cỡ chữ. Lựa chọn được nhớ trên máy. */
+/**
+ * Nút chuyển Chữ in / Chữ viết tay và nút A− / A+ đổi cỡ chữ. Lựa chọn được nhớ trên máy.
+ * Nút chữ viết tay chỉ hiện khi đã có font chữ mẫu tiểu học.
+ */
+interface Props {
+  showFontToggle: boolean;
+}
+const { showFontToggle } = Astro.props;
 ---
 
 <div class="toolbar" role="toolbar" aria-label="Cách hiển thị chữ">
-  <button type="button" class="comic-button" data-font-toggle aria-pressed="false">
-    <span data-font-label>Chữ viết tay</span>
-  </button>
+  {
+    showFontToggle && (
+      <button type="button" class="comic-button" data-font-toggle aria-pressed="false">
+        <span data-font-label>Chữ viết tay</span>
+      </button>
+    )
+  }
   <button type="button" class="comic-button comic-button--small" data-size-step="-1" aria-label="Chữ nhỏ hơn">A−</button>
   <button type="button" class="comic-button comic-button--small" data-size-step="1" aria-label="Chữ to hơn">A+</button>
 </div>

@@ -1,6 +1,5 @@
 import '@fontsource/andika/400.css';
 import '@fontsource/andika/700.css';
-import '@fontsource/dancing-script/400.css';
 import '../../../site/src/styles/design-tokens.css';
 import '../../../site/src/styles/lesson-content.css';
 import './editor.css';

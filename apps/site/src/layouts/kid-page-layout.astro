@@ -1,7 +1,6 @@
 ---
 import '@fontsource/andika/400.css';
 import '@fontsource/andika/700.css';
-import '@fontsource/dancing-script/400.css';
 import '../styles/design-tokens.css';
 import '../styles/lesson-content.css';
 import '../styles/global.css';
@@ -9,6 +8,7 @@ import MascotKitten from '../components/mascot-kitten.astro';
 import ReadingPreferencesToolbar from '../components/reading-preferences-toolbar.astro';
 import ImageZoomDialog from '../components/image-zoom-dialog.astro';
 import PwaInstallButton from '../components/pwa-install-button.astro';
+import { hasHandwritingFont } from '../lib/handwriting-font';
 
 interface Props {
   title: string;
@@ -17,6 +17,7 @@ interface Props {
   showToolbar?: boolean;
 }
 const { title, noindex = false, showToolbar = true } = Astro.props;
+const handwritingAvailable = hasHandwritingFont();
 ---
 
 <!doctype html>
@@ -34,12 +35,12 @@ const { title, noindex = false, showToolbar = true } = Astro.props;
     <meta name="apple-mobile-web-app-title" content="Học bài" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>{title} · Góc học tập của bé</title>
-    <script is:inline>
+    <script is:inline define:vars={{ handwritingAvailable }}>
       // Áp dụng kiểu chữ và cỡ chữ đã chọn trước khi vẽ trang để không bị nháy.
       try {
         const root = document.documentElement;
         const font = localStorage.getItem('kieu-chu');
-        if (font === 'viet-tay') root.dataset.font = 'viet-tay';
+        if (handwritingAvailable && font === 'viet-tay') root.dataset.font = 'viet-tay';
         const size = Number(localStorage.getItem('co-chu'));
         if (size >= 24 && size <= 60) root.style.setProperty('--text-size', size + 'px');
       } catch (_error) {
@@ -56,7 +57,7 @@ const { title, noindex = false, showToolbar = true } = Astro.props;
         </a>
         <div class="top-bar__right">
           <PwaInstallButton />
-          {showToolbar && <ReadingPreferencesToolbar />}
+          {showToolbar && <ReadingPreferencesToolbar showFontToggle={handwritingAvailable} />}
         </div>
       </header>
       <main>
