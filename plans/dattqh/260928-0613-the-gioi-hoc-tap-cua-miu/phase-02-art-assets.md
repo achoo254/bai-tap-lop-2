@@ -11,6 +11,8 @@ dependencies: [1]
 
 ## Overview
 
+> **Cập nhật 2026-09-28:** nhân vật SVG của phase này sẽ được thay dần bằng nhân vật 3D (Phase 4a, 4d) và giữ làm dự phòng khi thiết bị không có WebGL; tranh nền AI được phép từ Phase 4b.
+
 Chốt phong cách thống nhất cho cả thế giới (3 vùng + khu sự kiện). Nhân vật vẽ SVG bằng code, bối cảnh/vật phẩm/UI lấy từ bộ hình giấy phép tự do, ghi nguồn đầy đủ. Hình riêng của từng vùng/sự kiện lấy trong phase của nó theo style guide này.
 
 ## Nguồn hình

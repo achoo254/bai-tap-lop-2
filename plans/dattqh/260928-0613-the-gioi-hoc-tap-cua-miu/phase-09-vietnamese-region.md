@@ -4,12 +4,14 @@ title: 'Vùng Tiếng Việt'
 status: pending
 priority: P2
 effort: 'L'
-dependencies: [5]
+dependencies: [4e, 5]
 ---
 
 # Phase 9: Vùng Tiếng Việt (Thế giới Lớp 2)
 
 ## Overview
+
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
 
 Vùng thứ hai của Thế giới Lớp 2: chương trình Tiếng Việt lớp 2 (GDPT 2018) thành gameplay, dùng lại khuôn mini-game, HUD, thưởng, mastery.
 Kiểm tra §12: Base ✓ · cùng thế giới ✓ · kiến thức thành cơ chế (phân loại, xây dựng, điều khiển), không phải phiếu bài tập.

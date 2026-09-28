@@ -31,7 +31,7 @@ Kế hoạch đích: `plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu/plan.md`
 - Giữ đủ mục tiêu kiến thức; ≥ 70% thời gian nhiệm vụ vẫn là thao tác học; hoạt hình ≤ 1.5s và bỏ qua được (quy tắc sẵn có của plan).
 - Tương thích bản lưu `the-gioi:v1`: trường mới có `.default()`; không lấy lại đồ bé đã có (phụ kiện đang đeo/đang có được giữ khi chuyển sang chế độ khoá đồ).
 - Mini-game giữ interface `MiniGame` hiện có; Sự kiện vẫn cắm vào Base không sửa file Base.
-- Không sinh ảnh AI, không chép SGK; iPad Safari, touch-first; DOM + SVG, không engine game.
+- Ảnh AI chỉ cho tranh nền tĩnh và mô hình 3D nhân vật (ghi nguồn trong `licenses.json`), không chép SGK; iPad Safari, touch-first; giao diện DOM + CSS, nhân vật 3D bằng Three.js (thư viện dựng hình, không dùng engine game đầy đủ).
 - 27 file đang sửa chưa commit phải được commit trước khi bắt đầu.
 
 **Non-goals:** Làm nội dung 29 kỹ năng Toán (vẫn là Phase 5–6); cửa hàng và Nhà của Miu (vẫn Phase 11); đồng bộ máy chủ, chơi nhiều người, bảng xếp hạng với người khác.
@@ -77,6 +77,7 @@ Nguyên tắc: tính cách đổi **cách** bé đi qua nhiệm vụ (đường 
 
 ## Phase đề xuất (chèn trước Phase 5, đánh số 4a–4d để không đổi số phase cũ)
 
+0. **4-0 — Thử kỹ thuật nhân vật 3D:** 1 con mèo, 3 hoạt ảnh, 1 mũ, xoay 360°, trên nền AI, chạy iPad thật (xem mục "Nhân vật 3D"). Kết quả quyết định cách làm 4b.
 1. **4a — Tiến trình nhân vật:** `skillXp` theo môn + Logic, bảng danh hiệu Lv.1/5/10/20/30, danh mục vật phẩm (loại: trang phục, phụ kiện, đặc biệt, chìa khoá/công cụ, huy hiệu) kèm điều kiện mở; mở rộng `unlock-rules` (level, có vật phẩm, số huy hiệu, xong nhiệm vụ/sự kiện); `avatar.personality`, `collections` với `.default()`; giữ đồ đã có; bảng tác động của từng tính cách.
 2. **4b — Tạo nhân vật dạng game:** chia bước, xem trước trung tâm có idle + phản ứng khi chọn đồ, ổ khoá + điều kiện mở, tủ đồ (Inventory) xem đồ đã có, đổi tính cách.
 3. **4c — Quest Arc:** trình chạy màn theo dữ liệu, NPC hội thoại, màn khám phá, lựa chọn có hệ quả và phương án theo tính cách, boss tổng hợp, màn thưởng mới (XP kỹ năng, vật phẩm, mở khoá); dựng lại nhiệm vụ "Cầu thủ dự bị" (giữ nguyên bài và câu hỏi) làm nhiệm vụ mẫu; quy tắc 7 câu hỏi thành checklist trong phase 5–10.
@@ -91,7 +92,29 @@ Phase 5–10 cập nhật: mọi nhiệm vụ mới viết theo khuôn Quest Arc
 - **Bản lưu cũ** → test đọc bản lưu hiện tại trên máy (xuất mẫu) trước khi đổi schema.
 - **WIP chưa commit (27 file)** → commit trước, tránh trộn với thay đổi lớn.
 
+## Chuẩn hình ảnh (user chốt 2026-09-28 21:54)
+
+Ảnh mẫu: `plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu/design-reference-miu-game-world-mockup.png` (7 màn: Trang chủ, Chọn nhân vật, Tuỳ chỉnh, Khu vực, Nhiệm vụ, Sự kiện TIMO, Hồ sơ và bộ sưu tập). Đây là chuẩn thiết kế cho phase 4a–4d.
+
+- **Nguồn tranh — phương án B:** cho phép **ảnh AI cho tranh nền tĩnh** (bản đồ đảo, cảnh khu vực, nền nhiệm vụ, nền sự kiện, ảnh thu nhỏ địa điểm), sinh một lần và lưu thành file trong repo. Nhân vật, NPC và đồ mặc: xem mục "Nhân vật 3D" bên dưới (thay cho SVG nhiều lớp). Thay đổi quyết định cũ "không sinh ảnh AI": phải sửa README (nguyên tắc 3), `plan.md` (quyết định đã chốt) và ghi nguồn trong `licenses.json` (loại "AI-generated", công cụ, ngày).
+- **Đủ 4 loài nhân vật:** Mèo, Thỏ, Cáo, Gấu. Mỗi loài có đủ tư thế, màu, biểu cảm và mặc được mọi món đồ. Khối lượng hình nhân khoảng 4 lần → đồ mặc nên vẽ theo khung cơ thể dùng chung (điểm neo đầu, thân, lưng, chân) để một món đồ vừa cả 4 loài.
+- **Không dựng thử trước:** đưa thẳng vào kế hoạch.
+- Thư viện đề xuất: GSAP (chuyển động), Rive hoặc Lottie (hoạt ảnh nhân vật), canvas-confetti (màn thưởng), CSS scroll-snap (băng lướt ngang), font Baloo 2 hoặc Fredoka cho tiêu đề.
+- Rủi ro mới: nét vẽ nhân vật SVG lệch với nền AI → đặt một bảng màu và quy tắc đổ bóng chung, sinh nền theo cùng một prompt phong cách; hạn mức Gemini thấp → lập danh sách ảnh nền cần sinh (ước khoảng 15–25 ảnh cho Thế giới Lớp 2) trước khi sinh.
+
+## Nhân vật 3D (user chốt 2026-09-28)
+
+- Nhân vật (4 loài), NPC và đồ mặc làm **3D bằng Three.js**: mô hình `.glb` có xương + hoạt ảnh (đứng thở, chớp mắt, vẫy tay, nhảy, đi, suy nghĩ, ngáp) qua `AnimationMixer`; xoay 360° bằng `OrbitControls` ở màn tạo nhân vật; đồ mặc là mô hình riêng gắn vào xương (đầu, lưng, chân); tai và đuôi đung đưa bằng xương lò xo; tô hoạt hình có viền để hợp nền AI 2D (lớp canvas trong suốt đặt trên tranh nền).
+- Nguồn mô hình: AI dựng 3D từ ảnh 2D mẫu (Tripo/Meshy/Rodin…), tự gắn xương, hoạt ảnh dùng chung (Mixamo). Phải kiểm tra điều khoản bản quyền của gói dùng trước khi đưa vào repo; ghi nguồn trong `licenses.json`.
+- **Bộ xương và tỉ lệ chibi dùng chung cho 4 loài**, để một món đồ và một hoạt ảnh dùng được cho cả Mèo, Thỏ, Cáo, Gấu.
+- 3D thật chỉ ở Trang chủ, màn tạo nhân vật, màn nhiệm vụ (một WebGL renderer mỗi trang); chỗ nhỏ (đầu trang, nhân vật đồng hành góc màn hình) dùng ảnh chụp sẵn từ mô hình. Nén glb (Draco/meshopt), mục tiêu ≤ 2 MB mỗi nhân vật, cache cho offline.
+- Hệ SVG hiện có (`cat-character.ts`, phụ kiện) thay dần; giữ tới khi 3D đủ tư thế và đồ.
+- **Bước đầu tiên bắt buộc — thử kỹ thuật 1 con mèo:** 1 mô hình mèo, 3 hoạt ảnh (đứng thở, vẫy tay, nhảy), 1 cái mũ gắn xương, xoay 360°, đặt trên 1 nền AI; chạy trên iPad Safari thật. Đạt khi: ≥ 50fps, tải < 3s trên 4G, nhìn hợp với nền, bố mẹ duyệt độ dễ thương. Không đạt → quay lại chọn giữa "3D dựng bằng code" và "SVG nâng cấp".
+
 ## Câu hỏi đã giải quyết
 
 - Bài "Cầu thủ dự bị": giữ (bố mẹ tự nhập).
 - Tính cách: có ảnh hưởng cách chơi, theo bảng ở trên.
+- Nguồn tranh: phương án B (AI cho nền tĩnh); đủ 4 loài; màn hình không dựng thử trước.
+- Nhân vật, NPC, đồ mặc: 3D Three.js, thử kỹ thuật 1 con mèo trên iPad trước khi làm cả 4 loài.
+- Ghi chú: khi lập kế hoạch (2026-09-28 22:10) các phase trên đổi tên thành 4a (thử 3D), 4b (nền tảng hình ảnh), 4c (tiến trình), 4d (nhân vật 3D + tạo nhân vật), 4e (Quest Arc), 4f (Home Base); xem `plan.md`.

@@ -4,12 +4,14 @@ title: 'Vùng Toán 1: số, cộng trừ, tiền, lời văn (vùng mẫu)'
 status: pending
 priority: P1
 effort: 'L'
-dependencies: [3]
+dependencies: [3, 4e]
 ---
 
 # Phase 5: Vùng Toán 1 — số, cộng trừ, tiền, lời văn (vùng mẫu)
 
 ## Overview
+
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
 
 Nửa đầu Vùng Toán của Thế giới Lớp 2, làm hoàn chỉnh trước để **chốt khuôn mini-game** cho mọi vùng/sự kiện sau. Là Base: Learn → Practice → Master theo chương trình lớp 2.
 Kiểm tra §12: Base ✓ · cùng thế giới ✓ · cơ chế: cộng = thu thập tài nguyên, trừ = quản lý tài nguyên, lời văn = giải quyết tình huống.

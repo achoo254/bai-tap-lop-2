@@ -4,12 +4,14 @@ title: 'Meta: nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ
 status: pending
 priority: P2
 effort: 'L'
-dependencies: [5, 7]
+dependencies: [4f, 5, 7]
 ---
 
 # Phase 11: Meta — nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ, thành tích
 
 ## Overview
+
+> **Cập nhật 2026-09-28:** nhiệm vụ hằng ngày, chuỗi ngày + khiên đã chuyển lên **Phase 4f**; tủ đồ đã chuyển lên **Phase 4d** (màn tạo nhân vật ở chế độ sửa); danh mục vật phẩm và luật mở khoá ở **Phase 4c**. Phase này còn: ôn chỗ yếu, cửa hàng, Nhà của Miu, thành tích (dùng danh mục vật phẩm/huy hiệu của 4c).
 
 Các hệ thống giữ Miu quay lại mỗi ngày, hướng ôn đúng chỗ yếu và cho xu/đồ có ý nghĩa. Thuộc nhân vật (dùng chung mọi thế giới), không thuộc riêng thế giới nào. Làm khi đã có Vùng Toán + sự kiện TIMO; tự mở rộng khi thêm vùng/thế giới.
 

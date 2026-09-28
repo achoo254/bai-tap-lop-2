@@ -11,6 +11,8 @@ dependencies: [7, 6]
 
 ## Overview
 
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
+
 Hai đảo cuối của Quần Đảo Số, **đại chiến** mô phỏng đề vòng loại và **trận cuối** Vua Lộn Xộn, cùng bảng kỷ lục mùa và màn kết sự kiện. Phần nặng nhất: hình để đếm và khối 3D do code sinh chính xác.
 
 ## Requirements

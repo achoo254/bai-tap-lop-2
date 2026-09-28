@@ -11,6 +11,8 @@ dependencies: [5]
 
 ## Overview
 
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
+
 Nửa sau Vùng Toán của Thế giới Lớp 2 theo khuôn đã chốt ở phase 5.
 Kiểm tra §12: Base ✓ · cơ chế: nhân/chia = xây dựng/nâng cấp, hình học = xoay/lắp mảnh ghép, đo lường = điều khiển phương tiện.
 

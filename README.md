@@ -54,6 +54,6 @@ pnpm ci:all
 
 1. **Học qua trò chơi thực thụ**: Kiến thức được thiết kế thành gameplay tương tác (kéo-thả, chọn, ghép, điều khiển), không biến thành bài trắc nghiệm khoanh A–D khô khan.
 2. **Không sao chép nội dung có bản quyền**: Đề bài và câu hỏi được sinh tự động bằng thuật toán sinh câu (5 bậc độ khó + 3 bậc gợi ý), không chép y nguyên sách giáo khoa hay tài liệu cuộc thi.
-3. **Hình ảnh bản quyền tự do**: Nhân vật chính Miu được vẽ vector SVG; bối cảnh và icon sử dụng các gói miễn phí CC0 ([Kenney.nl](https://kenney.nl/assets)) và CC BY-SA ([OpenMoji](https://openmoji.org/)). Tuyệt đối không sinh hình AI.
+3. **Hình ảnh rõ nguồn gốc**: Icon dùng các gói miễn phí CC0 ([Kenney.nl](https://kenney.nl/assets)) và CC BY-SA ([OpenMoji](https://openmoji.org/)). Tranh nền tĩnh và mô hình 3D nhân vật/NPC/đồ mặc được phép sinh bằng AI (sinh một lần, lưu trong repo, chỉ dùng công cụ có điều khoản cho phép dùng công khai). Vật mang số liệu toán luôn do code vẽ. Mọi file hình ghi nguồn trong `apps/site/public/game/licenses.json`.
 4. **Bảo mật và quyền riêng tư**: Web công khai nên chỉ hiển thị tên gọi ở nhà và ngày/tháng sinh, không công khai họ tên đầy đủ, trường lớp hay năm sinh.
 5. **Ưu tiên iPad Safari**: Thiết kế touch-first, chuyển động mượt mà (>= 50fps) và hỗ trợ PWA offline khi mất mạng.

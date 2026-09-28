@@ -4,12 +4,14 @@ title: 'Vùng Tiếng Anh'
 status: pending
 priority: P2
 effort: 'L'
-dependencies: [5]
+dependencies: [4e, 5]
 ---
 
 # Phase 10: Vùng Tiếng Anh (Thế giới Lớp 2)
 
 ## Overview
+
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
 
 Vùng thứ ba của Thế giới Lớp 2: Tiếng Anh lớp 2 (chữ cái + âm, từ vựng theo chủ đề, câu mẫu ngắn) thành gameplay dựa trên nghe và hình, gần như không cần đọc.
 Kiểm tra §12: Base ✓ · cùng thế giới ✓ · cơ chế nghe → hành động, không phải điền từ.

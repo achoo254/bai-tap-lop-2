@@ -4,12 +4,14 @@ title: 'Sự kiện TIMO 1: Quần Đảo Số — lý thuyết số, tư duy lo
 status: pending
 priority: P2
 effort: 'L'
-dependencies: [4, 5]
+dependencies: [4, 4e, 5]
 ---
 
 # Phase 7: Sự kiện TIMO Khối 2 (phần 1) — Quần Đảo Số
 
 ## Overview
+
+> **Cập nhật 2026-09-28 (Phase 4e):** mọi nhiệm vụ của phase này viết thành **kịch bản Quest Arc** (`src/lib/game/quest-arc/`), trả lời 7 câu hỏi kiểm tra; mini-game là màn `challenge` trong kịch bản; cảnh dùng tranh nền AI + nhân vật/NPC 3D của Phase 4b/4d. Chỗ nào dưới đây ghi "SVG + Kenney" cho nhân vật/cảnh thì hiểu theo quy tắc hình mới trong `plan.md`.
 
 Sự kiện đầu tiên của Thế giới Lớp 2, cấu hình tại `src/worlds/lop-2/events/timo/`. Một ngày thuyền đưa thư cập bến: "Quần Đảo Số vừa nổi lên!" — khu vực mới mở trên bản đồ, NPC mới, nhiệm vụ, phần thưởng và huy hiệu riêng.
 Kiểm tra §12: **Event** ✓ · trong cùng Thế giới Lớp 2 ✓ · dùng kỹ năng Toán Base (`lop-2/*`) ở bậc khó + 1 ✓ · không kỹ năng riêng ✓ · gỡ sự kiện không ảnh hưởng Vùng Toán ✓.
