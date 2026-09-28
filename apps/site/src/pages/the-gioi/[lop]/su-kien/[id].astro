@@ -84,7 +84,12 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     <div class="event-layout-grid">
       <!-- Khung hải trình / Bản đồ Quần Đảo -->
       <section class="archipelago-viewport">
-        <div class="archipelago-canvas" id="event-canvas">
+        <div
+          class="archipelago-canvas"
+          id="event-canvas"
+          data-event-id={fullEventId}
+          data-event-desc={metadata.description}
+        >
           <!-- Biển & sóng trang trí -->
           <div class="sea-wave wave-1"></div>
           <div class="sea-wave wave-2"></div>
@@ -116,6 +121,8 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
                   data-quest-id={quest.id}
                   data-quest-url={questUrl}
                   data-is-first={isFirst ? 'true' : 'false'}
+                  data-unlock-type={quest.unlock.type}
+                  data-unlock-req={quest.unlock.type === 'quest-completed' ? quest.unlock.questId : ''}
                 >
                   <a href={isFirst ? questUrl : '#'} class="island-anchor">
                     <div class="island-body">
@@ -223,26 +230,29 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
   </main>
 </KidPageLayout>
 
-<script define:vars={{ fullEventId, quests, metadata }}>
-  import { renderCatSvgHtml } from '/src/components/game/characters/cat-character.ts';
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../../../../components/game/characters/cat-character';
+  import { getBrowserGameStore } from '../../../../lib/game/state/game-store';
 
-  const STORAGE_KEY = 'the-gioi:v1';
-
-  function loadGameState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+  const canvasEl = document.getElementById('event-canvas');
+  const fullEventId = canvasEl?.dataset.eventId || 'lop-2/timo';
+  const eventDesc = canvasEl?.dataset.eventDesc || '';
 
   function updateEventMap() {
-    const state = loadGameState();
-    const eventProgress = state?.events?.[fullEventId] || {
+    const state = store.getState();
+    const eventProgress = state.events[fullEventId] || {
       completedQuests: {},
       completedChallenges: [],
       unlockedBadges: [],
+      personalBest: { score: 0 },
+      hasSeenIntro: false,
+      lastVisited: null,
     };
 
     let completedCount = 0;
@@ -251,33 +261,34 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     // Render Miu nhân vật
     const miuFigure = document.getElementById('miu-event-figure');
     const miuTag = document.getElementById('miu-event-tag');
-    if (miuFigure && state?.avatar) {
+    if (miuFigure && state.avatar) {
       miuFigure.innerHTML = renderCatSvgHtml({
         pose: 'dung',
-        furColor: state.avatar.furColor || 'vang-cam',
-        accessories: state.avatar.accessories || ['no-hong'],
+        furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
+        accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
         size: 72,
       });
       if (miuTag) miuTag.textContent = state.avatar.name || 'Miu';
     }
 
-    // Duyệt qua từng ải để mở khoá và hiển thị sao
-    let currentActiveQuestCoords = null;
+    const islandNodes = document.querySelectorAll('.island-node');
+    let activeLeft = '';
+    let activeTop = '';
 
-    quests.forEach((quest, index) => {
-      const nodeEl = document.getElementById(`island-node-${quest.id}`);
-      if (!nodeEl) return;
+    for (const node of islandNodes) {
+      const nodeEl = node as HTMLElement;
+      const qId = nodeEl.dataset.questId;
+      if (!qId) continue;
 
-      const completion = eventProgress.completedQuests[quest.id];
-      const starsEl = document.getElementById(`stars-${quest.id}`);
+      const completion = eventProgress.completedQuests[qId];
+      const starsEl = document.getElementById(`stars-${qId}`);
+      const unlockType = nodeEl.dataset.unlockType;
+      const unlockReq = nodeEl.dataset.unlockReq;
+      const isFirst = nodeEl.dataset.isFirst === 'true';
 
-      // Kiểm tra điều kiện mở khoá
-      let isUnlocked = false;
-      if (index === 0 || quest.unlock.type === 'always') {
-        isUnlocked = true;
-      } else if (quest.unlock.type === 'quest-completed') {
-        const reqQuestId = quest.unlock.questId;
-        isUnlocked = !!eventProgress.completedQuests[reqQuestId];
+      let isUnlocked = isFirst || unlockType === 'always';
+      if (!isUnlocked && unlockType === 'quest-completed' && unlockReq) {
+        isUnlocked = !!eventProgress.completedQuests[unlockReq];
       }
 
       if (completion) {
@@ -287,7 +298,7 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
         nodeEl.classList.add('completed');
         const link = nodeEl.querySelector('a');
         if (link) {
-          link.href = nodeEl.dataset.questUrl;
+          link.href = nodeEl.dataset.questUrl || '#';
           const statusSpan = nodeEl.querySelector('.status-indicator');
           if (statusSpan) statusSpan.textContent = '✅ Đã xong';
         }
@@ -300,12 +311,13 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
         nodeEl.classList.add('unlocked');
         const link = nodeEl.querySelector('a');
         if (link) {
-          link.href = nodeEl.dataset.questUrl;
+          link.href = nodeEl.dataset.questUrl || '#';
           const statusSpan = nodeEl.querySelector('.status-indicator');
           if (statusSpan) statusSpan.textContent = '👉 Vào chơi';
         }
-        if (!currentActiveQuestCoords) {
-          currentActiveQuestCoords = quest.mapCoordinates;
+        if (!activeLeft) {
+          activeLeft = nodeEl.style.left;
+          activeTop = nodeEl.style.top;
         }
       } else {
         nodeEl.classList.remove('unlocked', 'completed');
@@ -321,13 +333,13 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
           if (statusSpan) statusSpan.textContent = '🔒 Khóa';
         }
       }
-    });
+    }
 
     // Cập nhật vị trí Miu đứng tại ải đang mở gần nhất
     const miuSailor = document.getElementById('miu-sailor');
-    if (miuSailor && currentActiveQuestCoords) {
-      miuSailor.style.left = `${currentActiveQuestCoords.x}%`;
-      miuSailor.style.top = `${currentActiveQuestCoords.y}%`;
+    if (miuSailor && activeLeft && activeTop) {
+      miuSailor.style.left = activeLeft;
+      miuSailor.style.top = activeTop;
     }
 
     // Cập nhật số liệu thống kê
@@ -335,11 +347,11 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     const totalStarsEl = document.getElementById('stat-total-stars');
     const rankEl = document.getElementById('stat-event-rank');
 
-    if (completedEl) completedEl.textContent = `${completedCount} / ${quests.length}`;
+    if (completedEl) completedEl.textContent = `${completedCount} / ${islandNodes.length}`;
     if (totalStarsEl) totalStarsEl.textContent = `${totalStars} ⭐`;
 
     if (rankEl) {
-      if (completedCount === quests.length) {
+      if (completedCount === islandNodes.length) {
         rankEl.textContent = '🏅 Vua Hải Tặc TIMO!';
         rankEl.style.color = '#d97706';
       } else if (completedCount > 0) {
@@ -355,17 +367,17 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     listenBtn.addEventListener('click', () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(metadata.description);
+        const utterance = new SpeechSynthesisUtterance(eventDesc);
         utterance.lang = 'vi-VN';
         utterance.rate = 0.9;
         window.speechSynthesis.speak(utterance);
       } else {
-        alert(metadata.description);
+        alert(eventDesc);
       }
     });
   }
 
-  window.addEventListener('DOMContentLoaded', updateEventMap);
+  updateEventMap();
 </script>
 
 <style>
