@@ -10,6 +10,26 @@ created: 2026-09-28
 
 # Thế giới học tập của Miu
 
+## Trạng thái hiện tại (cập nhật 2026-09-28 13:47)
+
+**Để tiếp tục:** `/ak:cook plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu` → làm tiếp từ **Phase 1 (việc còn lại) rồi Phase 2**.
+
+| Hạng mục | Trạng thái | Bằng chứng |
+|---|---|---|
+| Domain web | ✅ `lop2.hoandat.com` (thay `baitap.inetdev.io.vn`, đã gỡ); MCP giữ `mcp-baitap.inetdev.io.vn`, `SITE_URL` mới | commit `85defa1` |
+| Prototype "Kẹo chẵn lẻ" + trang `/luyen-timo/` + banner trang chủ | ✅ đang chạy trên web (deploy thủ công từ máy, 13:08) | commit `22e0ff5` |
+| Phase 1 — lõi game | 🟡 code xong: GRADES/`lop-2/*` skill id, 29 kỹ năng Toán lớp 2, state `the-gioi:v1`, thưởng, thích ứng, audio vi+en, kéo-thả | commits `20a427c`, `2d0d263`; 39 test site, `pnpm ci:all` exit 0 (103 test toàn repo) |
+| Phase 1 — còn lại | ⬜ code review lõi; test e2e kéo-thả (gắn vào phase 3) | — |
+| Phase 2 → 13 | ⬜ chưa bắt đầu | — |
+
+**Việc tiếp theo cụ thể (Phase 2):** tải gói Kenney CC0 + chọn hình OpenMoji → style guide → nhân vật Miu SVG → **cảnh mẫu cổng Vùng Toán để bố mẹ duyệt phong cách** (chưa duyệt thì không làm hàng loạt).
+
+**Chặn / cần bố mẹ làm:**
+- GitHub Actions "Cập nhật web của bé" **chưa bao giờ deploy được** (9/9 lần lỗi): repo thiếu secret `CLOUDFLARE_API_TOKEN` (chỉ có `CLOUDFLARE_ACCOUNT_ID`). Cần tạo token Cloudflare mẫu "Edit Cloudflare Workers" (tài khoản + zone `hoandat.com`) rồi `gh secret set CLOUDFLARE_API_TOKEN`. Tới lúc đó web chỉ cập nhật khi deploy thủ công: `pnpm --filter site deploy`.
+- Câu hỏi mở cuối file (bộ sách, bảng kỷ lục, ngày mở thế giới mới) — đang dùng mặc định.
+
+**Ghi chú môi trường:** Wrangler + MCP Cloudflare đã đăng nhập OAuth trên máy; Playwright dùng `channel: 'chrome'` (chưa cài trình duyệt riêng của Playwright); `apps/site` đã thêm `zod`.
+
 ## Overview
 
 Nguồn sự thật về sản phẩm: `~/Downloads/learning-world-game-based-learning-context.html` (bố mẹ cung cấp 2026-09-28).
