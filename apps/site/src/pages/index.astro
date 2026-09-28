@@ -647,6 +647,8 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   .region-meta {
     display: flex;
     flex-direction: column;
+    gap: 2px;
+    min-width: 0;
     line-height: 1.25;
   }
   .region-name {
@@ -654,12 +656,11 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     font-size: 0.95rem;
     color: #0f172a;
   }
+  /* Cho xuống dòng để hiện đủ tên chương, không tràn ra ngoài thẻ */
   .region-chapter {
     font-size: 0.8rem;
     color: #64748b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
 
   /* --- Bố Cục Tiện Ích Hằng Ngày (Đồng phục & Thời khóa biểu) --- */
@@ -940,12 +941,12 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   .period-icon {
     font-size: 1rem;
   }
+  /* Tên môn dài (Tiếng Việt, Tự nhiên và Xã hội) xuống dòng thay vì bị cắt thành "…" */
   .period-subject {
+    min-width: 0;
     font-weight: 800;
     color: #0f172a;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.2;
   }
 
   /* Modal Thời Khóa Biểu Cả Tuần */
