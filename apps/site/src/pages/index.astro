@@ -924,7 +924,8 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 6px;
   }
-  .period-item {
+  /* Các ô tiết học được script vẽ lại khi đổi ngày, nên style phải :global để áp dụng cho phần tử tạo bằng JS */
+  .periods-list :global(.period-item) {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -933,16 +934,16 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     border-radius: 10px;
     font-size: 0.82rem;
   }
-  .period-num {
+  .periods-list :global(.period-num) {
     font-size: 0.75rem;
     font-weight: 900;
     color: #0f172a;
   }
-  .period-icon {
+  .periods-list :global(.period-icon) {
     font-size: 1rem;
   }
   /* Tên môn dài (Tiếng Việt, Tự nhiên và Xã hội) xuống dòng thay vì bị cắt thành "…" */
-  .period-subject {
+  .periods-list :global(.period-subject) {
     min-width: 0;
     font-weight: 800;
     color: #0f172a;

@@ -206,3 +206,16 @@ test.describe('nhiệm vụ đọc hiểu', () => {
     await expect(next).toBeEnabled();
   });
 });
+
+test.describe('thời khoá biểu trang chủ', () => {
+  test('đổi ngày vẫn giữ nguyên kiểu ô tiết học', async ({ page }) => {
+    await page.clock.setFixedTime(setToday('2026-09-28'));
+    await page.goto('/');
+    const firstPeriod = page.locator('#tt-morning-list .period-item').first();
+    const before = await firstPeriod.evaluate((e) => getComputedStyle(e).borderRadius);
+    await page.locator('[data-tt-day="2"]').click();
+    await expect(page.locator('#tt-morning-list')).toContainText('Tiếng Việt');
+    expect(await firstPeriod.evaluate((e) => getComputedStyle(e).borderRadius)).toBe(before);
+    expect(before).not.toBe('0px');
+  });
+});
