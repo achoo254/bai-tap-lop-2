@@ -1,45 +1,17 @@
 ---
 import KidPageLayout from '../layouts/kid-page-layout.astro';
 import MascotKitten from '../components/mascot-kitten.astro';
-import LessonCard from '../components/lesson-card.astro';
-import { loadLessonCatalog } from '../lib/lesson-catalog';
-import { greetingFor } from '../lib/family-messages';
-
-const { published } = await loadLessonCatalog();
-const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.frontmatter.ngay }));
+import { greetingForWorld } from '../lib/family-messages';
 ---
 
-<KidPageLayout title="Bài hôm nay" showToolbar={false}>
+<KidPageLayout title="Thế giới học tập" showToolbar={false}>
   <div class="mascot-row">
     <MascotKitten pose="chao" label="Mèo con vẫy chào" />
-    <p class="speech-bubble" data-greeting>{greetingFor('hom-nay', 8)}</p>
+    <p class="speech-bubble" data-greeting>{greetingForWorld(8)}</p>
   </div>
   <p class="birthday-banner" data-birthday hidden></p>
 
-  <ul class="lesson-grid" data-today-list>
-    {published.map((lesson) => <LessonCard lesson={lesson} hidden />)}
-  </ul>
-  <noscript>
-    <style>
-      [data-card] {
-        display: block !important;
-      }
-    </style>
-  </noscript>
-
-  <p class="empty-state">
-    <a class="comic-button comic-button--sky" href="/cac-bai/">Xem tất cả bài</a>
-  </p>
-
-  <a class="timo-banner" href="/luyen-timo/">
-    <span class="timo-banner__emoji" aria-hidden="true">🏝️</span>
-    <span>
-      <span class="timo-banner__title">Luyện thi TIMO</span>
-      <span class="timo-banner__subtitle">Chơi trò chơi toán cùng mèo con</span>
-    </span>
-  </a>
-
-  <a class="timo-banner" style="margin-top: 12px; background: linear-gradient(135deg, #fef3c7 0%, #e0f2fe 100%); border-color: #0284c7;" href="/the-gioi/">
+  <a class="timo-banner" style="margin-top: 20px; background: linear-gradient(135deg, #fef3c7 0%, #e0f2fe 100%); border-color: #0284c7;" href="/the-gioi/">
     <span class="timo-banner__emoji" aria-hidden="true">🌌</span>
     <span>
       <span class="timo-banner__title" style="color: #0369a1;">Thế giới học tập của Miu (Lớp 2)</span>
@@ -47,33 +19,27 @@ const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.fr
     </span>
   </a>
 
-  <a class="timo-banner" style="margin-top: 8px; background: #f8fafc; border-color: #cbd5e1;" href="/the-gioi/mau-cong-toan/">
+  <a class="timo-banner" style="margin-top: 12px; background: #f8fafc; border-color: #cbd5e1;" href="/the-gioi/mau-cong-toan/">
     <span class="timo-banner__emoji" aria-hidden="true">🏰</span>
     <span>
       <span class="timo-banner__title" style="color: #475569;">Cảnh mẫu & Thử giọng đọc (Bố mẹ)</span>
       <span class="timo-banner__subtitle">Trải nghiệm phong cách mỹ thuật, tư thế và giọng kể chuyện</span>
     </span>
   </a>
-
-  <script type="application/json" id="du-lieu-bai" set:html={JSON.stringify(datedLessons)} />
 </KidPageLayout>
 
 <script>
-  import { birthdayMessage, greetingFor } from '../lib/family-messages';
-  import { hourInVietnam, pickLessonsForToday, todayInVietnam, type DatedLesson } from '../lib/today-lesson-picker';
+  import { birthdayMessage, greetingForWorld } from '../lib/family-messages';
+  import { hourInVietnam, todayInVietnam } from '../lib/today-lesson-picker';
 
-  const lessons = JSON.parse(document.getElementById('du-lieu-bai')?.textContent ?? '[]') as DatedLesson[];
   const today = todayInVietnam();
-  const pick = pickLessonsForToday(lessons, today);
   const greeting = document.querySelector('[data-greeting]');
-  if (greeting) greeting.textContent = greetingFor(pick.mode, hourInVietnam());
+  if (greeting) greeting.textContent = greetingForWorld(hourInVietnam());
   const birthday = birthdayMessage(today);
   const banner = document.querySelector<HTMLElement>('[data-birthday]');
   if (banner && birthday) {
     banner.textContent = birthday;
     banner.hidden = false;
   }
-  for (const card of document.querySelectorAll<HTMLElement>('[data-card]')) {
-    card.hidden = !pick.ids.includes(card.dataset.id ?? '');
-  }
 </script>
+

@@ -59,7 +59,13 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
           </div>
         </div>
         <div class="region-guide-chip">
-          <span>🦉 Bác Cú dẫn đường</span>
+          <span>
+            {region.guideNpc === 'soc-nau'
+              ? '🐿️ Sóc Nâu dẫn đường'
+              : region.guideNpc === 'chim-sau'
+                ? '🐦 Chim Sâu dẫn đường'
+                : '🦉 Bác Cú dẫn đường'}
+          </span>
         </div>
       </div>
 
@@ -98,7 +104,7 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
             <div class="quest-node-button" id={`btn-${q.id.replace(/\//g, '-')}`}>
               <div class="quest-halo"></div>
               <div class="quest-icon-inner">
-                {q.isBoss ? '👑' : idx === 0 ? '🍬' : '🧺'}
+                {q.isBoss ? '👑' : region.id === 'tieng-viet' ? (idx === 0 ? '📖' : '✍️') : idx === 0 ? '🍬' : '🧺'}
               </div>
               <div class="quest-stars-badge" id={`stars-${q.id.replace(/\//g, '-')}`}>
                 ⭐⭐⭐

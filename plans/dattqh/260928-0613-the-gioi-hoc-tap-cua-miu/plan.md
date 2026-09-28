@@ -14,15 +14,15 @@ created: 2026-09-28
 
 **Để tiếp tục:** `/ak:cook plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu` để làm tiếp **Phase 5 (Vùng Toán 1: số, cộng trừ, tiền, lời văn)**.
 
-| Hạng mục                                                          | Trạng thái                                                                                                                                                  | Bằng chứng                                                       |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Domain web                                                        | ✅ `lop2.hoandat.com` (thay `baitap.inetdev.io.vn`, đã gỡ); MCP giữ `mcp-baitap.inetdev.io.vn`, `SITE_URL` mới                                              | commit `85defa1`                                                 |
-| Prototype "Kẹo chẵn lẻ" + trang `/luyen-timo/` + banner trang chủ | ✅ đang chạy trên web (deploy thủ công từ máy, 13:08)                                                                                                       | commit `22e0ff5`                                                 |
-| Phase 1 — lõi game                                                | ✅ hoàn thành: GRADES/`lop-2/*` skill id, 29 kỹ năng Toán lớp 2, state `the-gioi:v1`, thưởng, thích ứng, audio vi+en, kéo-thả                               | commits `20a427c`, `2d0d263`; test xanh                          |
+| Hạng mục                                                          | Trạng thái                                                                                                                                                     | Bằng chứng                                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Domain web                                                        | ✅ `lop2.hoandat.com` (thay `baitap.inetdev.io.vn`, đã gỡ); MCP giữ `mcp-baitap.inetdev.io.vn`, `SITE_URL` mới                                                 | commit `85defa1`                                                 |
+| Prototype "Kẹo chẵn lẻ" + trang `/luyen-timo/` + banner trang chủ | ✅ đang chạy trên web (deploy thủ công từ máy, 13:08)                                                                                                          | commit `22e0ff5`                                                 |
+| Phase 1 — lõi game                                                | ✅ hoàn thành: GRADES/`lop-2/*` skill id, 29 kỹ năng Toán lớp 2, state `the-gioi:v1`, thưởng, thích ứng, audio vi+en, kéo-thả                                  | commits `20a427c`, `2d0d263`; test xanh                          |
 | Phase 2 — bộ hình & mỹ thuật                                      | ✅ hoàn thành: style guide, Kenney CC0 + OpenMoji (`licenses.json`), Miu SVG 8 tư thế/10 màu/16 phụ kiện, NPC & Boss TIMO, cảnh mẫu `/the-gioi/mau-cong-toan/` | `art-manifest.test.ts` 9/9 pass, `pnpm ci:all` exit 0            |
-| Phase 3 — Cổng thế giới + Thế giới Lớp 2                           | ✅ hoàn thành: cổng `/the-gioi/`, bản đồ thế giới, bản đồ Vùng Toán, tạo nhân vật, HUD, khung nhiệm vụ `/the-gioi/choi/`                                  | `world.test.ts` 13/13 pass, `pnpm ci:all` exit 0                 |
+| Phase 3 — Cổng thế giới + Thế giới Lớp 2                          | ✅ hoàn thành: cổng `/the-gioi/`, bản đồ thế giới, bản đồ Vùng Toán, tạo nhân vật, HUD, khung nhiệm vụ `/the-gioi/choi/`                                       | `world.test.ts` 13/13 pass, `pnpm ci:all` exit 0                 |
 | Phase 4 — Event System tổng quát                                  | ✅ hoàn thành: EventDefinition, registry, schedule (giờ VN), boost độ khó, Event Map `/the-gioi/lop-2/su-kien/timo/`, EventBanner, HUD, phần thưởng & huy hiệu | `event-*.test.ts` pass, 110 unit test xanh, `pnpm ci:all` exit 0 |
-| Phase 5 → 13                                                      | ⬜ tiếp tục với Phase 5 (Vùng Toán 1)                                                                                                                      | —                                                                |
+| Phase 5 → 13                                                      | ⬜ tiếp tục với Phase 5 (Vùng Toán 1)                                                                                                                          | —                                                                |
 
 **Chặn / cần bố mẹ làm:**
 
@@ -98,21 +98,21 @@ apps/site/public/game/              hình Kenney/OpenMoji đã chọn + licenses
 
 ## Phases
 
-| #   | Phase                                                                                                        | Tier | Status      |
-| --- | ------------------------------------------------------------------------------------------------------------ | ---- | ----------- |
-| 1   | [Lõi game: state, kỹ năng theo môn, tiến trình](./phase-01-game-core.md)                                     | L    | Completed   |
-| 2   | [Bộ hình: nhân vật SVG + bộ hình miễn phí](./phase-02-art-assets.md)                                         | L    | Completed   |
-| 3   | [Cổng thế giới + Thế giới Lớp 2: tạo nhân vật, bản đồ, vùng, HUD, khung nhiệm vụ](./phase-03-world-shell.md) | L    | Completed   |
-| 4   | [Event System tổng quát](./phase-04-event-system.md)                                                         | M    | Completed   |
-| 5   | [Vùng Toán 1: số, cộng trừ, tiền, lời văn (vùng mẫu)](./phase-05-math-region-numbers.md)                     | L    | Pending     |
-| 6   | [Vùng Toán 2: nhân chia, hình học, đo lường, thời gian, thống kê](./phase-06-math-region-shapes-measures.md) | L    | Pending     |
-| 7   | [Sự kiện TIMO 1: Quần Đảo Số — lý thuyết số, tư duy logic, số học](./phase-07-timo-event-part-1.md)          | L    | Pending     |
-| 8   | [Sự kiện TIMO 2: hình học, tổ hợp, đại chiến, boss cuối](./phase-08-timo-event-part-2.md)                    | XL   | Pending     |
-| 9   | [Vùng Tiếng Việt](./phase-09-vietnamese-region.md)                                                           | L    | Pending     |
-| 10  | [Vùng Tiếng Anh](./phase-10-english-region.md)                                                               | L    | Pending     |
-| 11  | [Meta: nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ, thành tích](./phase-11-meta-systems.md)              | L    | Pending     |
-| 12  | [Trang bố mẹ, sao lưu, chuyển mục cũ](./phase-12-parent-dashboard.md)                                        | M    | Pending     |
-| 13  | [QA iPad, hiệu năng, offline, tài liệu](./phase-13-qa-release.md)                                            | M    | Pending     |
+| #   | Phase                                                                                                        | Tier | Status    |
+| --- | ------------------------------------------------------------------------------------------------------------ | ---- | --------- |
+| 1   | [Lõi game: state, kỹ năng theo môn, tiến trình](./phase-01-game-core.md)                                     | L    | Completed |
+| 2   | [Bộ hình: nhân vật SVG + bộ hình miễn phí](./phase-02-art-assets.md)                                         | L    | Completed |
+| 3   | [Cổng thế giới + Thế giới Lớp 2: tạo nhân vật, bản đồ, vùng, HUD, khung nhiệm vụ](./phase-03-world-shell.md) | L    | Completed |
+| 4   | [Event System tổng quát](./phase-04-event-system.md)                                                         | M    | Completed |
+| 5   | [Vùng Toán 1: số, cộng trừ, tiền, lời văn (vùng mẫu)](./phase-05-math-region-numbers.md)                     | L    | Pending   |
+| 6   | [Vùng Toán 2: nhân chia, hình học, đo lường, thời gian, thống kê](./phase-06-math-region-shapes-measures.md) | L    | Pending   |
+| 7   | [Sự kiện TIMO 1: Quần Đảo Số — lý thuyết số, tư duy logic, số học](./phase-07-timo-event-part-1.md)          | L    | Pending   |
+| 8   | [Sự kiện TIMO 2: hình học, tổ hợp, đại chiến, boss cuối](./phase-08-timo-event-part-2.md)                    | XL   | Pending   |
+| 9   | [Vùng Tiếng Việt](./phase-09-vietnamese-region.md)                                                           | L    | Pending   |
+| 10  | [Vùng Tiếng Anh](./phase-10-english-region.md)                                                               | L    | Pending   |
+| 11  | [Meta: nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ, thành tích](./phase-11-meta-systems.md)              | L    | Pending   |
+| 12  | [Trang bố mẹ, sao lưu, chuyển mục cũ](./phase-12-parent-dashboard.md)                                        | M    | Pending   |
+| 13  | [QA iPad, hiệu năng, offline, tài liệu](./phase-13-qa-release.md)                                            | M    | Pending   |
 
 Thứ tự: 1 → 2 → 3 → 4 → 5 (chốt khuôn mini-game + chơi thử với Miu) → 6 và 7 → 8 → 9 → 10 → 11 → 12 → 13.
 Mỗi vùng/sự kiện xong là deploy được; phần chưa làm hiện "sắp mở" trên bản đồ.

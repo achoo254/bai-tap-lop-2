@@ -102,6 +102,6 @@ describe('danh mục kỹ năng theo thế giới', () => {
       await import('../../../src/lib/game/skills/skill-types');
     expect(SKILL_IDS.every((id) => id.startsWith(`${SKILLS[id].grade}/`))).toBe(true);
     expect(skillsOf('lop-2', 'toan')).toContain('lop-2/cong-tru-100');
-    expect(skillsOf('lop-2', 'tieng-viet')).toEqual([]);
+    expect(skillsOf('lop-2', 'tieng-viet')).toContain('lop-2/doc-hieu');
   });
 });

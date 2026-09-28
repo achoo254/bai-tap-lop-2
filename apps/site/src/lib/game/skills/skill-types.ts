@@ -8,6 +8,7 @@
  */
 import type { RandomSource } from './random';
 import { MATH_SKILLS as GRADE_2_MATH } from './lop-2/math-skills';
+import { VIETNAMESE_SKILLS as GRADE_2_VIETNAMESE } from './lop-2/vietnamese-skills';
 
 /** Mỗi năm học một thế giới; thêm lớp mới = thêm một mục ở đây + thư mục kỹ năng của lớp đó. */
 export const GRADES = {
@@ -54,6 +55,7 @@ function catalogOf<G extends GradeId, T extends Catalog>(
 
 export const SKILLS = {
   ...catalogOf('lop-2', 'toan', GRADE_2_MATH),
+  ...catalogOf('lop-2', 'tieng-viet', GRADE_2_VIETNAMESE),
 };
 
 export type SkillId = keyof typeof SKILLS;

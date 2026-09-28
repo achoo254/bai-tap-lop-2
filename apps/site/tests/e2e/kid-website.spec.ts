@@ -4,22 +4,13 @@ import { expect, test } from '@playwright/test';
 const setToday = (isoDate: string) => new Date(`${isoDate}T09:00:00+07:00`);
 
 test.describe('trang chủ', () => {
-  test('hiện bài của hôm nay theo giờ Việt Nam', async ({ page }) => {
+  test('hiện lời chào theo buổi và cổng thế giới học tập', async ({ page }) => {
     await page.clock.setFixedTime(setToday('2026-09-26'));
     await page.goto('/');
     await expect(page.locator('[data-greeting]')).toContainText('Chào Miu buổi sáng');
-    await expect(page.locator('[data-greeting]')).toContainText('Bài hôm nay');
-    const visibleCards = page.locator('[data-card]:not([hidden])');
-    await expect(visibleCards).toHaveCount(1);
-    await expect(visibleCards.first()).toContainText('Điền vần an hay ang');
-  });
-
-  test('chưa có bài hôm nay thì hiện bài gần nhất', async ({ page }) => {
-    await page.clock.setFixedTime(setToday('2026-10-05'));
-    await page.goto('/');
-    await expect(page.locator('[data-greeting]')).toContainText('bài gần nhất');
-    await expect(page.locator('[data-birthday]')).toBeHidden();
-    await expect(page.locator('[data-card]:not([hidden])')).toContainText('Xem giờ trên đồng hồ');
+    await expect(page.locator('[data-greeting]')).toContainText('Thế giới học tập');
+    await expect(page.locator('a[href="/the-gioi/"]')).toBeVisible();
+    await expect(page.locator('a[href="/the-gioi/"]')).toContainText('Thế giới học tập của Miu');
   });
 
   test('sinh nhật Miu và em Bo hiện lời chúc', async ({ page }) => {
@@ -31,7 +22,7 @@ test.describe('trang chủ', () => {
     await expect(page.locator('[data-birthday]')).toContainText('sinh nhật em Bo');
   });
 
-  test('không hiện bài nháp ở trang chủ và danh sách', async ({ page }) => {
+  test('không hiện bài nháp ở danh sách', async ({ page }) => {
     await page.goto('/cac-bai/');
     await expect(page.locator('[data-card]')).toHaveCount(3);
     await expect(page.getByText('Bài nháp thử')).toHaveCount(0);

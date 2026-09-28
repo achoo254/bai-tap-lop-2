@@ -5,11 +5,7 @@
  * Bậc khó = min(5, max(1, mastery[skill].level + difficultyBoost)).
  * Ví dụ: TIMO nâng độ khó thêm +1 bậc so với tiến độ hiện tại của bé ở môn Toán Base.
  */
-import {
-  MAX_DIFFICULTY,
-  MIN_DIFFICULTY,
-  type DifficultyLevel,
-} from '../skills/skill-types';
+import { MAX_DIFFICULTY, MIN_DIFFICULTY, type DifficultyLevel } from '../skills/skill-types';
 
 export function calculateEventDifficulty(
   baseMasteryLevel: number,

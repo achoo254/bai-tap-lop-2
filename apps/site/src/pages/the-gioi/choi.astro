@@ -157,8 +157,10 @@ import Hud from '../../components/game/hud.astro';
 </style>
 
 <script>
-  import { DemoMiniGame, type DemoChallenge } from '../../minigames/demo-minigame';
-  import type { QuestApi, HintTier } from '../../minigames/minigame-types';
+  import { DemoMiniGame } from '../../minigames/demo-minigame';
+  import { DocHieuMiniGame } from '../../minigames/doc-hieu-minigame';
+  import { CHALLENGES_DOC_HIEU, CHALLENGES_LUYEN_TAP } from '../../minigames/doc-hieu-cau-thu-du-bi';
+  import type { QuestApi, HintTier, MiniGame } from '../../minigames/minigame-types';
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
   import { recordEventQuestCompletion } from '../../lib/game/state/game-state';
   import { applyQuestResult, type AnswerRecord } from '../../lib/game/progression/rewards';
@@ -182,6 +184,7 @@ import Hud from '../../components/game/hud.astro';
   let isBoss = false;
   let skillId: SkillId = 'lop-2/so-den-1000';
   let returnUrl = '/the-gioi/lop-2/toan/';
+  let npcType = 'bac-cu';
 
   if (currentEvent) {
     const evtQuest = currentEvent.quests.find((q) => q.id === questId);
@@ -199,8 +202,17 @@ import Hud from '../../components/game/hud.astro';
       questIntro = questInfo.quest.intro;
       isBoss = !!questInfo.quest.isBoss;
       skillId = questInfo.quest.skill;
+      npcType = questInfo.quest.npc || 'bac-cu';
       returnUrl = `/the-gioi/${questInfo.world.grade}/${questInfo.region.id}/`;
     }
+  }
+
+  // Cập nhật avatar NPC
+  const npcAvatarEl = document.getElementById('npc-avatar-icon');
+  if (npcAvatarEl) {
+    if (npcType === 'soc-nau') npcAvatarEl.textContent = '🐿️';
+    else if (npcType === 'chim-sau') npcAvatarEl.textContent = '🐦';
+    else npcAvatarEl.textContent = '🦉';
   }
 
   // Cập nhật nút quay lại trên HUD
@@ -220,7 +232,7 @@ import Hud from '../../components/game/hud.astro';
   if (headerTitleEl) headerTitleEl.textContent = questTitle;
   if (bubbleTextEl) bubbleTextEl.textContent = questIntro;
 
-  // Đọc to lời dẫn Bác Cú
+  // Đọc to lời dẫn NPC
   speak(questIntro, { tone: 'guide' });
 
   document.getElementById('btn-skip-npc')?.addEventListener('click', () => {
@@ -228,8 +240,14 @@ import Hud from '../../components/game/hud.astro';
     if (npcBox) npcBox.style.display = 'none';
   });
 
-  // Sinh 3 câu hỏi mẫu tương tác
-  function createChallengesForQuest(qId: string): DemoChallenge[] {
+  // Sinh các câu hỏi tương tác theo nhiệm vụ
+  function createChallengesForQuest(qId: string): any[] {
+    if (qId.includes('q1-doc-hieu')) {
+      return CHALLENGES_DOC_HIEU;
+    }
+    if (qId.includes('q2-luyen-tap')) {
+      return CHALLENGES_LUYEN_TAP;
+    }
     if (qId.includes('chan-le')) {
       return [
         {
@@ -341,7 +359,11 @@ import Hud from '../../components/game/hud.astro';
   let heartsLeft = 3;
 
   const stageEl = document.getElementById('minigame-stage');
-  const minigame = new DemoMiniGame();
+  const isDocHieu =
+    questId.includes('doc-hieu') ||
+    questId.includes('luyen-tap') ||
+    questId.includes('tieng-viet');
+  const minigame: MiniGame<any> = isDocHieu ? new DocHieuMiniGame() : new DemoMiniGame();
 
   function renderHearts() {
     const heartsContainer = document.getElementById('hud-hearts');

@@ -109,8 +109,49 @@ export const WORLD_LOP_2: World = {
         bannerTitle: 'Vùng Tiếng Việt Thơ Mộng',
       },
       guideNpc: 'soc-nau',
-      status: 'coming-soon',
-      chapters: [],
+      status: 'open',
+      chapters: [
+        {
+          id: 'ch1-vuon-doc-hieu',
+          name: 'Chương 1: Khu Vườn Đọc Hiểu & Từ Vựng',
+          description: 'Luyện đọc các câu chuyện ý nghĩa, trả lời câu hỏi và mở rộng vốn từ.',
+          order: 1,
+          status: 'open',
+          lessons: [
+            {
+              id: 'les1-cau-thu-du-bi',
+              name: 'Bài 8: Cầu thủ dự bị',
+              skills: ['lop-2/doc-hieu'],
+              quests: [
+                {
+                  id: 'lop-2/tieng-viet/ch1/q1-doc-hieu',
+                  title: 'Đọc hiểu: Cầu thủ dự bị',
+                  npc: 'soc-nau',
+                  intro:
+                    'Chào bé Miu! Hãy cùng Sóc Nâu đọc bài "Cầu thủ dự bị" và trả lời các câu hỏi trang 35 nhé!',
+                  minigame: 'doc-hieu',
+                  skill: 'lop-2/doc-hieu',
+                  questions: 4,
+                  unlock: { type: 'always' },
+                  mapCoordinates: { x: 28, y: 70 },
+                },
+                {
+                  id: 'lop-2/tieng-viet/ch1/q2-luyen-tap',
+                  title: 'Luyện tập: Lời khen & Chúc mừng',
+                  npc: 'soc-nau',
+                  intro:
+                    'Rất tuyệt vời! Giờ hãy cùng Sóc Nâu tìm câu khen trong bài và gửi lời chúc mừng gấu con nhé!',
+                  minigame: 'doc-hieu',
+                  skill: 'lop-2/doc-hieu',
+                  questions: 2,
+                  unlock: { type: 'quest-completed', questId: 'lop-2/tieng-viet/ch1/q1-doc-hieu' },
+                  mapCoordinates: { x: 68, y: 38 },
+                },
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       id: 'tieng-anh',

@@ -15,8 +15,11 @@ export function partOfDay(hour: number): string {
   return 'buổi tối';
 }
 
-export function greetingFor(mode: TodayPickMode, hour: number): string {
+export function greetingFor(mode: TodayPickMode | 'the-gioi', hour: number): string {
   const hello = `Chào ${miu} ${partOfDay(hour)} vui vẻ!`;
+  if (mode === 'the-gioi') {
+    return `${hello} Cùng mèo con khám phá Thế giới học tập nhé! 🚀`;
+  }
   switch (mode) {
     case 'hom-nay':
       return `${hello} Bài hôm nay đây, ${miu} chép thật đẹp nhé!`;
@@ -27,6 +30,11 @@ export function greetingFor(mode: TodayPickMode, hour: number): string {
     case 'trong':
       return `${hello} Chưa có bài nào, ${miu} chờ bố ${father} mẹ ${mother} thêm bài nhé!`;
   }
+}
+
+/** Lời chào mèo con khi vào Thế giới học tập. */
+export function greetingForWorld(hour: number): string {
+  return greetingFor('the-gioi', hour);
 }
 
 /** Lời chúc sinh nhật trong ngày (nếu có). */

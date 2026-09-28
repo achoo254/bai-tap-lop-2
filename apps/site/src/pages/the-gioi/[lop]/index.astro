@@ -70,22 +70,40 @@ const worldEvents = getEventsForWorld(world.grade);
           </div>
         </a>
 
-        <!-- Vùng 2: Vùng Tiếng Việt (Sắp mở) -->
-        <div class="region-landmark tieng-viet-landmark coming-soon" title="Vùng Tiếng Việt (Sắp mở)">
-          <div class="landmark-badge">
-            <span class="landmark-icon">📖</span>
-            <div class="landmark-info">
-              <strong>Vùng Tiếng Việt</strong>
-              <small>Mở học kỳ 2 🌸</small>
+        <!-- Vùng 2: Vùng Tiếng Việt -->
+        {world.regions.find((r) => r.id === 'tieng-viet')?.status === 'open' ? (
+          <a href={`/the-gioi/${world.grade}/tieng-viet/`} class="region-landmark tieng-viet-landmark" title="Vào Vùng Tiếng Việt">
+            <div class="landmark-badge">
+              <span class="landmark-icon">📖</span>
+              <div class="landmark-info">
+                <strong>Vùng Tiếng Việt</strong>
+                <small id="tv-prog-badge">Đang mở • 2 Nhiệm vụ</small>
+              </div>
+              <span class="enter-arrow">👉</span>
             </div>
-            <span class="lock-tag">🔒</span>
-          </div>
 
-          <div class="landmark-scene-box">
-            <div class="castle-illustration">🌳</div>
-            <div class="npc-mini-avatar">🐿️</div>
+            <div class="landmark-scene-box">
+              <div class="castle-illustration">🌳</div>
+              <div class="npc-mini-avatar" title="Sóc Nâu">🐿️</div>
+            </div>
+          </a>
+        ) : (
+          <div class="region-landmark tieng-viet-landmark coming-soon" title="Vùng Tiếng Việt (Sắp mở)">
+            <div class="landmark-badge">
+              <span class="landmark-icon">📖</span>
+              <div class="landmark-info">
+                <strong>Vùng Tiếng Việt</strong>
+                <small>Mở học kỳ 2 🌸</small>
+              </div>
+              <span class="lock-tag">🔒</span>
+            </div>
+
+            <div class="landmark-scene-box">
+              <div class="castle-illustration">🌳</div>
+              <div class="npc-mini-avatar">🐿️</div>
+            </div>
           </div>
-        </div>
+        )}
 
         <!-- Vùng 3: Vùng Tiếng Anh (Sắp mở) -->
         <div class="region-landmark tieng-anh-landmark coming-soon" title="Vùng Tiếng Anh (Sắp mở)">
@@ -406,6 +424,19 @@ const worldEvents = getEventsForWorld(world.grade);
     });
     if (stars > 0) {
       toanBadge.textContent = `⭐ ${stars}/9 sao • Đang mở`;
+    }
+  }
+
+  // Đếm số sao đạt được ở Vùng Tiếng Việt
+  const tvBadge = document.getElementById('tv-prog-badge');
+  if (tvBadge) {
+    const tvQuests = ['lop-2/tieng-viet/ch1/q1-doc-hieu', 'lop-2/tieng-viet/ch1/q2-luyen-tap'];
+    let tvStars = 0;
+    tvQuests.forEach((qId) => {
+      tvStars += state.quests[qId]?.stars || 0;
+    });
+    if (tvStars > 0) {
+      tvBadge.textContent = `⭐ ${tvStars}/6 sao • Đang mở`;
     }
   }
 </script>

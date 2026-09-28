@@ -512,15 +512,7 @@ export function playMagicSound(): void {
 }
 
 export type SfxType =
-  | 'correct'
-  | 'wrong'
-  | 'pop'
-  | 'reward'
-  | 'magic'
-  | 'click'
-  | 'fail'
-  | 'levelUp'
-  | 'cheer';
+  'correct' | 'wrong' | 'pop' | 'reward' | 'magic' | 'click' | 'fail' | 'levelUp' | 'cheer';
 
 export type SfxName = SfxType;
 
