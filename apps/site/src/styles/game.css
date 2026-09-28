@@ -8,8 +8,8 @@
  */
 
 :root {
-  --game-font-title: 'Baloo 2', 'Nunito', system-ui, sans-serif;
-  --game-font-body: 'Nunito', system-ui, sans-serif;
+  --game-font-title: var(--font-ui);
+  --game-font-body: var(--font-ui);
   --game-hud-height: 72px;
   --game-border-radius: 20px;
   --game-border-width: 3px;

@@ -129,7 +129,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
     // 2. Khung nội dung bài đọc
     const storyCard = document.createElement('div');
     this.storyCardElement = storyCard;
-    storyCard.className = 'story-card-box';
+    storyCard.className = 'story-card-box lesson-font';
     storyCard.style.cssText = `
       background: #ffffff;
       border: 3px solid #fbcfe8;
@@ -159,7 +159,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
       p.style.cssText = `
         margin: 0 0 0.6rem 0;
         font-size: 1.05rem;
-        line-height: 1.6;
+        line-height: 1.9;
         color: #334155;
         text-indent: 1.2rem;
       `;
@@ -196,6 +196,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
     `;
 
     const questionTitle = document.createElement('div');
+    questionTitle.className = 'lesson-font';
     questionTitle.style.cssText = `
       font-size: 1.2rem;
       font-weight: 800;
@@ -257,6 +258,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
 
       const optText = document.createElement('span');
       optText.textContent = opt.text;
+      optText.className = 'lesson-font';
       optText.style.flex = '1';
 
       btn.appendChild(letterBadge);
@@ -284,6 +286,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
     // 5. Khung Gợi ý 3 bậc
     const hintBox = document.createElement('div');
     this.hintElement = hintBox;
+    hintBox.className = 'lesson-font';
     hintBox.style.cssText = `
       display: none;
       padding: 0.85rem 1.25rem;
@@ -315,10 +318,10 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
         <strong style="color: #a21caf; font-size: 1.05rem;">✍️ Mẫu viết vào vở hướng dẫn học:</strong>
         <span style="font-size: 0.85rem; background: #fae8ff; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 800;">Chuẩn ô li</span>
       </div>
-      <div style="background: #ffffff; border: 1px dashed #d946ef; border-radius: 10px; padding: 0.85rem 1rem; font-weight: 700; color: #4a044e; margin-bottom: 0.5rem; font-family: 'Be Vietnam Pro', system-ui, sans-serif;">
+      <div class="lesson-font" style="background: #ffffff; border: 1px dashed #d946ef; border-radius: 10px; padding: 0.85rem 1rem; font-weight: 700; color: #4a044e; margin-bottom: 0.5rem;">
         ${challenge.notebookAnswer}
       </div>
-      <small style="color: #86198f;"><strong>Giải thích:</strong> ${challenge.explanation}</small>
+      <small class="lesson-font lesson-font--thuong" style="color: #86198f;"><strong>Giải thích:</strong> ${challenge.explanation}</small>
     `;
     questionCard.appendChild(answerBox);
 

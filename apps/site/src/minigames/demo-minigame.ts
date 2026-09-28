@@ -93,13 +93,14 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
       numCard.className = 'demo-number-card';
       numCard.innerHTML = `
         <span style="font-size: 1.1rem; color: #64748b; font-weight: bold;">Số cần xếp:</span>
-        <div style="font-size: 3.5rem; font-weight: 900; color: #0284c7; font-family: var(--font-display, inherit);">${num}</div>
+        <div class="lesson-font" style="font-size: 3.5rem; font-weight: 900; color: #0284c7;">${num}</div>
       `;
       numCard.style.textAlign = 'center';
       displayArea.appendChild(numCard);
     } else {
       // Phép tính
       const promptText = document.createElement('div');
+      promptText.className = 'lesson-font';
       promptText.style.cssText = 'font-size: 2.5rem; font-weight: 900; color: #0f172a;';
       promptText.textContent = challenge.prompt;
       displayArea.appendChild(promptText);
@@ -108,7 +109,7 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
 
     // 2. Vùng hiển thị gợi ý khi bấm đèn
     this.hintElement = document.createElement('div');
-    this.hintElement.className = 'demo-hint-box';
+    this.hintElement.className = 'demo-hint-box lesson-font';
     this.hintElement.style.cssText = `
       display: none;
       padding: 0.75rem 1.25rem;
@@ -143,7 +144,7 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
       choices.forEach((c) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'demo-choice-btn';
+        btn.className = 'demo-choice-btn lesson-font';
         btn.textContent = c.label;
         btn.style.cssText = `
           flex: 1 1 180px;
@@ -168,7 +169,7 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
       opts.forEach((optVal) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'demo-choice-btn';
+        btn.className = 'demo-choice-btn lesson-font';
         btn.textContent = String(optVal);
         btn.style.cssText = `
           min-width: 68px;

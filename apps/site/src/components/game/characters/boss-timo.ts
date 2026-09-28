@@ -42,7 +42,7 @@ export const BOSS_TIMO: BossDefinition = {
   <g stroke="#451a03" stroke-width="2">
     <line x1="20" y1="50" x2="20" y2="90" stroke="#78350f" stroke-width="4" stroke-linecap="round" />
     <polygon points="20,50 60,62 20,74" fill="#facc15" />
-    <text x="32" y="66" font-family="Andika, sans-serif" font-size="14" font-weight="900" fill="#991b1b">±</text>
+    <text x="32" y="66" font-family="'Nunito Variable', Nunito, sans-serif" font-size="14" font-weight="900" fill="#991b1b">±</text>
   </g>
 
   <!-- Thân tròn đầu to của bạch tuộc -->
@@ -86,7 +86,7 @@ export const BOSS_TIMO: BossDefinition = {
     <path d="M44 84 C70 88 130 88 156 84" fill="none" stroke="#eab308" stroke-width="4" stroke-linecap="round" />
     <!-- Biểu tượng dấu nhân và cộng vàng trên mũ -->
     <circle cx="100" cy="74" r="8" fill="#ca8a04" stroke="#713f12" stroke-width="1.5" />
-    <text x="100" y="79" font-family="Andika, sans-serif" font-size="14" font-weight="900" fill="#fef08a" text-anchor="middle">×</text>
+    <text x="100" y="79" font-family="'Nunito Variable', Nunito, sans-serif" font-size="14" font-weight="900" fill="#fef08a" text-anchor="middle">×</text>
     <!-- Lông vũ đỏ trên mũ -->
     <path d="M140 68 Q158 44 170 48 Q162 62 148 72 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="2" />
   </g>

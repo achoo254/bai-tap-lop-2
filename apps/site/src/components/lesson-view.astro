@@ -17,7 +17,7 @@ const { frontmatter } = lesson;
 
 <article class="lesson" data-lesson-id={lesson.id}>
   <header class="lesson-header">
-    <h1 class="lesson-title">{frontmatter.tieu_de}</h1>
+    <h1 class="lesson-title lesson-font">{frontmatter.tieu_de}</h1>
     <span class="subject-badge" data-subject={frontmatter.mon}>{lesson.subjectLabel}</span>
     <span class="lesson-date">{formatVietnameseDate(frontmatter.ngay)}</span>
   </header>

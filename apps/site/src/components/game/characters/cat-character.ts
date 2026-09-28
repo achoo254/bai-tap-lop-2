@@ -437,7 +437,7 @@ export function renderCatSvgHtml(options: RenderCatOptions = {}): string {
         <!-- Bong bóng suy nghĩ -->
         <circle cx="152" cy="68" r="5" fill="#e0e7ff" stroke="#4338ca" stroke-width="2" />
         <circle cx="162" cy="56" r="8" fill="#e0e7ff" stroke="#4338ca" stroke-width="2.5" />
-        <text class="cat-question-mark" x="168" y="38" font-family="Andika, sans-serif" font-size="36" font-weight="900" fill="#5a3fc0">?</text>
+        <text class="cat-question-mark" x="168" y="38" font-family="'Nunito Variable', Nunito, sans-serif" font-size="36" font-weight="900" fill="#5a3fc0">?</text>
       </g>`;
   } else if (pose === 'vui') {
     pawsSvg = `

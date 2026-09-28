@@ -77,6 +77,29 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * Nội dung bài học ngoài vở ô li (tên bài, bài đọc, câu hỏi, đáp án trong mini-game)
+ * dùng chung font với vở: chữ viết tay mẫu tiểu học khi bé chọn, không thì chữ in.
+ * Chữ mẫu có chiều cao chữ thường thấp (0,41 cỡ chữ) nên nới cho bằng chiều cao chữ in để dễ đọc.
+ */
+:root[data-font='viet-tay'] {
+  --font-lesson: var(--font-handwriting);
+}
+.lesson-font {
+  font-family: var(--font-lesson);
+}
+:root[data-font='viet-tay'] .lesson-font {
+  font-size-adjust: 0.5;
+  font-weight: 700;
+  line-height: 1.7;
+}
+.lesson-font--thuong {
+  font-weight: 400;
+}
+:root[data-font='viet-tay'] .lesson-font--thuong {
+  font-weight: 400;
+}
+
 /* Font chữ mẫu tiểu học HP001: chữ thường 0,41 cỡ chữ, chữ cao/chữ hoa gấp 2,5 lần (5 ô li). */
 :root[data-font='viet-tay'] .lesson-text {
   --x-ratio: 0.41;
