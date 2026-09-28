@@ -1,14 +1,23 @@
 /**
  * Âm thanh của game:
- * - Giọng đọc tiếng Việt có sẵn trong máy (Web Speech API) đọc đề và lời thoại, để bé không phải tự đọc.
+ * - Giọng đọc có sẵn trong máy (Web Speech API) đọc đề và lời thoại: tiếng Việt cho mọi vùng,
+ *   tiếng Anh cho Vùng Tiếng Anh và dòng song ngữ của sự kiện — để bé không phải tự đọc.
  * - Tiếng "ting" khi đúng, "bụp" khi sai, "pop" khi chạm: tạo bằng Web Audio, không cần file âm thanh.
  * Safari trên iPad chỉ cho phát tiếng sau khi bé chạm màn hình, nên gọi unlockAudio() trong lượt chạm đầu.
  */
 
-const MUTED_KEY = 'dao-so:tat-tieng';
+export type SpeechLanguage = 'vi' | 'en';
+
+const MUTED_KEY = 'the-gioi:tat-tieng';
+
+const SPEECH_SETTINGS: Record<SpeechLanguage, { lang: string; rate: number; pitch: number }> = {
+  vi: { lang: 'vi-VN', rate: 0.9, pitch: 1.1 },
+  // Tiếng Anh đọc chậm hơn cho bé lớp 2 nghe rõ từng từ.
+  en: { lang: 'en-US', rate: 0.8, pitch: 1.1 },
+};
 
 let audioContext: AudioContext | null = null;
-let vietnameseVoice: SpeechSynthesisVoice | null = null;
+const voices: Record<SpeechLanguage, SpeechSynthesisVoice | null> = { vi: null, en: null };
 let muted = readMuted();
 
 function readMuted(): boolean {
@@ -34,25 +43,34 @@ export function setMuted(value: boolean): void {
   }
 }
 
-function findVietnameseVoice(): SpeechSynthesisVoice | null {
+function findVoice(language: SpeechLanguage): SpeechSynthesisVoice | null {
   if (!('speechSynthesis' in window)) return null;
-  const voices = window.speechSynthesis.getVoices();
-  return voices.find((voice) => voice.lang.toLowerCase().startsWith('vi')) ?? null;
+  const available = window.speechSynthesis.getVoices();
+  const exact = SPEECH_SETTINGS[language].lang.toLowerCase();
+  return (
+    available.find((voice) => voice.lang.toLowerCase().replace('_', '-') === exact) ??
+    available.find((voice) => voice.lang.toLowerCase().startsWith(language)) ??
+    null
+  );
 }
 
-/** Máy có giọng đọc tiếng Việt không (danh sách giọng có thể nạp muộn vài trăm ms). */
-export function waitForVietnameseVoice(timeoutMs = 1500): Promise<boolean> {
+/** Máy có giọng đọc cho ngôn ngữ này không (danh sách giọng có thể nạp muộn vài trăm ms). */
+export function waitForVoice(language: SpeechLanguage, timeoutMs = 1500): Promise<boolean> {
   if (!('speechSynthesis' in window)) return Promise.resolve(false);
-  vietnameseVoice = findVietnameseVoice();
-  if (vietnameseVoice) return Promise.resolve(true);
+  voices[language] = findVoice(language);
+  if (voices[language]) return Promise.resolve(true);
   return new Promise((resolve) => {
     const done = (): void => {
-      vietnameseVoice = findVietnameseVoice();
-      resolve(vietnameseVoice !== null);
+      voices[language] = findVoice(language);
+      resolve(voices[language] !== null);
     };
     window.speechSynthesis.addEventListener('voiceschanged', done, { once: true });
     window.setTimeout(done, timeoutMs);
   });
+}
+
+export function waitForVietnameseVoice(timeoutMs = 1500): Promise<boolean> {
+  return waitForVoice('vi', timeoutMs);
 }
 
 export function unlockAudio(): void {
@@ -66,16 +84,18 @@ export function unlockAudio(): void {
   if ('speechSynthesis' in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
 }
 
-/** Đọc to một câu tiếng Việt; câu mới thay câu đang đọc. */
-export function speak(text: string): void {
+/** Đọc to một câu (mặc định tiếng Việt); câu mới thay câu đang đọc. */
+export function speak(text: string, language: SpeechLanguage = 'vi'): void {
   if (muted || !('speechSynthesis' in window)) return;
   const synth = window.speechSynthesis;
   synth.cancel();
+  const settings = SPEECH_SETTINGS[language];
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'vi-VN';
-  if (vietnameseVoice) utterance.voice = vietnameseVoice;
-  utterance.rate = 0.9;
-  utterance.pitch = 1.1;
+  utterance.lang = settings.lang;
+  const voice = voices[language] ?? findVoice(language);
+  if (voice) utterance.voice = voice;
+  utterance.rate = settings.rate;
+  utterance.pitch = settings.pitch;
   synth.speak(utterance);
 }
 

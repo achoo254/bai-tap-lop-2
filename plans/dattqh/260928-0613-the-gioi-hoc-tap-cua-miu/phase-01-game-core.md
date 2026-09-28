@@ -24,7 +24,7 @@ Thư viện TS thuần dùng chung cho mọi vùng và mọi sự kiện: hồ s
 - [x] 39 unit test xanh, typecheck + eslint + prettier sạch.
 
 ## Còn lại
-- `media/audio.ts`: thêm `speak(text, lang)` hỗ trợ `en-US` (Vùng Tiếng Anh, dòng song ngữ sự kiện) + chọn giọng theo ngôn ngữ.
+- [x] `media/audio.ts`: `speak(text, 'vi' | 'en')`, chọn giọng theo ngôn ngữ (`en-US` đọc chậm 0.8), `waitForVoice(lang)`.
 - Quy ước `.default()` cho trường mới của `GameState` (đã ghi chú trong file) — thêm test mẫu khi phase 4 thêm `events`.
 - Code review lõi (drag-and-place chưa có test tự động → kiểm bằng e2e ở phase 3).
 
