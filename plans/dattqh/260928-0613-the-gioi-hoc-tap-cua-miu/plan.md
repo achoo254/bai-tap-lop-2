@@ -25,7 +25,7 @@ created: 2026-09-28
 **Việc tiếp theo cụ thể (Phase 2):** tải gói Kenney CC0 + chọn hình OpenMoji → style guide → nhân vật Miu SVG → **cảnh mẫu cổng Vùng Toán để bố mẹ duyệt phong cách** (chưa duyệt thì không làm hàng loạt).
 
 **Chặn / cần bố mẹ làm:**
-- GitHub Actions "Cập nhật web của bé" **chưa bao giờ deploy được** (9/9 lần lỗi): repo thiếu secret `CLOUDFLARE_API_TOKEN` (chỉ có `CLOUDFLARE_ACCOUNT_ID`). Cần tạo token Cloudflare mẫu "Edit Cloudflare Workers" (tài khoản + zone `hoandat.com`) rồi `gh secret set CLOUDFLARE_API_TOKEN`. Tới lúc đó web chỉ cập nhật khi deploy thủ công: `pnpm --filter site deploy`.
+- ~~Thiếu secret `CLOUDFLARE_API_TOKEN`~~ — đã thêm 2026-09-28; workflow "Cập nhật web của bé" deploy thành công (run 36388589597, custom domain `lop2.hoandat.com`). Từ giờ đăng bài/push `main` là web tự cập nhật.
 - Câu hỏi mở cuối file (bộ sách, bảng kỷ lục, ngày mở thế giới mới) — đang dùng mặc định.
 
 **Ghi chú môi trường:** Wrangler + MCP Cloudflare đã đăng nhập OAuth trên máy; Playwright dùng `channel: 'chrome'` (chưa cài trình duyệt riêng của Playwright); `apps/site` đã thêm `zod`.
