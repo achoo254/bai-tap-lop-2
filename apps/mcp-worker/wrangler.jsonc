@@ -22,7 +22,7 @@
     "GITHUB_REPO": "bai-tap-lop-2",
     "GITHUB_BRANCH": "main",
     "ALLOWED_GITHUB_LOGIN": "achoo254",
-    "SITE_URL": "https://baitap.inetdev.io.vn"
+    "SITE_URL": "https://lop2.hoandat.com"
   },
   "routes": [{ "pattern": "mcp-baitap.inetdev.io.vn", "custom_domain": true }],
   "workers_dev": false,

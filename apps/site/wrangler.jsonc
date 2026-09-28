@@ -10,7 +10,7 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
-  "routes": [{ "pattern": "baitap.inetdev.io.vn", "custom_domain": true }],
+  "routes": [{ "pattern": "lop2.hoandat.com", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false,
   "observability": { "enabled": true }

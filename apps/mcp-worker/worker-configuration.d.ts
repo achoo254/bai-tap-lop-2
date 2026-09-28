@@ -7,7 +7,7 @@ interface __BaseEnv_Env {
 	GITHUB_REPO: "bai-tap-lop-2";
 	GITHUB_BRANCH: "main";
 	ALLOWED_GITHUB_LOGIN: "achoo254";
-	SITE_URL: "https://baitap.inetdev.io.vn";
+	SITE_URL: "https://lop2.hoandat.com";
 	MCP_OBJECT: DurableObjectNamespace<import("./src/worker-entry").LessonMcpAgent>;
 }
 declare namespace Cloudflare {
