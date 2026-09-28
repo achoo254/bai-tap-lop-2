@@ -56,7 +56,10 @@ const handwritingAvailable = hasHandwritingFont();
     <div class="page">
       <header class="top-bar">
         <a class="brand" href="/">
-          <MascotKitten pose="vui" />
+          <!-- Mèo cá nhân hoá từ game store; MascotKitten là fallback cho đến khi JS tải xong -->
+          <span class="brand-cat" data-brand-cat aria-hidden="true">
+            <MascotKitten pose="vui" />
+          </span>
           <span>{SITE_TITLE}</span>
         </a>
         <div class="top-bar__right">
@@ -76,3 +79,38 @@ const handwritingAvailable = hasHandwritingFont();
     <CompanionBuddy context={companionContext} handwritingAvailable={handwritingAvailable} />
   </body>
 </html>
+
+<script>
+  /**
+   * Đồng bộ mèo ở thanh đầu trang với avatar cá nhân hoá từ game store.
+   * Khi store cập nhật (đổi màu/phụ kiện trong bảng cài đặt của đồng hành),
+   * subscriber này sẽ tự vẽ lại ngay lập tức — tất cả mèo trên trang đều
+   * hiển thị nhất quán theo cá nhân hóa của bé.
+   */
+  import {
+    renderCatSvgHtml,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../components/game/characters/cat-character';
+  import { getBrowserGameStore } from '../lib/game/state/game-store';
+  import { todayInVietnam } from '../lib/today-lesson-picker';
+
+  const brandCat = document.querySelector<HTMLElement>('[data-brand-cat]');
+  if (brandCat) {
+    const store = getBrowserGameStore(todayInVietnam(), 'Miu');
+
+    function drawBrandCat(): void {
+      const { avatar } = store.getState();
+      brandCat!.innerHTML = renderCatSvgHtml({
+        pose: 'vui',
+        furColor: (avatar.furColor as CatFurColorId) || 'vang-cam',
+        accessories: (avatar.accessories as CatAccessoryId[]) ?? [],
+        size: 40,
+        label: '',
+      });
+    }
+
+    drawBrandCat();
+    store.subscribe(() => drawBrandCat());
+  }
+</script>

@@ -16,7 +16,10 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
 <KidPageLayout title="Thế giới học tập của Miu" showToolbar={false}>
   <!-- Phần Lời Chào Mèo Con Sinh Động -->
   <div class="mascot-row mascot-row--interactive">
-    <MascotKitten pose="chao" label="Mèo con vẫy chào bé Miu" />
+    <!-- Mèo cá nhân hoá theo avatar của bé; JS thay thế sau khi đọc game store -->
+    <span class="greeting-cat" data-greeting-cat aria-hidden="true">
+      <MascotKitten pose="chao" label="Mèo con vẫy chào bé Miu" />
+    </span>
     <div class="speech-bubble-container">
       <p class="speech-bubble" data-greeting>{greetingForWorld(currentHour, currentDayOfWeek)}</p>
       <div class="speech-actions">
@@ -1064,6 +1067,12 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   import { introduceScreen } from '../lib/game/media/screen-intro';
   import type { UniformDay } from '../lib/uniform-schedule';
   import type { DaySchedule } from '../lib/timetable-schedule';
+  import {
+    renderCatSvgHtml,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../components/game/characters/cat-character';
+
 
   const today = todayInVietnam();
   const currentHour = hourInVietnam();
@@ -1110,8 +1119,10 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     banner.hidden = false;
   }
 
-  // 4. Đồng bộ Thanh Chiến Tích Từ Game Store (localStorage the-gioi:v1)
+  // 4. Đồng bộ Thanh Chiến Tích & Mèo Chào từ Game Store (localStorage the-gioi:v1)
   const store = getBrowserGameStore(today, 'Miu');
+  const greetingCat = document.querySelector<HTMLElement>('[data-greeting-cat]');
+
   function updateStats(state: ReturnType<typeof store.getState>) {
     const avatarNameEl = document.getElementById('home-avatar-name');
     const levelBadgeEl = document.getElementById('home-level-badge');
@@ -1128,6 +1139,7 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     if (xpFillEl) xpFillEl.style.width = `${Math.min(100, Math.max(0, Math.round(ratio * 100)))}%`;
     if (coinsEl) coinsEl.textContent = String(state.coins);
     if (streakEl) streakEl.textContent = `${state.streak.current || 1} ngày`;
+
     if (starsEl) starsEl.textContent = String(getTotalStars(state));
   }
   updateStats(store.getState());
