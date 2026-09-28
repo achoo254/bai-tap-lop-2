@@ -5,7 +5,6 @@
  * Bản đồ Thế giới học tập (World Map):
  * - Hiển thị 3 Vùng môn học (Toán, Tiếng Việt, Tiếng Anh)
  * - Hiển thị các điểm neo Sự kiện (như Quần đảo TIMO)
- * - Nhân vật Miu đứng ở vùng chơi gần nhất
  * - Chạm vào Vùng Toán để mở Bản đồ vùng (các chương và nhiệm vụ).
  */
 import KidPageLayout from '../../../layouts/kid-page-layout.astro';
@@ -151,14 +150,6 @@ const worldEvents = getEventsForWorld(world.grade);
             );
           })
         }
-
-        <!-- Nhân vật Miu đứng trên bản đồ -->
-        <div class="map-character-marker" id="map-miu-marker" style="top: 38%; left: 24%;">
-          <div class="miu-mini-figure" id="map-miu-figure">
-            <!-- Miu SVG -->
-          </div>
-          <div class="miu-name-tag" id="map-miu-tag">Miu</div>
-        </div>
       </div>
     </div>
   </main>
@@ -352,43 +343,9 @@ const worldEvents = getEventsForWorld(world.grade);
   .region-landmark.coming-soon:hover {
     transform: none;
   }
-
-  /* Marker nhân vật Miu */
-  .map-character-marker {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10;
-    transition: all 0.5s ease;
-  }
-
-  .miu-mini-figure {
-    width: 90px;
-    height: 90px;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
-  }
-
-  .miu-name-tag {
-    margin-top: -0.25rem;
-    padding: 0.2rem 0.6rem;
-    background: #ffb45c;
-    border: 2px solid #0f172a;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: #0f172a;
-  }
 </style>
 
 <script>
-  import {
-    renderCatSvgHtml,
-    type CatFurColorId,
-    type CatAccessoryId,
-  } from '../../../components/game/characters/cat-character';
   import { getBrowserGameStore } from '../../../lib/game/state/game-store';
 
   const today = new Date().toISOString().slice(0, 10);
@@ -398,23 +355,6 @@ const worldEvents = getEventsForWorld(world.grade);
   // Kiểm tra nếu chưa tạo nhân vật
   if (!state.avatar.createdOn) {
     window.location.replace('/the-gioi/tao-nhan-vat/');
-  }
-
-  const miuFigure = document.getElementById('map-miu-figure');
-  const miuTag = document.getElementById('map-miu-tag');
-
-  if (miuFigure) {
-    miuFigure.innerHTML = renderCatSvgHtml({
-      pose: 'dung',
-      furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
-      accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
-      size: 90,
-      label: `Bé ${state.avatar.name}`,
-    });
-  }
-
-  if (miuTag) {
-    miuTag.textContent = state.avatar.name || 'Miu';
   }
 
   // Đếm số sao đạt được ở Vùng Toán
