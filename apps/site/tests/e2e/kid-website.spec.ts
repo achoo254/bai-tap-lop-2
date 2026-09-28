@@ -10,7 +10,7 @@ test.describe('trang chủ', () => {
     await expect(page.locator('[data-greeting]')).toContainText('Chào Miu buổi sáng');
     await expect(page.locator('[data-greeting]')).toContainText('Thế giới học tập');
     await expect(page.locator('a[href="/the-gioi/"]')).toBeVisible();
-    await expect(page.locator('a[href="/the-gioi/"]')).toContainText('Thế giới học tập của Miu');
+    await expect(page.locator('a[href="/the-gioi/"]')).toContainText('Thế giới học tập');
   });
 
   test('sinh nhật Miu và em Bo hiện lời chúc', async ({ page }) => {

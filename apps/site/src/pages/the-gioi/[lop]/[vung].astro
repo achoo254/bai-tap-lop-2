@@ -43,9 +43,6 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
   title={`${region.name} — ${world.name}`}
   showToolbar={false}
 >
-  <link rel="stylesheet" href="/game/characters/character-poses.css" />
-  <link rel="stylesheet" href="/styles/game.css" />
-
   <Hud title={region.name} backUrl={`/the-gioi/${world.grade}/`} backLabel={`Về Bản đồ ${world.name}`} />
 
   <main class="world-container">
@@ -367,7 +364,7 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
   } from '../../../components/game/characters/cat-character';
   import { getBrowserGameStore } from '../../../lib/game/state/game-store';
   import { isQuestUnlocked } from '../../../lib/game/world/unlock-rules';
-  import { WORLD_LOP_2 } from '../../../worlds/lop-2/world';
+  import { findQuest } from '../../../lib/game/world/world-registry';
   import { playSfx, speak } from '../../../lib/game/media/audio';
 
   const today = new Date().toISOString().slice(0, 10);
@@ -389,14 +386,14 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
   }
 
   const nodes = document.querySelectorAll('.quest-node');
-  const chapter1Quests = WORLD_LOP_2.regions[0].chapters[0].lessons[0].quests;
 
   nodes.forEach((node) => {
-    const qId = node.getAttribute('data-quest-id');
-    const questDef = chapter1Quests.find((q) => q.id === qId);
-    if (!questDef) return;
+    // Tra nhiệm vụ theo id trên mọi vùng/chương — trang này dùng chung cho mọi vùng môn học
+    const found = findQuest(node.getAttribute('data-quest-id') ?? '');
+    if (!found) return;
+    const { quest: questDef, world } = found;
 
-    const unlocked = isQuestUnlocked(questDef, state, WORLD_LOP_2);
+    const unlocked = isQuestUnlocked(questDef, state, world);
     const questProg = state.quests[questDef.id];
     const starsEl = document.getElementById(`stars-${questDef.id.replace(/\//g, '-')}`);
     const statusEl = document.getElementById(`status-${questDef.id.replace(/\//g, '-')}`);
