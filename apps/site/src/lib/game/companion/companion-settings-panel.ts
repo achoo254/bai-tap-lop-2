@@ -3,8 +3,8 @@
  *
  * Bảng cài đặt mở ra khi bấm vào nhân vật đồng hành:
  * - Nhân vật: tên, màu lông, phụ kiện theo loại (lưu ngay vào tiến độ game)
- * - Âm thanh: tắt tất cả, nhạc nền + âm lượng, giọng đọc, chọn giọng, vùng miền,
- *   phong cách, tốc độ, cao độ, nghe thử
+ * - Âm thanh: tắt tất cả, nhạc nền + âm lượng, giọng đọc, chọn người đọc
+ *   (người đọc gồm cả giọng Zalo miền Nam), phong cách, tốc độ, cao độ, nghe thử
  * - Mèo tự nói chuyện, kiểu chữ đọc bài
  * Mọi lựa chọn lưu trên thiết bị (localStorage) nên tải lại trang không mất.
  */
@@ -13,19 +13,17 @@ import { bindAccessoryPicker } from '../avatar/accessory-picker';
 import type { GameStore } from '../state/game-store';
 import {
   getAvailableVoices,
-  getPreferredAccent,
   getPreferredTone,
   getPreferredVoice,
   isMuted,
   setMuted,
-  setPreferredAccent,
   setPreferredTone,
   setPreferredVoice,
   speak,
   VOICE_TONES,
-  type VietnameseAccent,
   type VoiceTone,
 } from '../media/audio';
+import { ZALO_VOICES } from '../media/zalo-voice';
 import {
   getMusicVolume,
   getSpeechPitchScale,
@@ -96,7 +94,6 @@ export function bindCompanionSettingsPanel(
   const musicVolume = field<HTMLInputElement>(panel, 'music-volume');
   const voice = field<HTMLInputElement>(panel, 'voice');
   const voiceName = field<HTMLSelectElement>(panel, 'voice-name');
-  const accent = field<HTMLSelectElement>(panel, 'accent');
   const tone = field<HTMLSelectElement>(panel, 'tone');
   const rate = field<HTMLInputElement>(panel, 'rate');
   const pitch = field<HTMLInputElement>(panel, 'pitch');
@@ -109,15 +106,24 @@ export function bindCompanionSettingsPanel(
     if (out) out.textContent = `${input.value}${suffix}`;
   };
 
+  /** Danh sách người đọc: giọng Zalo (có miền Nam) + mọi giọng tiếng Việt cài sẵn trong máy. */
   function fillVoices(): void {
     if (!voiceName) return;
-    const voices = getAvailableVoices('vi');
+    const deviceVoices = getAvailableVoices('vi', 'all');
     const preferred = getPreferredVoice('vi') ?? AUTO_VOICE;
+    const zaloGroup = document.createElement('optgroup');
+    zaloGroup.label = 'Giọng Zalo (cần mạng)';
+    zaloGroup.append(...ZALO_VOICES.map((v) => new Option(v.label, v.id)));
+    const deviceGroup = document.createElement('optgroup');
+    deviceGroup.label = 'Giọng có sẵn trong máy';
+    deviceGroup.append(...deviceVoices.map((v) => new Option(`${v.name} (${v.lang})`, v.name)));
     voiceName.replaceChildren(
-      new Option(voices.length ? 'Tự chọn giọng hay nhất' : 'Máy chưa có giọng tiếng Việt', AUTO_VOICE),
-      ...voices.map((v) => new Option(`${v.name} (${v.lang})`, v.name)),
+      new Option('Tự chọn giọng máy hay nhất', AUTO_VOICE),
+      zaloGroup,
+      ...(deviceVoices.length ? [deviceGroup] : []),
     );
-    voiceName.value = voices.some((v) => v.name === preferred) ? preferred : AUTO_VOICE;
+    const known = [...ZALO_VOICES.map((v) => v.id), ...deviceVoices.map((v) => v.name)];
+    voiceName.value = known.includes(preferred) ? preferred : AUTO_VOICE;
   }
 
   function syncSound(): void {
@@ -125,7 +131,6 @@ export function bindCompanionSettingsPanel(
     if (music) music.checked = isMusicEnabled();
     if (musicVolume) musicVolume.value = percent(getMusicVolume());
     if (voice) voice.checked = isVoiceEnabled();
-    if (accent) accent.value = getPreferredAccent();
     if (tone) tone.value = getPreferredTone();
     if (rate) rate.value = percent(getSpeechRateScale());
     if (pitch) pitch.value = percent(getSpeechPitchScale());
@@ -155,10 +160,6 @@ export function bindCompanionSettingsPanel(
   voiceName?.addEventListener('change', () => {
     setPreferredVoice('vi', voiceName.value);
     tryVoice();
-  });
-  accent?.addEventListener('change', () => {
-    setPreferredAccent(accent.value as VietnameseAccent);
-    fillVoices();
   });
   tone?.addEventListener('change', () => setPreferredTone(tone.value as VoiceTone));
   rate?.addEventListener('input', () => {

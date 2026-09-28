@@ -74,14 +74,6 @@ const furColors = Object.values(CAT_FUR_COLORS);
       <select data-setting="voice-name"></select>
     </label>
     <label class="select-row">
-      <span>Giọng vùng miền</span>
-      <select data-setting="accent">
-        <option value="bac">Miền Bắc</option>
-        <option value="nam">Miền Nam</option>
-        <option value="all">Tất cả</option>
-      </select>
-    </label>
-    <label class="select-row">
       <span>Phong cách</span>
       <select data-setting="tone"></select>
     </label>
@@ -92,6 +84,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
     <label class="slider-row">
       <span>Cao độ <output data-value-for="pitch"></output></span>
       <input type="range" min="60" max="150" step="5" data-setting="pitch" />
+      <small class="setting-hint">Giọng Zalo cần mạng và chỉ chỉnh được tốc độ; cao độ áp dụng cho giọng có sẵn của máy.</small>
     </label>
     <div class="panel-actions">
       <button type="button" class="panel-btn" data-action="try-voice">▶️ Nghe thử</button>
@@ -335,6 +328,12 @@ const furColors = Object.values(CAT_FUR_COLORS);
   .slider-row input {
     width: 100%;
     accent-color: #0369a1;
+  }
+
+  .setting-hint {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
   }
 
   .slider-row output {

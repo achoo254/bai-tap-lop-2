@@ -1,12 +1,16 @@
 /**
- * Web của bé: Worker chỉ phục vụ file tĩnh do Astro build ra (dist/).
+ * Web của bé: Worker phục vụ file tĩnh do Astro build ra (dist/) và /api/doc (đọc to bằng giọng Zalo).
  * Deploy: `pnpm --filter site deploy` (máy) hoặc GitHub Actions mỗi khi có bài mới.
+ * Secret: `wrangler secret put ZALO_TTS_API_KEY` (chưa đặt thì web dùng giọng có sẵn của máy).
  */
 {
   "name": "bai-tap-lop-2-web",
   "compatibility_date": "2026-09-01",
+  "main": "./src/worker/web-worker.ts",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
   },

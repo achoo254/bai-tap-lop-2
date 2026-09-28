@@ -14,6 +14,7 @@
  * - Tương thích chuẩn Safari/iPad (unlockAudio trong tương tác đầu tiên).
  */
 import { getSpeechPitchScale, getSpeechRateScale, isVoiceEnabled } from './sound-preferences';
+import { findZaloVoice, splitForSpeech, toZaloSpeed, zaloAudioUrl } from './zalo-voice';
 
 export type SpeechLanguage = 'vi' | 'en';
 
@@ -124,8 +125,12 @@ export function isMuted(): boolean {
   return muted;
 }
 
+/** Tăng mỗi lần dừng/đọc mới để huỷ hàng đợi giọng Zalo đang phát dở. */
+let speechToken = 0;
+
 /** Dừng mọi âm thanh đang đọc (cả tệp MP3 và Web Speech API). */
 export function stopAudio(): void {
+  speechToken++;
   if (currentAudioElement) {
     currentAudioElement.pause();
     currentAudioElement.currentTime = 0;
@@ -180,7 +185,8 @@ export function playAudioClip(url: string): Promise<void> {
       };
       audio.onended = finish;
       audio.onerror = finish;
-      emitSpeaking(true);
+      // Chỉ báo "đang đọc" khi thật sự phát (trình duyệt có thể chặn tự phát)
+      audio.onplaying = () => emitSpeaking(true);
       audio.play().catch(finish);
     } catch {
       resolve();
@@ -431,20 +437,77 @@ export function speak(text: string, optionsOrLanguage?: SpeechLanguage | SpeakOp
     return;
   }
 
+  const language = options.language ?? 'vi';
+  const toneId = options.tone ?? getPreferredTone();
+  const toneConfig = VOICE_TONES[toneId] ?? VOICE_TONES.story;
+
+  // Giọng Zalo (có giọng miền Nam): phát file âm thanh từ Worker, lỗi thì quay về giọng của máy
+  const zaloVoice = language === 'vi' ? findZaloVoice(options.voiceName ?? getPreferredVoice('vi')) : undefined;
+  if (zaloVoice) {
+    stopAudio();
+    const speed = toZaloSpeed((options.rate ?? toneConfig.rate) * getSpeechRateScale());
+    const urls = splitForSpeech(text).map((chunk) => zaloAudioUrl(zaloVoice.speaker, speed, chunk));
+    void playZaloQueue(urls, speechToken).then((ok) => {
+      if (!ok) speakWithDevice(text, { ...options, voiceName: undefined, deviceOnly: true });
+    });
+    return;
+  }
+
+  speakWithDevice(text, options);
+}
+
+/**
+ * Phát lần lượt các đoạn âm thanh giọng Zalo. Trả false nếu đoạn ĐẦU không phát được
+ * (mất mạng, chưa cấu hình) để đọc lại bằng giọng của máy; lỗi giữa chừng thì dừng.
+ */
+function playZaloQueue(urls: string[], token: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    let index = 0;
+    let started = false;
+    const playNext = () => {
+      if (token !== speechToken || index >= urls.length) {
+        currentAudioElement = null;
+        if (started) emitSpeaking(false);
+        resolve(started || urls.length === 0);
+        return;
+      }
+      const audio = new Audio(urls[index++]);
+      currentAudioElement = audio;
+      audio.onplaying = () => {
+        if (!started) emitSpeaking(true);
+        started = true;
+      };
+      audio.onended = playNext;
+      audio.onerror = () => {
+        index = urls.length;
+        playNext();
+      };
+      audio.play().catch(() => {
+        index = urls.length;
+        playNext();
+      });
+    };
+    playNext();
+  });
+}
+
+function speakWithDevice(text: string, options: SpeakOptions & { deviceOnly?: boolean }): void {
   if (!('speechSynthesis' in window)) return;
   const synth = window.speechSynthesis;
-  stopAudio();
+  if (!options.deviceOnly) stopAudio();
 
   const language = options.language ?? 'vi';
   const accent = options.accent ?? (language === 'vi' ? getPreferredAccent() : 'all');
   const toneId = options.tone ?? getPreferredTone();
   const toneConfig = VOICE_TONES[toneId] ?? VOICE_TONES.story;
   const baseSettings = BASE_SPEECH_SETTINGS[language];
+  // Giọng máy không có tên Zalo: bỏ qua lựa chọn Zalo, để findVoice chọn giọng máy tốt nhất
+  const deviceVoiceName = findZaloVoice(options.voiceName) ? undefined : options.voiceName;
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = baseSettings.lang;
 
-  const voice = findVoice(language, options.voiceName, accent);
+  const voice = findVoice(language, deviceVoiceName, accent);
   if (voice) utterance.voice = voice;
 
   // Tốc độ & cao độ bé/bố mẹ tinh chỉnh trong bảng cài đặt nhân vật nhân lên giọng điệu gốc
