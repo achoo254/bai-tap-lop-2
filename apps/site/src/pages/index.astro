@@ -19,10 +19,22 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     <MascotKitten pose="chao" label="Mèo con vẫy chào bé Miu" />
     <div class="speech-bubble-container">
       <p class="speech-bubble" data-greeting>{greetingForWorld(currentHour, currentDayOfWeek)}</p>
-      <button type="button" class="speech-voice-btn" id="btn-speak-greeting" title="Mèo con đọc lời chào cho bé">
-        <span class="voice-icon">🔊</span>
-        <span>Nghe mèo đọc</span>
-      </button>
+      <div class="speech-actions">
+        <button type="button" class="speech-voice-btn" id="btn-speak-greeting" title="Mèo con đọc lời chào cho bé">
+          <span class="voice-icon">🗣️</span>
+          <span>Nghe mèo đọc</span>
+        </button>
+        <button
+          type="button"
+          class="speech-voice-btn"
+          id="btn-sound-toggle"
+          title="Bật/tắt nhạc nền và giọng đọc"
+          aria-pressed="false"
+        >
+          <span class="voice-icon" data-sound-icon>🔊</span>
+          <span data-sound-label>Đang bật âm thanh</span>
+        </button>
+      </div>
     </div>
   </div>
   <p class="birthday-banner" data-birthday hidden></p>
@@ -354,6 +366,11 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
 </KidPageLayout>
 
 <style>
+  .speech-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
   /* --- Khung Lời Chào Mèo Con --- */
   .mascot-row--interactive {
     position: relative;
@@ -1040,6 +1057,9 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   import { getBrowserGameStore } from '../lib/game/state/game-store';
   import { levelProgress } from '../lib/game/progression/level-table';
   import { getTotalStars } from '../lib/game/world/unlock-rules';
+  import { startBackgroundMusic } from '../lib/game/media/background-music';
+  import { isMuted, setMuted, speak } from '../lib/game/media/audio';
+  import { introduceScreen } from '../lib/game/media/screen-intro';
   import type { UniformDay } from '../lib/uniform-schedule';
   import type { DaySchedule } from '../lib/timetable-schedule';
 
@@ -1053,19 +1073,30 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     greetingEl.textContent = greetingForWorld(currentHour, currentDayOfWeek);
   }
 
+  // Trang chủ là màn ngoài bài học: nhạc nền nhẹ nhàng và đọc lời chào khi bé vào
+  startBackgroundMusic();
+  introduceScreen(greetingEl?.textContent ?? '');
+
   // 2. Chức năng đọc lời chào bằng giọng nói
   const speakBtn = document.getElementById('btn-speak-greeting');
   speakBtn?.addEventListener('click', () => {
-    if (!('speechSynthesis' in window)) {
-      alert('Trình duyệt chưa hỗ trợ phát âm.');
-      return;
-    }
-    const textToSpeak = greetingEl?.textContent || '';
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = 'vi-VN';
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
+    speak(greetingEl?.textContent || '', { tone: 'guide' });
+  });
+
+  // Nút bật/tắt âm thanh (nhạc nền + giọng đọc), dùng chung lựa chọn với nút 🔊 trong thế giới game
+  const soundToggle = document.getElementById('btn-sound-toggle');
+  function renderSoundToggle() {
+    const off = isMuted();
+    soundToggle?.setAttribute('aria-pressed', String(off));
+    const icon = soundToggle?.querySelector('[data-sound-icon]');
+    const label = soundToggle?.querySelector('[data-sound-label]');
+    if (icon) icon.textContent = off ? '🔇' : '🔊';
+    if (label) label.textContent = off ? 'Đã tắt âm thanh' : 'Đang bật âm thanh';
+  }
+  renderSoundToggle();
+  soundToggle?.addEventListener('click', () => {
+    setMuted(!isMuted());
+    renderSoundToggle();
   });
 
   // 3. Banner Sinh Nhật

@@ -14,17 +14,27 @@ import Hud from '../../components/game/hud.astro';
 import {
   CAT_FUR_COLORS,
   CAT_ACCESSORIES,
+  CAT_ACCESSORY_CATEGORIES,
 } from '../../components/game/characters/cat-character';
 
 const furColors = Object.values(CAT_FUR_COLORS);
-const accessories = Object.values(CAT_ACCESSORIES);
+const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
+  ...category,
+  items: Object.values(CAT_ACCESSORIES).filter((acc) => acc.category === category.id),
+}));
 ---
 
 <KidPageLayout
   title="Tạo nhân vật của bé — Thế giới học tập của Miu"
   showToolbar={false}
 >
-  <Hud title="Tạo nhân vật của bé" backUrl="/the-gioi/" backLabel="Về Cổng thế giới" />
+  <Hud
+    title="Tạo nhân vật của bé"
+    backUrl="/the-gioi/"
+    backLabel="Về Cổng thế giới"
+    backgroundMusic
+    intro="Mình cùng trang trí cho Miu nào! Chọn màu lông, rồi mỗi loại chọn một món phụ kiện thật xinh nhé!"
+  />
 
   <main class="creator-main-container">
     <div class="creator-card">
@@ -96,18 +106,22 @@ const accessories = Object.values(CAT_ACCESSORIES);
 
           <!-- 3. Chọn phụ kiện -->
           <div class="option-group">
-            <label class="group-label">🎀 3. Phụ kiện đeo kèm (chọn tự do):</label>
-            <div class="accessory-grid" id="accessory-grid">
-              {accessories.map((acc, index) => (
-                <button
-                  type="button"
-                  class={`acc-chip ${index === 0 ? 'active' : ''}`}
-                  data-acc-id={acc.id}
-                >
-                  <span class="acc-name">{acc.name}</span>
-                </button>
-              ))}
-            </div>
+            <label class="group-label">🎀 3. Phụ kiện (mỗi loại chọn 1 món):</label>
+            {accessoryGroups.map((group) => (
+              <div class="acc-category" data-acc-category={group.id} role="radiogroup" aria-label={group.name}>
+                <span class="acc-category-name">{group.icon} {group.name}</span>
+                <div class="accessory-grid">
+                  <button type="button" class="acc-chip acc-chip--none" data-acc-id="" role="radio" aria-checked="false">
+                    <span class="acc-name">Không đeo</span>
+                  </button>
+                  {group.items.map((acc) => (
+                    <button type="button" class="acc-chip" data-acc-id={acc.id} role="radio" aria-checked="false">
+                      <span class="acc-name">{acc.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
 
           <!-- Nút chốt Lưu & Lên đường -->
@@ -340,7 +354,25 @@ const accessories = Object.values(CAT_ACCESSORIES);
     color: #1e293b;
   }
 
-  /* Grid phụ kiện */
+  /* Phụ kiện theo loại */
+  .acc-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .acc-category-name {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #475569;
+  }
+
+  .acc-chip--none {
+    color: #64748b;
+    border-style: dashed;
+  }
+
   .accessory-grid {
     display: flex;
     flex-wrap: wrap;
@@ -401,6 +433,8 @@ const accessories = Object.values(CAT_ACCESSORIES);
     type CatPose,
     type CatFurColorId,
     type CatAccessoryId,
+    CAT_ACCESSORIES,
+    normalizeAccessories,
   } from '../../components/game/characters/cat-character';
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
   import { speak, playSfx } from '../../lib/game/media/audio';
@@ -411,7 +445,7 @@ const accessories = Object.values(CAT_ACCESSORIES);
 
   let currentName = initialState.avatar.name || 'Miu';
   let currentFur: CatFurColorId = (initialState.avatar.furColor as CatFurColorId) || 'vang-cam';
-  let currentAccessories: CatAccessoryId[] = (initialState.avatar.accessories as CatAccessoryId[]) || ['no-hong'];
+  let currentAccessories: CatAccessoryId[] = normalizeAccessories(initialState.avatar.accessories ?? ['no-hong']);
   let currentPose: CatPose = 'chao';
 
   const catStage = document.getElementById('creator-cat-stage');
@@ -472,22 +506,34 @@ const accessories = Object.values(CAT_ACCESSORIES);
     });
   });
 
-  // Chọn phụ kiện
-  const accChips = document.querySelectorAll('.acc-chip');
-  accChips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const accId = chip.getAttribute('data-acc-id');
-      if (!accId) return;
+  // Chọn phụ kiện: mỗi loại 1 món, bấm lại món đang đeo hoặc "Không đeo" để bỏ
+  const accCategories = document.querySelectorAll<HTMLElement>('[data-acc-category]');
 
-      if (chip.classList.contains('active')) {
-        chip.classList.remove('active');
-        currentAccessories = currentAccessories.filter((id) => id !== accId);
-      } else {
-        chip.classList.add('active');
-        currentAccessories.push(accId as CatAccessoryId);
-      }
-      renderPreview();
-      playSfx('click');
+  function syncAccessoryChips() {
+    accCategories.forEach((group) => {
+      const category = group.dataset.accCategory;
+      const worn = currentAccessories.find((id) => CAT_ACCESSORIES[id].category === category) ?? '';
+      group.querySelectorAll<HTMLElement>('.acc-chip').forEach((chip) => {
+        const selected = (chip.dataset.accId ?? '') === worn;
+        chip.classList.toggle('active', selected);
+        chip.setAttribute('aria-checked', String(selected));
+      });
+    });
+  }
+  syncAccessoryChips();
+
+  accCategories.forEach((group) => {
+    const category = group.dataset.accCategory;
+    group.querySelectorAll<HTMLElement>('.acc-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const accId = (chip.dataset.accId ?? '') as CatAccessoryId | '';
+        const withoutCategory = currentAccessories.filter((id) => CAT_ACCESSORIES[id].category !== category);
+        const alreadyWorn = accId !== '' && currentAccessories.includes(accId);
+        currentAccessories = accId === '' || alreadyWorn ? withoutCategory : [...withoutCategory, accId];
+        syncAccessoryChips();
+        renderPreview();
+        playSfx('click');
+      });
     });
   });
 

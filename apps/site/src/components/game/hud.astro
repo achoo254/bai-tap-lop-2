@@ -16,6 +16,10 @@ interface Props {
   backUrl?: string;
   backLabel?: string;
   showHearts?: boolean;
+  /** Màn ngoài bài học: phát nhạc nền nhẹ nhàng. */
+  backgroundMusic?: boolean;
+  /** Lời giới thiệu đọc to khi bé vào màn này. */
+  intro?: string;
 }
 
 const {
@@ -23,10 +27,12 @@ const {
   backUrl = '/the-gioi/',
   backLabel = 'Cổng thế giới',
   showHearts = false,
+  backgroundMusic = false,
+  intro,
 } = Astro.props;
 ---
 
-<div class="game-hud-wrapper">
+<div class="game-hud-wrapper" data-background-music={backgroundMusic ? '' : undefined} data-screen-intro={intro}>
   <header class="game-hud" id="game-hud">
     <div class="hud-left">
       <a href="/the-gioi/tao-nhan-vat/" class="hud-avatar-chip" title="Chỉnh sửa nhân vật của bé">
@@ -89,6 +95,8 @@ const {
 <script>
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
   import { isMuted, setMuted } from '../../lib/game/media/audio';
+  import { startBackgroundMusic } from '../../lib/game/media/background-music';
+  import { introduceScreen } from '../../lib/game/media/screen-intro';
   import { levelProgress } from '../../lib/game/progression/level-table';
 
   const today = new Date().toISOString().slice(0, 10);
@@ -134,4 +142,10 @@ const {
     setMuted(!isMuted());
     updateSoundIcon();
   });
+
+  // Nhạc nền và lời giới thiệu màn (khai báo qua props của HUD)
+  const hudWrapper = document.querySelector<HTMLElement>('.game-hud-wrapper');
+  if (hudWrapper?.hasAttribute('data-background-music')) startBackgroundMusic();
+  const introText = hudWrapper?.dataset.screenIntro;
+  if (introText) introduceScreen(introText);
 </script>

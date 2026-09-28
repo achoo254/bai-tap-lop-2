@@ -147,35 +147,79 @@ export type CatAccessoryId =
   | 'canh-thien-than' // Cánh thiên thần nhỏ
   | 'ao-choang-hero'; // Áo choàng siêu nhân
 
+/** Loại phụ kiện: mỗi loại bé chỉ đeo được 1 món. */
+export type CatAccessoryCategoryId =
+  | 'no-cai-tai'
+  | 'mu'
+  | 'tai-nghe'
+  | 'kinh'
+  | 'ngam-mieng'
+  | 'khan-co'
+  | 'deo-lung';
+
+export interface CatAccessoryCategoryDef {
+  id: CatAccessoryCategoryId;
+  name: string;
+  icon: string;
+}
+
+/** Thứ tự hiển thị các loại phụ kiện ở trang tạo nhân vật. */
+export const CAT_ACCESSORY_CATEGORIES: CatAccessoryCategoryDef[] = [
+  { id: 'no-cai-tai', name: 'Nơ cài tai', icon: '🎀' },
+  { id: 'mu', name: 'Mũ & đồ đội đầu', icon: '🎩' },
+  { id: 'tai-nghe', name: 'Tai nghe', icon: '🎧' },
+  { id: 'kinh', name: 'Kính', icon: '👓' },
+  { id: 'ngam-mieng', name: 'Ngậm miệng', icon: '🍀' },
+  { id: 'khan-co', name: 'Khăn cổ', icon: '🧣' },
+  { id: 'deo-lung', name: 'Đồ đeo lưng', icon: '🎒' },
+];
+
 export interface CatAccessoryDef {
   id: CatAccessoryId;
   name: string;
+  /** Vị trí vẽ trên người mèo. */
   slot: 'head' | 'face' | 'back' | 'neck';
+  category: CatAccessoryCategoryId;
 }
 
 export const CAT_ACCESSORIES: Record<CatAccessoryId, CatAccessoryDef> = {
   // --- Mũ & Đầu ---
-  'no-hong': { id: 'no-hong', name: 'Nơ hồng Miu', slot: 'head' },
-  'no-do': { id: 'no-do', name: 'Nơ đỏ chấm bi', slot: 'head' },
-  'mu-cu-nhan': { id: 'mu-cu-nhan', name: 'Mũ cử nhân', slot: 'head' },
-  'mu-phot': { id: 'mu-phot', name: 'Mũ phớt thám tử', slot: 'head' },
-  'vuong-mien-sao': { id: 'vuong-mien-sao', name: 'Vương miện sao', slot: 'head' },
-  'mu-len-bong': { id: 'mu-len-bong', name: 'Mũ len quả bông', slot: 'head' },
-  'tai-nghe-gamer': { id: 'tai-nghe-gamer', name: 'Tai nghe phi công', slot: 'head' },
-  'mu-dau-bep': { id: 'mu-dau-bep', name: 'Mũ đầu bếp', slot: 'head' },
-  'sung-tuan-loc': { id: 'sung-tuan-loc', name: 'Sừng tuần lộc', slot: 'head' },
+  'no-hong': { id: 'no-hong', name: 'Nơ hồng Miu', slot: 'head', category: 'no-cai-tai' },
+  'no-do': { id: 'no-do', name: 'Nơ đỏ chấm bi', slot: 'head', category: 'no-cai-tai' },
+  'mu-cu-nhan': { id: 'mu-cu-nhan', name: 'Mũ cử nhân', slot: 'head', category: 'mu' },
+  'mu-phot': { id: 'mu-phot', name: 'Mũ phớt thám tử', slot: 'head', category: 'mu' },
+  'vuong-mien-sao': { id: 'vuong-mien-sao', name: 'Vương miện sao', slot: 'head', category: 'mu' },
+  'mu-len-bong': { id: 'mu-len-bong', name: 'Mũ len quả bông', slot: 'head', category: 'mu' },
+  'tai-nghe-gamer': { id: 'tai-nghe-gamer', name: 'Tai nghe phi công', slot: 'head', category: 'tai-nghe' },
+  'mu-dau-bep': { id: 'mu-dau-bep', name: 'Mũ đầu bếp', slot: 'head', category: 'mu' },
+  'sung-tuan-loc': { id: 'sung-tuan-loc', name: 'Sừng tuần lộc', slot: 'head', category: 'mu' },
 
   // --- Mặt & Mắt ---
-  'kinh-tri-thuc': { id: 'kinh-tri-thuc', name: 'Kính tròn trí thức', slot: 'face' },
-  'kinh-ram-ngau': { id: 'kinh-ram-ngau', name: 'Kính râm ngầu', slot: 'face' },
-  'co-bon-la': { id: 'co-bon-la', name: 'Cỏ 4 lá may mắn', slot: 'face' },
+  'kinh-tri-thuc': { id: 'kinh-tri-thuc', name: 'Kính tròn trí thức', slot: 'face', category: 'kinh' },
+  'kinh-ram-ngau': { id: 'kinh-ram-ngau', name: 'Kính râm ngầu', slot: 'face', category: 'kinh' },
+  'co-bon-la': { id: 'co-bon-la', name: 'Cỏ 4 lá may mắn', slot: 'face', category: 'ngam-mieng' },
 
   // --- Cổ & Lưng ---
-  'balo-tho': { id: 'balo-tho', name: 'Balo tai thỏ', slot: 'back' },
-  'khan-quang-do': { id: 'khan-quang-do', name: 'Khăn quàng đỏ', slot: 'neck' },
-  'canh-thien-than': { id: 'canh-thien-than', name: 'Cánh thiên thần', slot: 'back' },
-  'ao-choang-hero': { id: 'ao-choang-hero', name: 'Áo choàng siêu nhân', slot: 'back' },
+  'balo-tho': { id: 'balo-tho', name: 'Balo tai thỏ', slot: 'back', category: 'deo-lung' },
+  'khan-quang-do': { id: 'khan-quang-do', name: 'Khăn quàng đỏ', slot: 'neck', category: 'khan-co' },
+  'canh-thien-than': { id: 'canh-thien-than', name: 'Cánh thiên thần', slot: 'back', category: 'deo-lung' },
+  'ao-choang-hero': { id: 'ao-choang-hero', name: 'Áo choàng siêu nhân', slot: 'back', category: 'deo-lung' },
 };
+
+/**
+ * Chuẩn hoá danh sách phụ kiện: bỏ mã lạ, mỗi loại chỉ giữ 1 món (món chọn sau cùng thắng).
+ * Dùng cả khi vẽ lẫn khi đọc dữ liệu cũ đã lưu nhiều món cùng loại.
+ */
+export function normalizeAccessories(ids: readonly string[]): CatAccessoryId[] {
+  const byCategory = new Map<CatAccessoryCategoryId, CatAccessoryId>();
+  for (const id of ids) {
+    const def = CAT_ACCESSORIES[id as CatAccessoryId];
+    if (!def) continue;
+    byCategory.delete(def.category);
+    byCategory.set(def.category, def.id);
+  }
+  return [...byCategory.values()];
+}
 
 export interface RenderCatOptions {
   pose?: CatPose;
@@ -205,7 +249,8 @@ export function renderCatSvgHtml(options: RenderCatOptions = {}): string {
   const eyeColor = color.eyeColor ?? ink;
 
   // Lọc phụ kiện
-  const hasAccessory = (id: CatAccessoryId) => accessories.includes(id);
+  const wornAccessories = normalizeAccessories(accessories);
+  const hasAccessory = (id: CatAccessoryId) => wornAccessories.includes(id);
 
   // SVG các phụ kiện lưng (Back layer)
   let accessoryBackSvg = '';
@@ -243,8 +288,10 @@ export function renderCatSvgHtml(options: RenderCatOptions = {}): string {
 
   // SVG các phụ kiện đầu (Head layer)
   let accessoryHeadSvg = '';
+  // Nơ cài tai vẽ riêng và đặt trên cùng để không bị mũ/tai nghe che mất
+  let accessoryBowSvg = '';
   if (hasAccessory('no-hong')) {
-    accessoryHeadSvg += `
+    accessoryBowSvg += `
       <g class="cat-accessory-bow" stroke="${ink}" stroke-width="4" stroke-linejoin="round">
         <path d="M132 40 L112 26 L114 54 Z" fill="#ff5c9a" />
         <path d="M132 40 L154 28 L150 56 Z" fill="#ff5c9a" />
@@ -252,7 +299,7 @@ export function renderCatSvgHtml(options: RenderCatOptions = {}): string {
       </g>`;
   }
   if (hasAccessory('no-do')) {
-    accessoryHeadSvg += `
+    accessoryBowSvg += `
       <g class="cat-accessory-bow-red" stroke="${ink}" stroke-width="4" stroke-linejoin="round">
         <path d="M68 40 L48 26 L50 54 Z" fill="#ef4444" />
         <path d="M68 40 L90 28 L86 56 Z" fill="#ef4444" />
@@ -537,6 +584,7 @@ export function renderCatSvgHtml(options: RenderCatOptions = {}): string {
 
     <!-- Phụ kiện đầu (Nơ / Mũ / Vương miện...) -->
     ${accessoryHeadSvg}
+    ${accessoryBowSvg}
   </g>
 
   <!-- [Layer 4] Tay & Phụ ứng động tác -->

@@ -36,6 +36,11 @@ const { lop, vung } = Astro.params;
 const world = Astro.props.world;
 const region = Astro.props.region ?? findRegion(lop ?? 'lop-2', vung as any)!;
 const chapter1 = region.chapters[0];
+const GUIDE_NAMES: Record<Region['guideNpc'], string> = {
+  'soc-nau': 'Sóc Nâu',
+  'chim-sau': 'Chim Sâu',
+  'bac-cu': 'Bác Cú',
+};
 const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
 ---
 
@@ -43,7 +48,13 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
   title={`${region.name} — ${world.name}`}
   showToolbar={false}
 >
-  <Hud title={region.name} backUrl={`/the-gioi/${world.grade}/`} backLabel={`Về Bản đồ ${world.name}`} />
+  <Hud
+    title={region.name}
+    backUrl={`/the-gioi/${world.grade}/`}
+    backLabel={`Về Bản đồ ${world.name}`}
+    backgroundMusic
+    intro={`Chào mừng Miu đến ${region.name}! ${GUIDE_NAMES[region.guideNpc]} sẽ dẫn đường. Chạm vào nhiệm vụ để bắt đầu nhé!`}
+  />
 
   <main class="world-container">
     <div class="region-map-card">

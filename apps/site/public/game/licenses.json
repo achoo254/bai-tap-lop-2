@@ -48,7 +48,11 @@
       "license": "Bản quyền riêng của dự án",
       "licenseUrl": "file:///Users/hoandat/inet-gitlab/bai-tap-lop-2/LICENSE",
       "website": "https://lop2.hoandat.com",
-      "files": ["characters/cat-character.ts", "characters/npc-guide.ts", "characters/boss-timo.ts"]
+      "files": [
+        "characters/cat-character.ts",
+        "characters/npc-guide.ts",
+        "characters/boss-timo.ts"
+      ]
     },
     {
       "id": "project-voiceover",
@@ -64,6 +68,19 @@
         "audio/calm-encourage.mp3",
         "audio/sample-north.mp3",
         "audio/sample-south.mp3"
+      ]
+    },
+    {
+      "id": "nhac-nen-cc0",
+      "name": "Nhạc nền không lời cho các màn ngoài bài học (OpenGameArt)",
+      "author": "Cakeflaps (Good Morning); Brandon Morris, bản cắt vòng lặp của AntumDeluge (Feel Good Island Loop); Memoraphile (Beary Fishy Menu Screen)",
+      "license": "CC0 1.0 Universal (Public Domain)",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "website": "https://opengameart.org/content/good-morning ; https://opengameart.org/content/feel-good-island-loop ; https://opengameart.org/content/gone-fishin",
+      "files": [
+        "audio/nhac-nen/buoi-sang-vui-ve.mp3",
+        "audio/nhac-nen/dao-xanh-thu-gian.mp3",
+        "audio/nhac-nen/gau-con-cau-ca.mp3"
       ]
     }
   ]

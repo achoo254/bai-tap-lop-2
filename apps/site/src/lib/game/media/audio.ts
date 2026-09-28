@@ -135,7 +135,17 @@ export function stopAudio(): void {
   }
 }
 
-/** Tắt/bật mọi âm thanh (giọng đọc và tiếng động); nhớ lựa chọn trên máy. */
+/** Sự kiện phát ra khi bật/tắt tiếng hoặc khi bắt đầu/kết thúc giọng đọc (nhạc nền lắng nghe để tắt/nhỏ lại). */
+export const MUTED_EVENT = 'miu-audio:muted';
+export const SPEECH_EVENT = 'miu-audio:speech';
+
+function emitSpeaking(speaking: boolean): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SPEECH_EVENT, { detail: speaking }));
+  }
+}
+
+/** Tắt/bật mọi âm thanh (giọng đọc, tiếng động, nhạc nền); nhớ lựa chọn trên máy. */
 export function setMuted(value: boolean): void {
   muted = value;
   if (value) {
@@ -145,6 +155,9 @@ export function setMuted(value: boolean): void {
     localStorage.setItem(MUTED_KEY, value ? '1' : '0');
   } catch {
     // Không lưu được: chỉ áp dụng trong phiên này.
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(MUTED_EVENT, { detail: value }));
   }
 }
 
@@ -157,18 +170,15 @@ export function playAudioClip(url: string): Promise<void> {
     try {
       const audio = new Audio(url);
       currentAudioElement = audio;
-      audio.onended = () => {
+      const finish = () => {
         currentAudioElement = null;
+        emitSpeaking(false);
         resolve();
       };
-      audio.onerror = () => {
-        currentAudioElement = null;
-        resolve();
-      };
-      audio.play().catch(() => {
-        currentAudioElement = null;
-        resolve();
-      });
+      audio.onended = finish;
+      audio.onerror = finish;
+      emitSpeaking(true);
+      audio.play().catch(finish);
     } catch {
       resolve();
     }
@@ -437,6 +447,9 @@ export function speak(text: string, optionsOrLanguage?: SpeechLanguage | SpeakOp
   utterance.rate = options.rate ?? toneConfig.rate;
   utterance.pitch = options.pitch ?? toneConfig.pitch;
   utterance.volume = options.volume ?? 1.0;
+  utterance.onstart = () => emitSpeaking(true);
+  utterance.onend = () => emitSpeaking(false);
+  utterance.onerror = () => emitSpeaking(false);
 
   synth.speak(utterance);
 }

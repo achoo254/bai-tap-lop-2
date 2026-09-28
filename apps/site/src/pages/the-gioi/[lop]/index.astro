@@ -38,7 +38,13 @@ const worldEvents = getEventsForWorld(world.grade);
   title={`${world.name} — Thế giới học tập của Miu`}
   showToolbar={false}
 >
-  <Hud title={world.name} backUrl="/the-gioi/" backLabel="Cổng thế giới" />
+  <Hud
+    title={world.name}
+    backUrl="/the-gioi/"
+    backLabel="Cổng thế giới"
+    backgroundMusic
+    intro={`Đây là bản đồ ${world.name}. Miu chọn một vùng môn học để khám phá nhé!`}
+  />
 
   <main class="world-container">
     {featuredEvent && <EventBanner event={featuredEvent} />}
