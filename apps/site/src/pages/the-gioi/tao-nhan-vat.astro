@@ -11,17 +11,10 @@
  */
 import KidPageLayout from '../../layouts/kid-page-layout.astro';
 import Hud from '../../components/game/hud.astro';
-import {
-  CAT_FUR_COLORS,
-  CAT_ACCESSORIES,
-  CAT_ACCESSORY_CATEGORIES,
-} from '../../components/game/characters/cat-character';
+import AccessoryCategoryPicker from '../../components/game/accessory-category-picker.astro';
+import { CAT_FUR_COLORS } from '../../components/game/characters/cat-character';
 
 const furColors = Object.values(CAT_FUR_COLORS);
-const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
-  ...category,
-  items: Object.values(CAT_ACCESSORIES).filter((acc) => acc.category === category.id),
-}));
 ---
 
 <KidPageLayout
@@ -107,21 +100,7 @@ const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
           <!-- 3. Chọn phụ kiện -->
           <div class="option-group">
             <label class="group-label">🎀 3. Phụ kiện (mỗi loại chọn 1 món):</label>
-            {accessoryGroups.map((group) => (
-              <div class="acc-category" data-acc-category={group.id} role="radiogroup" aria-label={group.name}>
-                <span class="acc-category-name">{group.icon} {group.name}</span>
-                <div class="accessory-grid">
-                  <button type="button" class="acc-chip acc-chip--none" data-acc-id="" role="radio" aria-checked="false">
-                    <span class="acc-name">Không đeo</span>
-                  </button>
-                  {group.items.map((acc) => (
-                    <button type="button" class="acc-chip" data-acc-id={acc.id} role="radio" aria-checked="false">
-                      <span class="acc-name">{acc.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+            <AccessoryCategoryPicker />
           </div>
 
           <!-- Nút chốt Lưu & Lên đường -->
@@ -354,52 +333,6 @@ const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
     color: #1e293b;
   }
 
-  /* Phụ kiện theo loại */
-  .acc-category {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .acc-category-name {
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: #475569;
-  }
-
-  .acc-chip--none {
-    color: #64748b;
-    border-style: dashed;
-  }
-
-  .accessory-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .acc-chip {
-    padding: 0.5rem 0.85rem;
-    min-height: 50px;
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 14px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 800;
-    color: #334155;
-    touch-action: manipulation;
-    transition: all 0.15s;
-  }
-
-  .acc-chip.active {
-    background: #fdf2f8;
-    border-color: #ec4899;
-    color: #be185d;
-    box-shadow: 0 0 0 2px #ec4899;
-  }
-
   /* Nút xuất phát */
   .confirm-launch-btn {
     width: 100%;
@@ -433,9 +366,9 @@ const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
     type CatPose,
     type CatFurColorId,
     type CatAccessoryId,
-    CAT_ACCESSORIES,
     normalizeAccessories,
   } from '../../components/game/characters/cat-character';
+  import { bindAccessoryPicker } from '../../lib/game/avatar/accessory-picker';
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
   import { speak, playSfx } from '../../lib/game/media/audio';
 
@@ -506,36 +439,19 @@ const accessoryGroups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
     });
   });
 
-  // Chọn phụ kiện: mỗi loại 1 món, bấm lại món đang đeo hoặc "Không đeo" để bỏ
-  const accCategories = document.querySelectorAll<HTMLElement>('[data-acc-category]');
-
-  function syncAccessoryChips() {
-    accCategories.forEach((group) => {
-      const category = group.dataset.accCategory;
-      const worn = currentAccessories.find((id) => CAT_ACCESSORIES[id].category === category) ?? '';
-      group.querySelectorAll<HTMLElement>('.acc-chip').forEach((chip) => {
-        const selected = (chip.dataset.accId ?? '') === worn;
-        chip.classList.toggle('active', selected);
-        chip.setAttribute('aria-checked', String(selected));
-      });
-    });
-  }
-  syncAccessoryChips();
-
-  accCategories.forEach((group) => {
-    const category = group.dataset.accCategory;
-    group.querySelectorAll<HTMLElement>('.acc-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        const accId = (chip.dataset.accId ?? '') as CatAccessoryId | '';
-        const withoutCategory = currentAccessories.filter((id) => CAT_ACCESSORIES[id].category !== category);
-        const alreadyWorn = accId !== '' && currentAccessories.includes(accId);
-        currentAccessories = accId === '' || alreadyWorn ? withoutCategory : [...withoutCategory, accId];
-        syncAccessoryChips();
+  // Chọn phụ kiện: mỗi loại 1 món
+  const accessoryRoot = document.querySelector('.creator-main-container');
+  if (accessoryRoot) {
+    bindAccessoryPicker(
+      accessoryRoot,
+      () => currentAccessories,
+      (next) => {
+        currentAccessories = next;
         renderPreview();
         playSfx('click');
-      });
-    });
-  });
+      },
+    );
+  }
 
   // Nút Lưu và Vào Game
   document.getElementById('btn-launch-game')?.addEventListener('click', () => {

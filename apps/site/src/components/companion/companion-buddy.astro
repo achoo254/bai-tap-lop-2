@@ -1,0 +1,424 @@
+---
+/**
+ * Nhân vật đồng hành của bé: luôn ở góc dưới bên phải mọi trang.
+ * - Tự nói chuyện & đổi biểu cảm theo màn bé đang xem (companion-chatter.ts)
+ * - Bấm vào mèo mở bảng cài đặt: nhân vật, phụ kiện, âm thanh, giọng đọc, kiểu chữ
+ *   (companion-settings-panel.ts). Mọi lựa chọn lưu trên thiết bị.
+ */
+import AccessoryCategoryPicker from '../game/accessory-category-picker.astro';
+import { CAT_FUR_COLORS } from '../game/characters/cat-character';
+
+interface Props {
+  /** Ghi đè ngữ cảnh khi đường dẫn không đủ để biết (trang 404, ngoại tuyến). */
+  context?: string;
+  handwritingAvailable: boolean;
+}
+const { context, handwritingAvailable } = Astro.props;
+const furColors = Object.values(CAT_FUR_COLORS);
+---
+
+<div class="companion" data-companion data-companion-context={context}>
+  <p class="companion-bubble" data-companion-bubble hidden title="Bấm để nghe mèo đọc"></p>
+  <button type="button" class="companion-cat" data-companion-open aria-label="Mở cài đặt nhân vật của bé">
+    <span class="companion-figure" data-companion-figure></span>
+  </button>
+</div>
+
+<dialog class="companion-panel" data-companion-panel aria-labelledby="companion-panel-title">
+  <div class="panel-head">
+    <h2 id="companion-panel-title">🐾 Bạn mèo của bé</h2>
+    <button type="button" class="panel-close" data-companion-close aria-label="Đóng cài đặt">✕</button>
+  </div>
+  <div class="panel-preview" data-companion-preview aria-hidden="true"></div>
+
+  <section class="panel-section">
+    <h3>🏷️ Tên bạn mèo</h3>
+    <input class="panel-input" type="text" maxlength="20" data-setting="name" aria-label="Tên bạn mèo" />
+  </section>
+
+  <section class="panel-section">
+    <h3>🎨 Màu lông</h3>
+    <div class="fur-grid" role="radiogroup" aria-label="Màu lông">
+      {
+        furColors.map((color) => (
+          <button type="button" class="fur-chip" data-fur-id={color.id} role="radio" aria-checked="false">
+            <span class="fur-swatch" style={`background:${color.fur};border-color:${color.furDark}`} />
+            {color.name}
+          </button>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="panel-section">
+    <h3>🎀 Phụ kiện (mỗi loại 1 món)</h3>
+    <AccessoryCategoryPicker />
+  </section>
+
+  <section class="panel-section">
+    <h3>🔊 Âm thanh</h3>
+    <label class="switch-row"><span>Bật âm thanh</span><input type="checkbox" data-setting="all-sound" /></label>
+    <label class="switch-row"><span>🎵 Nhạc nền</span><input type="checkbox" data-setting="music" /></label>
+    <label class="slider-row">
+      <span>Âm lượng nhạc <output data-value-for="music-volume"></output></span>
+      <input type="range" min="0" max="100" step="5" data-setting="music-volume" />
+    </label>
+    <label class="switch-row"><span>💬 Mèo tự nói chuyện</span><input type="checkbox" data-setting="chatter" /></label>
+  </section>
+
+  <section class="panel-section">
+    <h3>🗣️ Giọng đọc</h3>
+    <label class="switch-row"><span>Bật giọng đọc</span><input type="checkbox" data-setting="voice" /></label>
+    <label class="select-row">
+      <span>Người đọc</span>
+      <select data-setting="voice-name"></select>
+    </label>
+    <label class="select-row">
+      <span>Giọng vùng miền</span>
+      <select data-setting="accent">
+        <option value="bac">Miền Bắc</option>
+        <option value="nam">Miền Nam</option>
+        <option value="all">Tất cả</option>
+      </select>
+    </label>
+    <label class="select-row">
+      <span>Phong cách</span>
+      <select data-setting="tone"></select>
+    </label>
+    <label class="slider-row">
+      <span>Tốc độ <output data-value-for="rate"></output></span>
+      <input type="range" min="60" max="140" step="5" data-setting="rate" />
+    </label>
+    <label class="slider-row">
+      <span>Cao độ <output data-value-for="pitch"></output></span>
+      <input type="range" min="60" max="150" step="5" data-setting="pitch" />
+    </label>
+    <div class="panel-actions">
+      <button type="button" class="panel-btn" data-action="try-voice">▶️ Nghe thử</button>
+      <button type="button" class="panel-btn panel-btn--ghost" data-action="reset-voice">↺ Giọng mặc định</button>
+    </div>
+  </section>
+
+  {
+    handwritingAvailable && (
+      <section class="panel-section">
+        <h3>✍️ Chữ đọc bài</h3>
+        <label class="switch-row">
+          <span>Chữ viết tay mẫu tiểu học</span>
+          <input type="checkbox" data-setting="handwriting" />
+        </label>
+      </section>
+    )
+  }
+
+  <p class="panel-note">Mọi lựa chọn được lưu trên máy này, tải lại trang vẫn giữ nguyên.</p>
+</dialog>
+
+<style>
+  .companion {
+    position: fixed;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  .companion-bubble {
+    pointer-events: auto;
+    max-width: min(260px, calc(100vw - 32px));
+    margin: 0;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 3px solid var(--color-ink, #1f1b2e);
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 4px 0 var(--color-ink, #1f1b2e);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.45;
+    color: #1f1b2e;
+    cursor: pointer;
+    animation: bubble-pop 0.25s ease-out;
+  }
+
+  .companion-cat {
+    pointer-events: auto;
+    width: 92px;
+    height: 92px;
+    padding: 0;
+    border: 3px solid var(--color-ink, #1f1b2e);
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #fff7ed, #fde68a);
+    box-shadow: 0 5px 0 var(--color-ink, #1f1b2e);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    touch-action: manipulation;
+    transition: transform 0.15s;
+  }
+
+  .companion-cat:hover {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+
+  .companion-cat:active {
+    transform: translateY(2px);
+  }
+
+  .companion-figure {
+    display: block;
+    width: 84px;
+    height: 84px;
+    margin-top: 10px;
+  }
+
+  @keyframes bubble-pop {
+    from {
+      transform: scale(0.8) translateY(8px);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .companion-bubble {
+      animation: none;
+    }
+  }
+
+  @media print {
+    .companion {
+      display: none;
+    }
+  }
+
+  /* Bảng cài đặt */
+  .companion-panel {
+    width: min(560px, calc(100vw - 24px));
+    max-height: calc(100dvh - 24px);
+    padding: 0 20px 20px;
+    border: 4px solid var(--color-ink, #1f1b2e);
+    border-radius: 24px;
+    background: #fffdf7;
+    color: #1f1b2e;
+    box-shadow: 0 10px 0 var(--color-ink, #1f1b2e);
+  }
+
+  .companion-panel::backdrop {
+    background: rgba(15, 23, 42, 0.45);
+  }
+
+  .panel-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0 10px;
+    background: #fffdf7;
+  }
+
+  .panel-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .panel-close {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--color-ink, #1f1b2e);
+    border-radius: 50%;
+    background: #fecdd3;
+    font-size: 1.2rem;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .panel-preview {
+    display: grid;
+    place-items: center;
+    height: 150px;
+    margin-bottom: 8px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #fef3c7, #e0f2fe);
+  }
+
+  .panel-section {
+    padding: 12px 0;
+    border-top: 2px dashed #e2e8f0;
+  }
+
+  .panel-section h3 {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #5a3fc0;
+  }
+
+  .panel-input,
+  .select-row select {
+    width: 100%;
+    min-height: 48px;
+    padding: 8px 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    background: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .fur-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .fur-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 6px 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .fur-chip.active {
+    border-color: #0369a1;
+    box-shadow: 0 0 0 2px #0369a1;
+    background: #f0f9ff;
+  }
+
+  .fur-swatch {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 3px solid;
+    border-radius: 50%;
+  }
+
+  .switch-row,
+  .slider-row,
+  .select-row {
+    display: flex;
+    gap: 10px;
+    min-height: 48px;
+    font-weight: 800;
+  }
+
+  .switch-row {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .switch-row input {
+    width: 28px;
+    height: 28px;
+    accent-color: #db2777;
+  }
+
+  .slider-row,
+  .select-row {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+
+  .slider-row input {
+    width: 100%;
+    accent-color: #0369a1;
+  }
+
+  .slider-row output {
+    color: #0369a1;
+  }
+
+  .panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .panel-btn {
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 3px solid var(--color-ink, #1f1b2e);
+    border-radius: 999px;
+    background: #fde047;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .panel-btn--ghost {
+    background: #ffffff;
+  }
+
+  .panel-note {
+    margin: 8px 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+</style>
+
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatAccessoryId,
+    type CatFurColorId,
+  } from '../game/characters/cat-character';
+  import { getBrowserGameStore } from '../../lib/game/state/game-store';
+  import { todayInVietnam } from '../../lib/today-lesson-picker';
+  import { startCompanionChatter } from '../../lib/game/companion/companion-chatter';
+  import { bindCompanionSettingsPanel } from '../../lib/game/companion/companion-settings-panel';
+
+  const root = document.querySelector<HTMLElement>('[data-companion]');
+  const figure = root?.querySelector<HTMLElement>('[data-companion-figure]');
+  const bubble = root?.querySelector<HTMLElement>('[data-companion-bubble]');
+  const panel = document.querySelector<HTMLDialogElement>('[data-companion-panel]');
+  const preview = panel?.querySelector<HTMLElement>('[data-companion-preview]');
+
+  if (root && figure && bubble && panel) {
+    const store = getBrowserGameStore(todayInVietnam(), 'Miu');
+    const chatter = startCompanionChatter(figure, bubble, store.getState(), root.dataset.companionContext);
+
+    const drawPreview = () => {
+      if (!preview) return;
+      const { avatar } = store.getState();
+      preview.innerHTML = renderCatSvgHtml({
+        pose: 'vui',
+        furColor: (avatar.furColor as CatFurColorId) || 'vang-cam',
+        accessories: avatar.accessories as CatAccessoryId[],
+        size: 140,
+        label: `Bạn mèo ${avatar.name}`,
+      });
+    };
+
+    store.subscribe((state) => {
+      chatter.render(state);
+      drawPreview();
+    });
+
+    bindCompanionSettingsPanel(panel, store, { onChatterChange: () => chatter.refreshChatter() });
+
+    root.querySelector('[data-companion-open]')?.addEventListener('click', () => {
+      drawPreview();
+      panel.dispatchEvent(new Event('companion:open'));
+      panel.showModal();
+      chatter.react('openSettings');
+    });
+    panel.querySelector('[data-companion-close]')?.addEventListener('click', () => panel.close());
+    // Bấm ra ngoài bảng thì đóng
+    panel.addEventListener('click', (event) => {
+      if (event.target === panel) panel.close();
+    });
+    panel.addEventListener('close', () => store.flush());
+  }
+</script>

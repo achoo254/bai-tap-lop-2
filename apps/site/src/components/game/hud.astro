@@ -94,7 +94,7 @@ const {
 
 <script>
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
-  import { isMuted, setMuted } from '../../lib/game/media/audio';
+  import { isMuted, MUTED_EVENT, setMuted } from '../../lib/game/media/audio';
   import { startBackgroundMusic } from '../../lib/game/media/background-music';
   import { introduceScreen } from '../../lib/game/media/screen-intro';
   import { levelProgress } from '../../lib/game/progression/level-table';
@@ -138,6 +138,7 @@ const {
   }
 
   updateSoundIcon();
+  window.addEventListener(MUTED_EVENT, updateSoundIcon);
   soundBtn?.addEventListener('click', () => {
     setMuted(!isMuted());
     updateSoundIcon();

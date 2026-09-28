@@ -1058,7 +1058,7 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   import { levelProgress } from '../lib/game/progression/level-table';
   import { getTotalStars } from '../lib/game/world/unlock-rules';
   import { startBackgroundMusic } from '../lib/game/media/background-music';
-  import { isMuted, setMuted, speak } from '../lib/game/media/audio';
+  import { isMuted, MUTED_EVENT, setMuted, speak } from '../lib/game/media/audio';
   import { introduceScreen } from '../lib/game/media/screen-intro';
   import type { UniformDay } from '../lib/uniform-schedule';
   import type { DaySchedule } from '../lib/timetable-schedule';
@@ -1094,6 +1094,7 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     if (label) label.textContent = off ? 'Đã tắt âm thanh' : 'Đang bật âm thanh';
   }
   renderSoundToggle();
+  window.addEventListener(MUTED_EVENT, renderSoundToggle);
   soundToggle?.addEventListener('click', () => {
     setMuted(!isMuted());
     renderSoundToggle();

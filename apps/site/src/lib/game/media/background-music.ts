@@ -10,6 +10,7 @@
  * - Trình duyệt chặn tự phát thì chờ lần chạm đầu tiên của bé.
  */
 import { isMuted, MUTED_EVENT, SPEECH_EVENT } from './audio';
+import { getMusicVolume, isMusicEnabled, PREFS_EVENT } from './sound-preferences';
 
 export interface BackgroundTrack {
   id: string;
@@ -23,8 +24,8 @@ export const BACKGROUND_TRACKS: BackgroundTrack[] = [
   { id: 'gau-con-cau-ca', url: '/game/audio/nhac-nen/gau-con-cau-ca.mp3' },
 ];
 
-const NORMAL_VOLUME = 0.28;
-const DUCKED_VOLUME = 0.08;
+/** Khi có giọng đọc, nhạc nhỏ còn khoảng 1/3 âm lượng bé chọn. */
+const DUCK_RATIO = 0.3;
 const SESSION_KEY = 'the-gioi:nhac-nen';
 
 interface SavedPosition {
@@ -35,6 +36,13 @@ interface SavedPosition {
 let audio: HTMLAudioElement | null = null;
 let trackIndex = 0;
 let started = false;
+let speaking = false;
+
+function applyVolume(): void {
+  if (audio) audio.volume = getMusicVolume() * (speaking ? DUCK_RATIO : 1);
+}
+
+const canPlay = () => !isMuted() && isMusicEnabled();
 
 function readSaved(): SavedPosition | null {
   try {
@@ -74,10 +82,10 @@ function loadTrack(index: number, startAt = 0): void {
 
 /** Thử phát; bị chặn tự phát thì phát ở lần chạm/bấm phím đầu tiên. */
 function tryPlay(): void {
-  if (!audio || isMuted()) return;
+  if (!audio || !canPlay()) return;
   audio.play().catch(() => {
     const resume = () => {
-      if (audio && !isMuted()) void audio.play().catch(() => undefined);
+      if (audio && canPlay()) void audio.play().catch(() => undefined);
     };
     window.addEventListener('pointerdown', resume, { once: true });
     window.addEventListener('keydown', resume, { once: true });
@@ -91,7 +99,7 @@ export function startBackgroundMusic(): void {
 
   audio = new Audio();
   audio.preload = 'auto';
-  audio.volume = NORMAL_VOLUME;
+  applyVolume();
 
   const saved = readSaved();
   if (saved) {
@@ -113,7 +121,19 @@ export function startBackgroundMusic(): void {
   });
 
   window.addEventListener(SPEECH_EVENT, (event) => {
-    if (audio) audio.volume = (event as CustomEvent<boolean>).detail ? DUCKED_VOLUME : NORMAL_VOLUME;
+    speaking = (event as CustomEvent<boolean>).detail;
+    applyVolume();
+  });
+
+  // Bé đổi âm lượng / tắt nhạc trong bảng cài đặt nhân vật: áp dụng ngay
+  window.addEventListener(PREFS_EVENT, () => {
+    if (!audio) return;
+    applyVolume();
+    if (canPlay()) {
+      if (audio.paused) tryPlay();
+    } else {
+      audio.pause();
+    }
   });
 
   // Chuyển tab/khóa màn hình thì dừng; rời trang thì nhớ vị trí để trang sau phát tiếp.

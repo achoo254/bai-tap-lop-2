@@ -1,0 +1,81 @@
+---
+/**
+ * Bộ chọn phụ kiện chia theo loại (mỗi loại 1 món), dùng ở trang Tạo nhân vật
+ * và bảng cài đặt của nhân vật đồng hành. Hành vi gắn bằng `bindAccessoryPicker`.
+ */
+import { CAT_ACCESSORIES, CAT_ACCESSORY_CATEGORIES } from './characters/cat-character';
+
+const groups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
+  ...category,
+  items: Object.values(CAT_ACCESSORIES).filter((acc) => acc.category === category.id),
+}));
+---
+
+<div class="acc-picker">
+  {
+    groups.map((group) => (
+      <div class="acc-category" data-acc-category={group.id} role="radiogroup" aria-label={group.name}>
+        <span class="acc-category-name">
+          {group.icon} {group.name}
+        </span>
+        <div class="acc-grid">
+          <button type="button" class="acc-chip acc-chip--none" data-acc-id="" role="radio" aria-checked="false">
+            Không đeo
+          </button>
+          {group.items.map((acc) => (
+            <button type="button" class="acc-chip" data-acc-id={acc.id} role="radio" aria-checked="false">
+              {acc.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .acc-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .acc-category-name {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #475569;
+  }
+
+  .acc-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .acc-chip {
+    padding: 0.5rem 0.85rem;
+    min-height: 48px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #334155;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .acc-chip--none {
+    color: #64748b;
+    border-style: dashed;
+  }
+
+  .acc-chip.active {
+    background: #fdf2f8;
+    border-color: #ec4899;
+    color: #be185d;
+    box-shadow: 0 0 0 2px #ec4899;
+  }
+</style>

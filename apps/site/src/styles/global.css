@@ -42,7 +42,8 @@ img {
 .page {
   max-width: 1180px;
   margin: 0 auto;
-  padding: var(--space-4) var(--space-5) var(--space-7);
+  /* Chừa chỗ cuối trang cho nhân vật đồng hành ở góc dưới phải */
+  padding: var(--space-4) var(--space-5) 128px;
 }
 
 /* Thanh trên cùng */

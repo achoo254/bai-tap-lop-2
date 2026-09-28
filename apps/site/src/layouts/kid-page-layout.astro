@@ -7,6 +7,7 @@ import MascotKitten from '../components/mascot-kitten.astro';
 import ReadingPreferencesToolbar from '../components/reading-preferences-toolbar.astro';
 import ImageZoomDialog from '../components/image-zoom-dialog.astro';
 import PwaInstallButton from '../components/pwa-install-button.astro';
+import CompanionBuddy from '../components/companion/companion-buddy.astro';
 import { hasHandwritingFont } from '../lib/handwriting-font';
 import { FAMILY_FOOTER, SITE_TITLE } from '../lib/family-messages';
 
@@ -15,8 +16,10 @@ interface Props {
   /** Trang xem trước bài nháp không được lập chỉ mục. */
   noindex?: boolean;
   showToolbar?: boolean;
+  /** Ngữ cảnh cho nhân vật đồng hành khi đường dẫn không đủ để biết (404, ngoại tuyến). */
+  companionContext?: string;
 }
-const { title, noindex = false, showToolbar = true } = Astro.props;
+const { title, noindex = false, showToolbar = true, companionContext } = Astro.props;
 const handwritingAvailable = hasHandwritingFont();
 ---
 
@@ -70,5 +73,6 @@ const handwritingAvailable = hasHandwritingFont();
       </footer>
     </div>
     <ImageZoomDialog />
+    <CompanionBuddy context={companionContext} handwritingAvailable={handwritingAvailable} />
   </body>
 </html>

@@ -13,6 +13,7 @@
  *   + "ting" (đúng), "bụp" (sai), "pop" (chạm/nhảy), "rủng rỉnh" (xu thưởng), "bụi tiên" (phép thuật/mở cổng).
  * - Tương thích chuẩn Safari/iPad (unlockAudio trong tương tác đầu tiên).
  */
+import { getSpeechPitchScale, getSpeechRateScale, isVoiceEnabled } from './sound-preferences';
 
 export type SpeechLanguage = 'vi' | 'en';
 
@@ -138,6 +139,8 @@ export function stopAudio(): void {
 /** Sự kiện phát ra khi bật/tắt tiếng hoặc khi bắt đầu/kết thúc giọng đọc (nhạc nền lắng nghe để tắt/nhỏ lại). */
 export const MUTED_EVENT = 'miu-audio:muted';
 export const SPEECH_EVENT = 'miu-audio:speech';
+/** Phát khi có tiếng hiệu ứng (đúng/sai/thưởng...) để nhân vật đồng hành phản ứng theo. */
+export const SFX_EVENT = 'miu-audio:sfx';
 
 function emitSpeaking(speaking: boolean): void {
   if (typeof window !== 'undefined') {
@@ -164,7 +167,7 @@ export function setMuted(value: boolean): void {
 /** Phát một tệp âm thanh thu sẵn (ví dụ giọng Miền Bắc chuẩn Hà Nội). */
 export function playAudioClip(url: string): Promise<void> {
   stopAudio();
-  if (muted || typeof window === 'undefined') return Promise.resolve();
+  if (muted || typeof window === 'undefined' || !isVoiceEnabled()) return Promise.resolve();
 
   return new Promise((resolve) => {
     try {
@@ -415,7 +418,7 @@ export function unlockAudio(): void {
  * - speak('Ngày xửa ngày xưa...', { audioClipUrl: '/game/audio/story-intro.mp3' })
  */
 export function speak(text: string, optionsOrLanguage?: SpeechLanguage | SpeakOptions): void {
-  if (muted || typeof window === 'undefined') return;
+  if (muted || typeof window === 'undefined' || !isVoiceEnabled()) return;
 
   const options: SpeakOptions =
     typeof optionsOrLanguage === 'string'
@@ -444,8 +447,9 @@ export function speak(text: string, optionsOrLanguage?: SpeechLanguage | SpeakOp
   const voice = findVoice(language, options.voiceName, accent);
   if (voice) utterance.voice = voice;
 
-  utterance.rate = options.rate ?? toneConfig.rate;
-  utterance.pitch = options.pitch ?? toneConfig.pitch;
+  // Tốc độ & cao độ bé/bố mẹ tinh chỉnh trong bảng cài đặt nhân vật nhân lên giọng điệu gốc
+  utterance.rate = Math.min(10, (options.rate ?? toneConfig.rate) * getSpeechRateScale());
+  utterance.pitch = Math.min(2, (options.pitch ?? toneConfig.pitch) * getSpeechPitchScale());
   utterance.volume = options.volume ?? 1.0;
   utterance.onstart = () => emitSpeaking(true);
   utterance.onend = () => emitSpeaking(false);
@@ -530,6 +534,7 @@ export type SfxType =
 export type SfxName = SfxType;
 
 export function playSfx(type: SfxType): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(SFX_EVENT, { detail: type }));
   unlockAudio();
   switch (type) {
     case 'correct':
