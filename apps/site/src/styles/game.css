@@ -1,0 +1,485 @@
+/**
+ * apps/site/src/styles/game.css
+ *
+ * Phong cách giao diện Thế giới học tập của Miu:
+ * - Touch-first cho iPad Safari (vùng chạm >= 56px, không phụ thuộc hover).
+ * - Nét vẽ mực đậm viền rõ kết hợp màu pastel theo style-guide.
+ * - Hoạt ảnh nhẹ nhàng, mượt mà (>= 50fps), hỗ trợ prefers-reduced-motion.
+ */
+
+:root {
+  --game-font-title: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --game-font-body: 'Nunito', system-ui, sans-serif;
+  --game-hud-height: 72px;
+  --game-border-radius: 20px;
+  --game-border-width: 3px;
+  --game-ink: #0f172a;
+  --game-gold: #f59e0b;
+  --game-gold-light: #fef3c7;
+  --game-sky: #0284c7;
+  --game-sky-light: #e0f2fe;
+  --game-emerald: #10b981;
+  --game-emerald-light: #d1fae5;
+  --game-rose: #ec4899;
+  --game-rose-light: #fce7f3;
+}
+
+/* --- Khung HUD (Đầu trang) --- */
+.game-hud {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.25rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 3px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  gap: 1rem;
+}
+
+.hud-left,
+.hud-center,
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hud-avatar-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.4rem;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--game-ink);
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+}
+
+.hud-avatar-chip:hover {
+  border-color: var(--game-sky);
+  transform: translateY(-1px);
+}
+
+.hud-avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffedd5;
+  border: 2px solid #fdba74;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hud-avatar-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-avatar-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.hud-level-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #b45309;
+}
+
+/* Thanh XP tiến trình */
+.hud-xp-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  gap: 0.2rem;
+}
+
+.hud-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.hud-xp-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+}
+
+.hud-xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Các chỉ số tiền và streak */
+.hud-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.hud-stat-pill.coins {
+  color: #b45309;
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.hud-stat-pill.streak {
+  color: #c2410c;
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+/* Nút điều khiển HUD */
+.hud-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #334155;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.hud-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+}
+
+.hud-btn:active {
+  transform: translateY(0);
+}
+
+/* --- Bản đồ thế giới & Vùng --- */
+.world-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - var(--game-hud-height));
+  background: linear-gradient(180deg, #f0fdf4 0%, #e0f2fe 100%);
+  padding: 1.5rem;
+}
+
+.world-map-card {
+  position: relative;
+  width: 100%;
+  max-width: 1024px;
+  background: #ffffff;
+  border: 4px solid #0f172a;
+  border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+/* --- Khung Nhiệm Vụ (Stage) --- */
+.quest-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - var(--game-hud-height));
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+.quest-card {
+  width: 100%;
+  max-width: 768px;
+  background: #ffffff;
+  border: 3px solid #0f172a;
+  border-radius: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.quest-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: #f1f5f9;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.quest-hearts {
+  display: flex;
+  gap: 0.35rem;
+  font-size: 1.4rem;
+}
+
+.quest-npc-intro {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #eff6ff;
+  border-bottom: 2px dashed #bfdbfe;
+}
+
+.npc-avatar-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+
+.npc-speech-bubble-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  line-height: 1.4;
+}
+
+.quest-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: #f8fafc;
+  border-top: 2px solid #e2e8f0;
+}
+
+.quest-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding: 0.6rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  touch-action: manipulation;
+}
+
+.quest-action-btn.hint-btn {
+  background: #fef9c3;
+  color: #854d0e;
+  border-color: #fde047;
+}
+
+.quest-action-btn.hint-btn:hover {
+  background: #fef08a;
+  transform: translateY(-2px);
+}
+
+.quest-action-btn.speak-btn {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.quest-action-btn.speak-btn:hover {
+  background: #bae6fd;
+  transform: translateY(-2px);
+}
+
+/* --- Màn Thưởng Rực Rỡ (Reward Screen) --- */
+.reward-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: reward-fade-in 0.3s ease;
+}
+
+.reward-modal-card {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border: 4px solid #0f172a;
+  border-radius: 32px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  animation: reward-card-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reward-stars-row {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.reward-star-icon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.4));
+  animation: star-bounce 0.6s ease;
+}
+
+.reward-stats-box {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.reward-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  font-weight: 800;
+}
+
+.reward-stat-item strong {
+  font-size: 1.6rem;
+  color: #0f172a;
+}
+
+.reward-continue-btn {
+  width: 100%;
+  min-height: 60px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 3px solid #047857;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  touch-action: manipulation;
+}
+
+.reward-continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+}
+
+/* Hoạt ảnh */
+@keyframes reward-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reward-card-pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes star-bounce {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes demo-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes demo-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion cho thiết bị nhạy cảm */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

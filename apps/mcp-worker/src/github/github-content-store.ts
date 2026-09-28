@@ -23,7 +23,9 @@ export interface CommitRequest {
 /** Nơi khác (trang Soạn bài, lần gọi trước) vừa sửa đúng bài đang ghi. */
 export class ContentConflictError extends Error {
   constructor(readonly paths: string[]) {
-    super('Bài vừa được sửa ở nơi khác (trang Soạn bài hoặc một lần sửa khác). Hãy đọc lại bài bằng get_lesson rồi làm lại.');
+    super(
+      'Bài vừa được sửa ở nơi khác (trang Soạn bài hoặc một lần sửa khác). Hãy đọc lại bài bằng get_lesson rồi làm lại.',
+    );
   }
 }
 
@@ -88,9 +90,12 @@ export class GitHubContentStore implements LessonFileStore {
   }
 
   async readText(path: string): Promise<string | null> {
-    const response = await this.request(`contents/${encodePath(path)}?ref=${encodeURIComponent(this.config.branch)}`, {
-      headers: { accept: 'application/vnd.github.raw+json' },
-    });
+    const response = await this.request(
+      `contents/${encodePath(path)}?ref=${encodeURIComponent(this.config.branch)}`,
+      {
+        headers: { accept: 'application/vnd.github.raw+json' },
+      },
+    );
     if (response.status === 404) return null;
     if (!response.ok) throw await toApiError(response);
     return response.text();
@@ -102,11 +107,18 @@ export class GitHubContentStore implements LessonFileStore {
     if (paths.length === 0) return result;
     const { owner, repo, branch, token } = this.config;
     const fields = paths
-      .map((path, index) => `f${index}: object(expression: ${JSON.stringify(`${branch}:${path}`)}) { ... on Blob { text } }`)
+      .map(
+        (path, index) =>
+          `f${index}: object(expression: ${JSON.stringify(`${branch}:${path}`)}) { ... on Blob { text } }`,
+      )
       .join(' ');
     const response = await this.fetchImpl('https://api.github.com/graphql', {
       method: 'POST',
-      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'user-agent': 'bai-tap-lop-2-mcp' },
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json',
+        'user-agent': 'bai-tap-lop-2-mcp',
+      },
       body: JSON.stringify({
         query: `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`,
         variables: { owner, name: repo },
@@ -118,16 +130,24 @@ export class GitHubContentStore implements LessonFileStore {
       errors?: { message: string }[];
     };
     if (!body.data?.repository) {
-      throw new GitHubApiError(502, `GitHub GraphQL lỗi: ${body.errors?.map((e) => e.message).join('; ') ?? 'không rõ'}`);
+      throw new GitHubApiError(
+        502,
+        `GitHub GraphQL lỗi: ${body.errors?.map((e) => e.message).join('; ') ?? 'không rõ'}`,
+      );
     }
-    paths.forEach((path, index) => result.set(path, body.data!.repository![`f${index}`]?.text ?? null));
+    paths.forEach((path, index) =>
+      result.set(path, body.data!.repository![`f${index}`]?.text ?? null),
+    );
     return result;
   }
 
   async commit(request: CommitRequest): Promise<void> {
     // Tạo blob một lần; nếu nhánh vừa có commit khác (vd. trang Soạn bài) thì dựng lại tree trên commit mới.
     const blobs = await Promise.all(
-      request.upserts.map(async (file) => ({ path: file.path, sha: await this.createBlob(file.content) })),
+      request.upserts.map(async (file) => ({
+        path: file.path,
+        sha: await this.createBlob(file.content),
+      })),
     );
     let checkedSha = request.baseSha;
     for (let attempt = 1; ; attempt++) {
@@ -142,7 +162,12 @@ export class GitHubContentStore implements LessonFileStore {
         body: {
           base_tree: parent.tree.sha,
           tree: [
-            ...blobs.map((blob) => ({ path: blob.path, mode: '100644', type: 'blob', sha: blob.sha })),
+            ...blobs.map((blob) => ({
+              path: blob.path,
+              mode: '100644',
+              type: 'blob',
+              sha: blob.sha,
+            })),
             ...request.deletes.map((path) => ({ path, mode: '100644', type: 'blob', sha: null })),
           ],
         },
@@ -151,30 +176,42 @@ export class GitHubContentStore implements LessonFileStore {
         method: 'POST',
         body: { message: request.message, tree: tree.sha, parents: [parentSha] },
       });
-      const update = await this.request(`git/refs/heads/${encodeURIComponent(this.config.branch)}`, {
-        method: 'PATCH',
-        body: { sha: commit.sha, force: false },
-      });
+      const update = await this.request(
+        `git/refs/heads/${encodeURIComponent(this.config.branch)}`,
+        {
+          method: 'PATCH',
+          body: { sha: commit.sha, force: false },
+        },
+      );
       if (update.ok) return;
       if (update.status !== 422 || attempt >= MAX_COMMIT_ATTEMPTS) throw await toApiError(update);
     }
   }
 
   /** Ném ContentConflictError nếu giữa hai commit có file nằm trong `guardPaths` bị đổi. */
-  private async assertUntouched(fromSha: string, toSha: string, guardPaths: string[]): Promise<void> {
-    const comparison = await this.api<{ files?: { filename: string; previous_filename?: string }[] }>(
-      `compare/${fromSha}...${toSha}`,
-    );
+  private async assertUntouched(
+    fromSha: string,
+    toSha: string,
+    guardPaths: string[],
+  ): Promise<void> {
+    const comparison = await this.api<{
+      files?: { filename: string; previous_filename?: string }[];
+    }>(`compare/${fromSha}...${toSha}`);
     const touched = (comparison.files ?? [])
       .flatMap((file) => [file.filename, file.previous_filename ?? ''])
-      .filter((name) => name && guardPaths.some((guard) => name === guard || name.startsWith(guard)));
+      .filter(
+        (name) => name && guardPaths.some((guard) => name === guard || name.startsWith(guard)),
+      );
     if (touched.length > 0) throw new ContentConflictError(touched);
   }
 
   private async headCommitSha(): Promise<string> {
     const response = await this.request(`git/ref/heads/${encodeURIComponent(this.config.branch)}`);
     if (response.status === 404 || response.status === 409) {
-      throw new GitHubApiError(response.status, 'Repo GitHub chưa có nhánh chính. Hãy đẩy mã nguồn lên repo trước.');
+      throw new GitHubApiError(
+        response.status,
+        'Repo GitHub chưa có nhánh chính. Hãy đẩy mã nguồn lên repo trước.',
+      );
     }
     if (!response.ok) throw await toApiError(response);
     return ((await response.json()) as { object: { sha: string } }).object.sha;
@@ -194,7 +231,10 @@ export class GitHubContentStore implements LessonFileStore {
     return (await response.json()) as T;
   }
 
-  private request(path: string, init: { method?: string; body?: unknown; headers?: Record<string, string> } = {}) {
+  private request(
+    path: string,
+    init: { method?: string; body?: unknown; headers?: Record<string, string> } = {},
+  ) {
     const { owner, repo, token } = this.config;
     return this.fetchImpl(`https://api.github.com/repos/${owner}/${repo}/${path}`, {
       method: init.method ?? 'GET',
@@ -227,7 +267,10 @@ async function toApiError(response: Response): Promise<GitHubApiError> {
     response.status === 401 || response.status === 403
       ? ' (token GitHub hết hạn hoặc thiếu quyền Contents: read/write)'
       : '';
-  return new GitHubApiError(response.status, `GitHub trả lỗi ${response.status}: ${message.slice(0, 200)}${hint}`);
+  return new GitHubApiError(
+    response.status,
+    `GitHub trả lỗi ${response.status}: ${message.slice(0, 200)}${hint}`,
+  );
 }
 
 export function bytesToBase64(bytes: Uint8Array): string {

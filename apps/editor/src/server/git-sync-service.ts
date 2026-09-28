@@ -40,11 +40,19 @@ export class GitSyncService {
       const committed = staged.trim() !== '';
       if (committed) await this.git.commit(message, [pathspec]);
       if (!(await this.hasRemote())) {
-        return { committed, pushed: false, message: 'Đã lưu trên máy. Chưa kết nối GitHub nên chưa đăng lên mạng.' };
+        return {
+          committed,
+          pushed: false,
+          message: 'Đã lưu trên máy. Chưa kết nối GitHub nên chưa đăng lên mạng.',
+        };
       }
       try {
         await this.pushWithRetry();
-        return { committed, pushed: true, message: 'Đã lưu và gửi lên GitHub. Web sẽ cập nhật sau vài phút.' };
+        return {
+          committed,
+          pushed: true,
+          message: 'Đã lưu và gửi lên GitHub. Web sẽ cập nhật sau vài phút.',
+        };
       } catch (error) {
         return {
           committed,
@@ -56,7 +64,8 @@ export class GitSyncService {
   }
 
   private async pullUnlocked(): Promise<GitSyncResult> {
-    if (!(await this.hasRemote())) return { ok: true, message: 'Chưa kết nối GitHub (làm việc trên máy).' };
+    if (!(await this.hasRemote()))
+      return { ok: true, message: 'Chưa kết nối GitHub (làm việc trên máy).' };
     try {
       const branch = (await this.git.revparse(['--abbrev-ref', 'HEAD'])).trim();
       await this.git.pull('origin', branch, ['--rebase', '--autostash']);
@@ -91,5 +100,11 @@ export class GitSyncService {
 
 function shortError(error: unknown): string {
   const text = error instanceof Error ? error.message : String(error);
-  return text.split('\n').find((line) => line.trim())?.trim().slice(0, 160) ?? 'lỗi không rõ';
+  return (
+    text
+      .split('\n')
+      .find((line) => line.trim())
+      ?.trim()
+      .slice(0, 160) ?? 'lỗi không rõ'
+  );
 }

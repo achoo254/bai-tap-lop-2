@@ -1,0 +1,1693 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/mau-cong-toan.astro
+ *
+ * Cảnh mẫu Cổng vào Vùng Toán để bố mẹ duyệt phong cách mỹ thuật (Phase 2).
+ * Tích hợp:
+ * - Gạch nền, cổng gỗ, biển báo, cây cối từ Kenney (CC0)
+ * - Mèo con Miu vẽ bằng SVG tách lớp với đầy đủ hoạt hình hành động THỰC SỰ
+ * - 10 màu lông đa dạng & 16 phụ kiện thuộc 3 nhóm (Đầu, Mặt, Lưng/Cổ)
+ * - NPC Người dẫn đường Cú Thông Thái (SVG)
+ * - Bảng điều khiển tương tác thời gian thực
+ */
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import {
+  CAT_FUR_COLORS,
+  CAT_ACCESSORIES,
+  renderCatSvgHtml,
+} from '../../components/game/characters/cat-character';
+import { NPC_GUIDES } from '../../components/game/characters/npc-guide';
+import { getAssetUrl } from '../../lib/game/media/art-manifest';
+
+const initialMiuSvg = renderCatSvgHtml({
+  pose: 'chao',
+  furColor: 'vang-cam',
+  accessories: ['no-hong'],
+  size: 160,
+  label: 'Miu đang vẫy chào',
+});
+
+const cuThongThaiSvg = NPC_GUIDES['cu-thong-thai'].renderSvg(140);
+---
+
+<KidPageLayout title="Cảnh mẫu Cổng Vùng Toán — Bố Mẹ Duyệt Phong Cách" showToolbar={false}>
+  <div class="preview-container">
+    <header class="preview-header">
+      <div class="breadcrumb">
+        <a href="/">← Trang chủ</a> / <span>Thế giới học tập</span> / <span>Cảnh mẫu Vùng Toán</span>
+      </div>
+      <h1 class="preview-title">🎨 Cảnh mẫu: Cổng vào Vùng Toán (Thung Lũng Con Số)</h1>
+      <p class="preview-desc">
+        Bố mẹ xem và duyệt phong cách đồ hoạ kết hợp: <strong>Kenney CC0</strong> (bối cảnh) + 
+        <strong>SVG tự vẽ</strong> (Miu & NPC) + <strong>OpenMoji</strong> (vật phẩm).
+        Bấm vào các nút bên dưới để thử <strong>hành động thật</strong> (đi bộ qua lại, nhảy cao, ngã ngồi bệt, ăn mừng...), 
+        thay đổi <strong>10 màu lông</strong> và <strong>16 phụ kiện</strong> khác nhau!
+      </p>
+    </header>
+
+    <!-- Khung cảnh tương tác (Stage) -->
+    <div class="stage-wrapper">
+      <div class="scene-stage" id="math-stage">
+        <!-- Nền trời và mây -->
+        <div class="scene-sky">
+          <div class="cloud cloud-1"></div>
+          <div class="cloud cloud-2"></div>
+          <div class="scene-sun"></div>
+          <img src={getAssetUrl('openmoji-rainbow')} alt="Cầu vồng" class="scene-rainbow" width="96" height="96" />
+        </div>
+
+        <!-- Cây cối hai bên cổng -->
+        <div class="scene-tree tree-left">
+          <img src={getAssetUrl('tree-cartoon')} alt="Cây bên trái" width="110" height="150" />
+        </div>
+        <div class="scene-tree tree-right">
+          <img src={getAssetUrl('tree-cartoon')} alt="Cây bên phải" width="110" height="150" />
+        </div>
+
+        <!-- Cổng gỗ Vùng Toán ở trung tâm -->
+        <div class="scene-gate">
+          <img src={getAssetUrl('gate-wood')} alt="Cổng gỗ Vùng Toán" width="180" height="162" />
+        </div>
+
+        <!-- Biển chỉ đường và khóm hoa -->
+        <div class="scene-signpost">
+          <img src={getAssetUrl('signpost')} alt="Biển chỉ đường" width="60" height="90" />
+        </div>
+        <div class="scene-flowers flowers-1">
+          <img src={getAssetUrl('flowers')} alt="Khóm hoa" width="48" height="48" />
+        </div>
+        <div class="scene-flowers flowers-2">
+          <img src={getAssetUrl('flowers')} alt="Khóm hoa" width="48" height="48" />
+        </div>
+
+        <!-- Rương kho báu và đồng xu vàng -->
+        <div class="scene-chest">
+          <img src={getAssetUrl('chest-gold')} alt="Rương kho báu" width="64" height="64" />
+        </div>
+        <div class="scene-coin coin-1">
+          <img src={getAssetUrl('coin-star')} alt="Xu sao" width="32" height="32" />
+        </div>
+        <div class="scene-coin coin-2">
+          <img src={getAssetUrl('coin-star')} alt="Xu sao" width="28" height="28" />
+        </div>
+
+        <!-- Vật phẩm OpenMoji để bé đếm (kẹo, táo, sách) -->
+        <div class="scene-props">
+          <img src={getAssetUrl('openmoji-apple')} alt="Quả táo" class="prop prop-apple" width="40" height="40" />
+          <img src={getAssetUrl('openmoji-candy')} alt="Kẹo ngọt" class="prop prop-candy" width="40" height="40" />
+          <img src={getAssetUrl('openmoji-book')} alt="Quyển sách" class="prop prop-book" width="44" height="44" />
+        </div>
+
+        <!-- NPC Cú Thông Thái đứng bên cổng chào đón -->
+        <div class="scene-npc" id="npc-container" title="Bấm để nghe Cú chào!">
+          <div set:html={cuThongThaiSvg} />
+          <div class="npc-speech-bubble">Chào Miu! Vào Vùng Toán nào! 🦉✨</div>
+        </div>
+
+        <!-- Mặt đất cỏ và lối đi lát đá Kenney -->
+        <div class="scene-ground">
+          <div class="ground-grass-layer"></div>
+          <div class="ground-path"></div>
+        </div>
+
+        <!-- Nhân vật chính Miu (nằm trên lớp mặt đất) -->
+        <div class="scene-miu action-chao" id="miu-wrapper">
+          <div class="miu-shadow" id="miu-shadow"></div>
+          <div id="miu-svg-slot" set:html={initialMiuSvg} />
+          <div class="miu-nameplate" id="miu-nameplate">Bé Miu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng điều khiển thử nghiệm tương tác cho bố mẹ -->
+    <div class="control-panel">
+      <h2 class="control-panel-title">🛠️ Bảng điều khiển thử nghiệm Miu (Hành động & Ngoại hình)</h2>
+
+      <!-- Chọn tư thế hành động -->
+      <div class="control-group">
+        <label class="control-label">
+          🎬 Hành động & Tư thế của Miu:
+          <span class="control-hint">(bấm để xem chuyển động thật trên sân khấu)</span>
+        </label>
+        <div class="btn-group" id="pose-buttons">
+          <button type="button" class="ctrl-btn active" data-pose="chao">👋 Vẫy chào</button>
+          <button type="button" class="ctrl-btn" data-pose="di">🐾 Đi bộ qua lại</button>
+          <button type="button" class="ctrl-btn" data-pose="nhay">🦘 Nhảy cao đàn hồi</button>
+          <button type="button" class="ctrl-btn" data-pose="vui">🎉 Ăn mừng chiến thắng</button>
+          <button type="button" class="ctrl-btn" data-pose="suy-nghi">🤔 Suy nghĩ gợi ý</button>
+          <button type="button" class="ctrl-btn" data-pose="te">💥 Trượt ngã ngồi bệt</button>
+          <button type="button" class="ctrl-btn" data-pose="buon">🥺 Buồn rũ tai</button>
+          <button type="button" class="ctrl-btn" data-pose="dung">🧍 Đứng thở nhẹ</button>
+        </div>
+      </div>
+
+      <!-- Chọn màu lông -->
+      <div class="control-group">
+        <label class="control-label">
+          🐱 Màu lông (10 bộ sưu tập màu):
+          <span class="control-hint">(chọn màu yêu thích cho Miu)</span>
+        </label>
+        <div class="btn-group" id="fur-buttons">
+          {
+            Object.values(CAT_FUR_COLORS).map((fur, idx) => (
+              <button
+                type="button"
+                class={`ctrl-btn fur-btn ${idx === 0 ? 'active' : ''}`}
+                data-fur={fur.id}
+                style={`--fur-color: ${fur.fur};`}
+              >
+                <span class="color-swatch" style={`background-color: ${fur.fur}; border-color: ${fur.furDark};`}></span>
+                {fur.name}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Chọn phụ kiện -->
+      <div class="control-group">
+        <label class="control-label">
+          🎀 Phụ kiện thời trang (16 món — có thể bấm chọn kết hợp nhiều món):
+        </label>
+        
+        <!-- Nhóm Mũ & Đầu -->
+        <div class="accessory-subgroup">
+          <span class="accessory-subgroup-title">🎩 Mũ & Cài đầu:</span>
+          <div class="btn-group" id="acc-head-buttons">
+            {
+              Object.values(CAT_ACCESSORIES)
+                .filter((a) => a.slot === 'head')
+                .map((acc) => (
+                  <button
+                    type="button"
+                    class={`ctrl-btn acc-btn ${acc.id === 'no-hong' ? 'active' : ''}`}
+                    data-acc={acc.id}
+                  >
+                    {acc.name}
+                  </button>
+                ))
+            }
+          </div>
+        </div>
+
+        <!-- Nhóm Mặt & Kính -->
+        <div class="accessory-subgroup">
+          <span class="accessory-subgroup-title">👓 Mặt & Mắt:</span>
+          <div class="btn-group" id="acc-face-buttons">
+            {
+              Object.values(CAT_ACCESSORIES)
+                .filter((a) => a.slot === 'face')
+                .map((acc) => (
+                  <button type="button" class="ctrl-btn acc-btn" data-acc={acc.id}>
+                    {acc.name}
+                  </button>
+                ))
+            }
+          </div>
+        </div>
+
+        <!-- Nhóm Lưng & Cổ -->
+        <div class="accessory-subgroup">
+          <span class="accessory-subgroup-title">🎒 Lưng & Cổ:</span>
+          <div class="btn-group" id="acc-body-buttons">
+            {
+              Object.values(CAT_ACCESSORIES)
+                .filter((a) => a.slot === 'back' || a.slot === 'neck')
+                .map((acc) => (
+                  <button type="button" class="ctrl-btn acc-btn" data-acc={acc.id}>
+                    {acc.name}
+                  </button>
+                ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Thử âm thanh & Giọng đọc truyền cảm (Storytelling Studio) -->
+      <div class="control-group voice-studio-card">
+        <div class="voice-header-flex">
+          <div>
+            <label class="control-label" style="margin-bottom: 2px;">
+              🎙️ Giọng Đọc Truyền Cảm & Kể Chuyện Cho Bé:
+            </label>
+            <p class="voice-subtitle">
+              Tùy biến phong cách kể chuyện cổ tích ấm áp, chọn giọng đọc tốt nhất trên máy và tinh chỉnh nhịp điệu phù hợp với bé Miu.
+            </p>
+          </div>
+          <button type="button" class="stop-speech-btn" id="btn-stop-speech" title="Dừng đọc">
+            ⏹️ Dừng đọc
+          </button>
+        </div>
+
+        <!-- 0. Chọn Vùng miền / Chất giọng -->
+        <div class="voice-section-block accent-selector-block">
+          <span class="sub-label">🏛️ Chất giọng vùng miền:</span>
+          <div class="accent-btn-group" id="accent-buttons">
+            <button type="button" class="accent-btn active" data-accent="bac">
+              <span class="accent-icon">🏛️</span>
+              <div class="accent-text">
+                <strong>Giọng Miền Bắc (Hà Nội)</strong>
+                <small>Chuẩn âm điệu, tròn vành rõ chữ, truyền cảm (Linh / Nam Minh)</small>
+              </div>
+            </button>
+            <button type="button" class="accent-btn" data-accent="nam">
+              <span class="accent-icon">🌴</span>
+              <div class="accent-text">
+                <strong>Giọng Miền Nam (Sài Gòn)</strong>
+                <small>Ngọt ngào, nhẹ nhàng, thân thuộc (Hoài My)</small>
+              </div>
+            </button>
+            <button type="button" class="accent-btn" data-accent="all">
+              <span class="accent-icon">🌐</span>
+              <div class="accent-text">
+                <strong>Tất cả các giọng</strong>
+                <small>Hiển thị toàn bộ giọng tiếng Việt trên máy</small>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Chọn phong cách giọng đọc -->
+        <div class="voice-section-block">
+          <span class="sub-label">📖 1. Chọn phong cách truyền cảm (bấm để nghe thử ngay):</span>
+          <div class="tone-grid" id="tone-buttons">
+            <button type="button" class="tone-btn active" data-tone="story">
+              <span class="tone-icon">📖</span>
+              <div class="tone-info">
+                <strong>Kể chuyện cổ tích</strong>
+                <span>Trầm ấm, chậm rãi (0.82x), truyền cảm như đọc truyện đêm khuya</span>
+              </div>
+            </button>
+            <button type="button" class="tone-btn" data-tone="guide">
+              <span class="tone-icon">🦉</span>
+              <div class="tone-info">
+                <strong>Bác Cú Thông Thái</strong>
+                <span>Từ tốn, ân cần (0.84x), điềm đạm dẫn dắt chỉ lối</span>
+              </div>
+            </button>
+            <button type="button" class="tone-btn" data-tone="cheer">
+              <span class="tone-icon">🎉</span>
+              <div class="tone-info">
+                <strong>Vui tươi khích lệ</strong>
+                <span>Hào hứng, rộn ràng (0.92x) khi bé hoàn thành thử thách</span>
+              </div>
+            </button>
+            <button type="button" class="tone-btn" data-tone="calm">
+              <span class="tone-icon">💖</span>
+              <div class="tone-info">
+                <strong>Thủ thỉ dỗ dành</strong>
+                <span>Dịu dàng, kiên nhẫn (0.80x) khi bé gặp bài khó hoặc làm chưa đúng</span>
+              </div>
+            </button>
+            <button type="button" class="tone-btn" data-tone="teacher">
+              <span class="tone-icon">👩‍🏫</span>
+              <div class="tone-info">
+                <strong>Cô giáo mẫu mực</strong>
+                <span>Rõ ràng, dứt khoát (0.86x), tròn vành rõ chữ chuẩn sư phạm</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Bộ chọn giọng nói thiết bị -->
+        <div class="voice-section-block">
+          <span class="sub-label">🎧 2. Giọng đọc phát hiện trên máy của gia đình:</span>
+          <div class="voice-picker-row">
+            <select id="voice-select" class="voice-dropdown">
+              <option value="">Đang tìm kiếm giọng tiếng Việt trên máy...</option>
+            </select>
+            <button type="button" class="ctrl-btn action-btn" id="btn-test-selected-voice">
+              ▶️ Nghe giọng này
+            </button>
+          </div>
+          <div id="voice-detected-badge" class="voice-quality-badge">
+            Đang quét hệ thống giọng nói...
+          </div>
+        </div>
+
+        <!-- 3. Thanh tinh chỉnh nhịp điệu -->
+        <div class="voice-section-block">
+          <span class="sub-label">🎚️ 3. Tinh chỉnh tốc độ & cao độ:</span>
+          <div class="sliders-grid">
+            <div class="slider-item">
+              <div class="slider-header">
+                <span>🐢 Tốc độ đọc (Rate):</span>
+                <span id="rate-display" class="slider-val-badge">0.82x</span>
+              </div>
+              <input type="range" id="rate-slider" min="0.70" max="1.15" step="0.02" value="0.82" class="voice-slider" />
+              <div class="slider-limits">
+                <span>0.70x (Rất chậm)</span>
+                <span>0.82x (Kể chuyện chuẩn)</span>
+                <span>1.15x (Nhanh)</span>
+              </div>
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-header">
+                <span>🎵 Cao độ giọng (Pitch):</span>
+                <span id="pitch-display" class="slider-val-badge">0.98x</span>
+              </div>
+              <input type="range" id="pitch-slider" min="0.80" max="1.20" step="0.02" value="0.98" class="voice-slider" />
+              <div class="slider-limits">
+                <span>0.80x (Trầm ấm)</span>
+                <span>0.98x (Tự nhiên)</span>
+                <span>1.20x (Cao/Nhí nhảnh)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Các đoạn kể chuyện mẫu -->
+        <div class="voice-section-block">
+          <span class="sub-label">📜 4. Nghe thử các đoạn kể chuyện & câu thoại mẫu:</span>
+          <div class="story-snippets-list">
+            <button type="button" class="story-snippet-btn" data-story="intro">
+              <span class="story-icon">🏰</span>
+              <div class="story-content">
+                <strong>Đoạn truyện mở màn Thung Lũng Con Số</strong>
+                <p><em>"Ngày xửa ngày xưa... ở Thung Lũng Con Số diệu kỳ... có một chú mèo nhỏ thông minh tên là Miu... Hôm nay, Miu mang chiếc ba lô nhỏ xinh, đứng trước cánh cổng Vùng Toán rực rỡ sắc màu... Miu đã sẵn sàng bước vào hành trình phiêu lưu kỳ thú chưa nào?"</em></p>
+              </div>
+              <span class="play-tag">▶️ Nghe</span>
+            </button>
+
+            <button type="button" class="story-snippet-btn" data-story="guide">
+              <span class="story-icon">🦉</span>
+              <div class="story-content">
+                <strong>Lời dặn dò ân cần của Bác Cú Thông Thái</strong>
+                <p><em>"Mến chào bé Miu thân yêu... Đừng lo lắng về những bài toán khó nhé... Cứ tự tin từng bước một, bác Cú sẽ luôn bên cạnh chỉ dẫn cho bé từng bước một!"</em></p>
+              </div>
+              <span class="play-tag">▶️ Nghe</span>
+            </button>
+
+            <button type="button" class="story-snippet-btn" data-story="reward">
+              <span class="story-icon">⭐</span>
+              <div class="story-content">
+                <strong>Lời khen ngợi ấm áp khi bé giải đúng</strong>
+                <p><em>"Ôi tuyệt vời làm sao! Bé Miu đã tìm ra lời giải chính xác rồi... Rương kho báu bừng sáng, và những ngôi sao vàng lấp lánh đang mỉm cười tặng bé kìa!"</em></p>
+              </div>
+              <span class="play-tag">▶️ Nghe</span>
+            </button>
+
+            <button type="button" class="story-snippet-btn" data-story="calm">
+              <span class="story-icon">🌸</span>
+              <div class="story-content">
+                <strong>Lời thủ thỉ động viên khi bé chọn nhầm</strong>
+                <p><em>"Không sao đâu bé ngoan... Cứ bình tĩnh thử lại một lần nữa nhé... Mỗi lần thử là một lần bé thông minh hơn một chút đấy mà!"</em></p>
+              </div>
+              <span class="play-tag">▶️ Nghe</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Hiệu ứng âm thanh trò chơi -->
+        <div class="voice-section-block">
+          <span class="sub-label">🔔 5. Hiệu ứng âm thanh trò chơi (Web Audio tổng hợp):</span>
+          <div class="btn-group">
+            <button type="button" class="ctrl-btn action-btn" id="btn-sound-magic">
+              ✨ Tiếng Phép Thuật (Magic Dust)
+            </button>
+            <button type="button" class="ctrl-btn action-btn" id="btn-sound-coin">
+              ⭐ Tiếng Nhận Xu Vàng
+            </button>
+            <button type="button" class="ctrl-btn action-btn" id="btn-sound-cheer">
+              🎊 Tiếng Ăn Mừng
+            </button>
+            <button type="button" class="ctrl-btn action-btn" id="btn-sound-jump">
+              🦘 Tiếng Nhảy Bật
+            </button>
+            <button type="button" class="ctrl-btn action-btn" id="btn-sound-slip">
+              💥 Tiếng Ngã Nhẹ
+            </button>
+          </div>
+        </div>
+
+        <!-- Hướng dẫn về giọng đọc trên iPad và thiết bị -->
+        <div class="ipad-tip-card">
+          <div class="tip-badge">💡 GIẢI THÍCH VỀ GIỌNG ĐỌC MIỀN BẮC & THIẾT BỊ APPLE</div>
+          <p>
+            Giọng đọc mặc định mang tên <strong>Linh</strong> trên các thiết bị Apple (iPad, iPhone, Mac) thực chất mang âm hưởng <strong>Miền Nam</strong>.
+          </p>
+          <p>
+            Vì vậy, để bé Miu được học tập với <strong>chuẩn giọng Miền Bắc (Hà Nội)</strong> tròn vành rõ chữ, hệ thống đã trang bị sẵn:
+          </p>
+          <ol>
+            <li><strong>Bản thu âm AI Neural chuẩn Hà Nội (Hoài My & Nam Minh):</strong> Tích hợp sẵn để phát ngay các trích đoạn truyện và lời thoại của Cú Thông Thái.</li>
+            <li><strong>Giọng Siri Tiếng Việt (Giọng 1) trên iOS 18.4+:</strong> Nếu máy có Siri tiếng Việt, hệ thống sẽ tự động bắt giọng Bắc.</li>
+          </ol>
+          <p class="tip-note">
+            👉 Bố mẹ hãy bấm vào nút <strong>"🏛️ Giọng Miền Bắc (Hà Nội)"</strong> hoặc các nút <strong>"▶️ Nghe"</strong> ở mục số 4 để nghe ngay chuẩn giọng Hà Nội ấm áp nhé!
+          </p>
+        </div>
+      </div>
+
+      <!-- Tiêu chí bố mẹ duyệt -->
+      <div class="approval-card">
+        <h3>📋 Tiêu chí bố mẹ kiểm tra trước khi duyệt Phase 2:</h3>
+        <ul>
+          <li>✅ <strong>Hành động thật sống động:</strong> Miu có chuyển động rõ ràng khi đi bộ, nhảy vọt lên cao, ngã trượt bệt xuống sàn, nhảy múa ăn mừng...</li>
+          <li>✅ <strong>Bộ sưu tập màu lông phong phú:</strong> 10 phong cách từ vàng cam Miu Miu, tam thể may mắn đến mướp vằn hổ, mèo Xiêm quý tộc.</li>
+          <li>✅ <strong>16 phụ kiện độc đáo:</strong> Dễ dàng phối đồ giữa mũ cử nhân, nơ hồng, cánh thiên thần, áo choàng siêu nhân, kính trí thức...</li>
+          <li>✅ <strong>Âm thanh & Giọng đọc truyền cảm:</strong> Tùy chọn 5 phong cách kể chuyện (chậm rãi, trầm ấm, dỗ dành), tự nhận diện giọng Enhanced/Siri trên iPad và tinh chỉnh tốc độ/cao độ linh hoạt.</li>
+          <li>✅ <strong>Bản quyền sạch 100%:</strong> Bối cảnh Kenney CC0, OpenMoji CC BY-SA 4.0 và SVG tự vẽ hoàn toàn bằng code, không dùng hình AI.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</KidPageLayout>
+
+<!-- Toàn bộ CSS chuyển động nhân vật được đặt ở phạm vi global để áp dụng trực tiếp cho các thẻ SVG -->
+<style is:global>
+  @import '../../components/game/characters/character-poses.css';
+
+  /* Hoạt hình bước đi di chuyển trên sân khấu */
+  .scene-miu.action-di {
+    animation: miu-walk-across 5s ease-in-out infinite alternate;
+  }
+  @keyframes miu-walk-across {
+    0% {
+      left: 36%;
+      transform: translateX(-50%) scaleX(1);
+    }
+    45% {
+      left: 58%;
+      transform: translateX(-50%) scaleX(1);
+    }
+    50% {
+      left: 58%;
+      transform: translateX(-50%) scaleX(-1); /* Quay đầu lại */
+    }
+    95% {
+      left: 36%;
+      transform: translateX(-50%) scaleX(-1);
+    }
+    100% {
+      left: 36%;
+      transform: translateX(-50%) scaleX(1);
+    }
+  }
+
+  /* Hoạt hình bóng đổ khi Miu nhảy */
+  .scene-miu.action-nhay .miu-shadow {
+    animation: miu-shadow-jump 1.1s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+  }
+  @keyframes miu-shadow-jump {
+    0%, 100% { transform: scale(1); opacity: 0.25; }
+    15% { transform: scale(1.2); opacity: 0.35; }
+    45% { transform: scale(0.45); opacity: 0.08; } /* Bóng co nhỏ và mờ đi khi Miu lên cao */
+    75% { transform: scale(1.1); opacity: 0.3; }
+  }
+
+  /* Hoạt hình bóng đổ khi Miu đi */
+  .scene-miu.action-di .miu-shadow {
+    animation: miu-shadow-walk 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes miu-shadow-walk {
+    from { transform: scale(0.9, 0.9); }
+    to { transform: scale(1.05, 1.05); }
+  }
+
+  /* Hoạt hình rung lắc khi ngã */
+  .scene-miu.action-te {
+    animation: miu-fall-shake 1.4s ease-in-out infinite;
+  }
+  @keyframes miu-fall-shake {
+    0%, 25% { transform: translateX(-50%) translateY(0); }
+    30% { transform: translateX(-50%) translateY(4px); }
+    35% { transform: translateX(-52%) translateY(2px); }
+    40% { transform: translateX(-48%) translateY(4px); }
+    50%, 100% { transform: translateX(-50%) translateY(0); }
+  }
+
+  /* Hoạt hình khi Cú Thông Thái hoặc nhân vật đang kể chuyện / nói */
+  .scene-npc.talking {
+    animation: npc-talk-bounce 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes npc-talk-bounce {
+    from {
+      transform: translateY(0) rotate(0deg);
+    }
+    to {
+      transform: translateY(-5px) rotate(2deg);
+    }
+  }
+
+  .scene-npc.talking .npc-speech-bubble {
+    background: #fef08a;
+    border-color: #ca8a04;
+    color: #713f12;
+    transform: translateX(-50%) scale(1.06);
+    box-shadow: 0 6px 16px rgba(202, 138, 4, 0.35);
+    transition: all 0.2s ease;
+  }
+</style>
+
+<style>
+  .preview-container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .preview-header {
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  .breadcrumb a {
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .preview-title {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #1e1b4b;
+    margin: 0 0 8px 0;
+  }
+
+  .preview-desc {
+    color: #475569;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  /* Sân khấu */
+  .stage-wrapper {
+    background: #0284c7;
+    padding: 8px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(2, 132, 199, 0.25);
+    margin-bottom: 28px;
+  }
+
+  .scene-stage {
+    position: relative;
+    width: 100%;
+    height: 440px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #38bdf8 0%, #bae6fd 65%, #7dd3fc 100%);
+    user-select: none;
+  }
+
+  /* Bầu trời & Chi tiết trang trí */
+  .scene-sky {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .scene-sun {
+    position: absolute;
+    top: 24px;
+    right: 48px;
+    width: 60px;
+    height: 60px;
+    background: #fde047;
+    border: 3.5px solid #ca8a04;
+    border-radius: 50%;
+    box-shadow: 0 0 24px #fef08a;
+  }
+
+  .scene-rainbow {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    opacity: 0.85;
+  }
+
+  .cloud {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 30px;
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .cloud-1 {
+    top: 36px;
+    left: 180px;
+    width: 110px;
+    height: 38px;
+  }
+
+  .cloud-2 {
+    top: 60px;
+    right: 140px;
+    width: 130px;
+    height: 42px;
+  }
+
+  /* Mặt đất & Lối đi */
+  .scene-ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: #48bb78;
+    border-top: 4px solid #22543d;
+    z-index: 1;
+  }
+
+  .ground-grass-layer {
+    position: absolute;
+    inset: 0;
+    background-image: url('/game/kenney/tile-grass.svg');
+    background-size: 64px 64px;
+    opacity: 0.45;
+  }
+
+  .ground-path {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 120px;
+    background-image: url('/game/kenney/tile-stone-path.svg');
+    background-size: 50px 50px;
+    border-left: 3px solid #334155;
+    border-right: 3px solid #334155;
+    opacity: 0.9;
+  }
+
+  /* Cổng & Công trình */
+  .scene-gate {
+    position: absolute;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .tree-left {
+    position: absolute;
+    bottom: 90px;
+    left: 20px;
+    z-index: 2;
+  }
+
+  .tree-right {
+    position: absolute;
+    bottom: 90px;
+    right: 20px;
+    z-index: 2;
+  }
+
+  .scene-signpost {
+    position: absolute;
+    bottom: 84px;
+    left: 150px;
+    z-index: 3;
+  }
+
+  .flowers-1 {
+    position: absolute;
+    bottom: 60px;
+    left: 60px;
+    z-index: 3;
+  }
+
+  .flowers-2 {
+    position: absolute;
+    bottom: 50px;
+    right: 70px;
+    z-index: 3;
+  }
+
+  .scene-chest {
+    position: absolute;
+    bottom: 74px;
+    right: 150px;
+    z-index: 3;
+    animation: chest-bounce 3s ease-in-out infinite;
+  }
+
+  .scene-coin {
+    position: absolute;
+    z-index: 4;
+    animation: coin-spin 2s ease-in-out infinite alternate;
+  }
+  .coin-1 {
+    bottom: 140px;
+    right: 165px;
+  }
+  .coin-2 {
+    bottom: 120px;
+    right: 205px;
+    animation-delay: 0.5s;
+  }
+
+  .scene-props {
+    position: absolute;
+    bottom: 45px;
+    left: 210px;
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+  }
+  .prop {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+  }
+
+  /* NPC Cú Thông Thái */
+  .scene-npc {
+    position: absolute;
+    bottom: 80px;
+    right: 235px;
+    z-index: 4;
+    cursor: pointer;
+  }
+
+  .npc-speech-bubble {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    color: #78350f;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 2px solid #ca8a04;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Nhân vật Miu */
+  .scene-miu {
+    position: absolute;
+    bottom: 70px;
+    left: 45%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: left 0.3s ease;
+  }
+
+  .miu-shadow {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 16px;
+    background: #000000;
+    opacity: 0.25;
+    border-radius: 50%;
+    filter: blur(2px);
+    z-index: -1;
+  }
+
+  .miu-nameplate {
+    background: #f43f5e;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 2px 10px;
+    border-radius: 10px;
+    border: 2px solid #881337;
+    margin-top: -8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Bảng điều khiển */
+  .control-panel {
+    background: #ffffff;
+    border: 3px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  .control-panel-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #1e1b4b;
+    margin: 0 0 18px 0;
+  }
+
+  .control-group {
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px dashed #e2e8f0;
+  }
+  .control-group:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .control-label {
+    display: block;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+  }
+
+  .control-hint {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: #64748b;
+    margin-left: 6px;
+  }
+
+  .accessory-subgroup {
+    margin-top: 10px;
+    margin-bottom: 12px;
+  }
+
+  .accessory-subgroup-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 6px;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ctrl-btn {
+    appearance: none;
+    border: 2.5px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 7px 13px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ctrl-btn:hover {
+    border-color: #38bdf8;
+    background: #f0f9ff;
+    transform: translateY(-1px);
+  }
+
+  .ctrl-btn.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0369a1;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+  }
+
+  .color-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .action-btn {
+    background: #fef08a;
+    border-color: #ca8a04;
+    color: #78350f;
+  }
+  .action-btn:hover {
+    background: #fde047;
+    border-color: #a16207;
+  }
+
+  .approval-card {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .approval-card h3 {
+    margin: 0 0 10px 0;
+    color: #166534;
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  .approval-card ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #15803d;
+    line-height: 1.6;
+  }
+
+  @keyframes chest-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes coin-spin {
+    from { transform: translateY(0) scale(1); }
+    to { transform: translateY(-8px) scale(1.08); }
+  }
+
+  /* Voice Studio Styles */
+  .voice-studio-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+  }
+
+  .voice-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .voice-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 0.92rem;
+    color: #475569;
+  }
+
+  .stop-speech-btn {
+    appearance: none;
+    background: #fee2e2;
+    border: 2px solid #ef4444;
+    color: #991b1b;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .stop-speech-btn:hover {
+    background: #fecaca;
+    transform: translateY(-1px);
+  }
+
+  .voice-section-block {
+    margin-bottom: 18px;
+  }
+
+  .sub-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  .accent-btn-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .accent-btn {
+    appearance: none;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s ease;
+  }
+  .accent-btn:hover {
+    border-color: #0284c7;
+    background: #f0f9ff;
+    transform: translateY(-1px);
+  }
+  .accent-btn.active {
+    background: #eff6ff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+  .accent-btn.active strong {
+    color: #1d4ed8;
+  }
+
+  .accent-icon {
+    font-size: 1.5rem;
+  }
+
+  .accent-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .accent-text strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+  }
+  .accent-text small {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  .tone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+  }
+
+  .tone-btn {
+    appearance: none;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: all 0.15s ease;
+  }
+  .tone-btn:hover {
+    border-color: #38bdf8;
+    background: #f0f9ff;
+    transform: translateY(-1px);
+  }
+  .tone-btn.active {
+    background: #f0fdf4;
+    border-color: #16a34a;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+  }
+
+  .tone-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .tone-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tone-info strong {
+    font-size: 0.92rem;
+    color: #0f172a;
+  }
+  .tone-info span {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.3;
+  }
+
+  .voice-picker-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .voice-dropdown {
+    flex: 1;
+    min-width: 260px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 2px solid #94a3b8;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    background: #ffffff;
+  }
+
+  .voice-quality-badge {
+    font-size: 0.82rem;
+    color: #0369a1;
+    background: #e0f2fe;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .sliders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .slider-item {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+
+  .slider-val-badge {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+
+  .voice-slider {
+    width: 100%;
+    accent-color: #0284c7;
+    cursor: pointer;
+  }
+
+  .slider-limits {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+
+  .story-snippets-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+
+  .story-snippet-btn {
+    appearance: none;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: all 0.15s ease;
+  }
+  .story-snippet-btn:hover {
+    border-color: #f59e0b;
+    background: #fefce8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  }
+
+  .story-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .story-content {
+    flex: 1;
+  }
+  .story-content strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+  .story-content p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .play-tag {
+    background: #fef08a;
+    color: #854d0e;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    border: 1.5px solid #facc15;
+  }
+
+  .ipad-tip-card {
+    background: #fdf4ff;
+    border: 2px solid #f0abfc;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 18px;
+  }
+
+  .tip-badge {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #a21caf;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .ipad-tip-card p {
+    margin: 0 0 8px 0;
+    font-size: 0.88rem;
+    color: #701a75;
+    line-height: 1.5;
+  }
+
+  .ipad-tip-card ol {
+    margin: 0 0 8px 0;
+    padding-left: 20px;
+    font-size: 0.88rem;
+    color: #86198f;
+    line-height: 1.5;
+  }
+
+  .tip-note {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #4c1d95;
+    margin: 0 !important;
+  }
+</style>
+
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatPose,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../../components/game/characters/cat-character';
+  import {
+    speak,
+    playSfx,
+    playAudioClip,
+    stopAudio,
+    getAvailableVoices,
+    rateVoiceQuality,
+    getVoiceAccent,
+    getPreferredAccent,
+    setPreferredAccent,
+    type VietnameseAccent,
+    setPreferredVoice,
+    getPreferredVoice,
+    setPreferredTone,
+    getPreferredTone,
+    VOICE_TONES,
+    type VoiceTone,
+  } from '../../lib/game/media/audio';
+
+  // Trạng thái nhân vật
+  let currentPose: CatPose = 'chao';
+  let currentFur: CatFurColorId = 'vang-cam';
+  let currentAccessories: CatAccessoryId[] = ['no-hong'];
+
+  // Trạng thái giọng đọc & âm thanh (mặc định giọng Miền Bắc)
+  let currentAccent: VietnameseAccent = getPreferredAccent();
+  let currentTone: VoiceTone = getPreferredTone();
+  let currentRate = VOICE_TONES[currentTone]?.rate ?? 0.82;
+  let currentPitch = VOICE_TONES[currentTone]?.pitch ?? 0.98;
+  let currentVoiceName = getPreferredVoice('vi') ?? '';
+
+  const slot = document.getElementById('miu-svg-slot');
+  const wrapper = document.getElementById('miu-wrapper');
+  const rateSlider = document.getElementById('rate-slider') as HTMLInputElement | null;
+  const pitchSlider = document.getElementById('pitch-slider') as HTMLInputElement | null;
+  const rateDisplay = document.getElementById('rate-display');
+  const pitchDisplay = document.getElementById('pitch-display');
+  const voiceSelect = document.getElementById('voice-select') as HTMLSelectElement | null;
+  const voiceDetectedBadge = document.getElementById('voice-detected-badge');
+  const npcContainer = document.getElementById('npc-container');
+  const npcSpeechBubble = document.querySelector('.npc-speech-bubble');
+
+  function updateMiu() {
+    if (!slot || !wrapper) return;
+
+    // Cập nhật class hành động trên wrapper để áp dụng chuyển động sân khấu (bước đi, nhảy, ngã)
+    wrapper.className = `scene-miu action-${currentPose}`;
+
+    // Cập nhật SVG nội dung
+    slot.innerHTML = renderCatSvgHtml({
+      pose: currentPose,
+      furColor: currentFur,
+      accessories: currentAccessories,
+      size: 160,
+      label: `Bé Miu tư thế ${currentPose}`,
+    });
+  }
+
+  function updateSliderDisplays() {
+    if (rateSlider && rateDisplay) {
+      rateSlider.value = currentRate.toFixed(2);
+      rateDisplay.textContent = `${currentRate.toFixed(2)}x`;
+    }
+    if (pitchSlider && pitchDisplay) {
+      pitchSlider.value = currentPitch.toFixed(2);
+      pitchDisplay.textContent = `${currentPitch.toFixed(2)}x`;
+    }
+  }
+
+  let talkingTimer: number | undefined;
+  function setNpcTalking(text: string, durationEstimateMs = 5000) {
+    if (npcContainer) npcContainer.classList.add('talking');
+    if (npcSpeechBubble) {
+      npcSpeechBubble.textContent = text;
+      npcSpeechBubble.classList.add('talking');
+    }
+    window.clearTimeout(talkingTimer);
+    talkingTimer = window.setTimeout(() => {
+      stopNpcTalking();
+    }, durationEstimateMs);
+  }
+
+  function stopNpcTalking() {
+    if (npcContainer) npcContainer.classList.remove('talking');
+    if (npcSpeechBubble) {
+      npcSpeechBubble.textContent = 'Chào Miu! Vào Vùng Toán nào! 🦉✨';
+      npcSpeechBubble.classList.remove('talking');
+    }
+  }
+
+  function playSpokenPhrase(text: string, customTone?: VoiceTone) {
+    const toneToUse = customTone ?? currentTone;
+    speak(text, {
+      language: 'vi',
+      accent: currentAccent,
+      tone: toneToUse,
+      rate: currentRate,
+      pitch: currentPitch,
+      voiceName: currentVoiceName || undefined,
+    });
+    // Ước chừng thời gian đọc dựa theo số từ và tốc độ để đồng bộ animation
+    const words = text.split(/\s+/).length;
+    const estDuration = Math.max(2500, Math.round((words / (2.2 * currentRate)) * 1000));
+    const bubbleSnippet = text.length > 45 ? text.substring(0, 42) + '...' : text;
+    setNpcTalking(bubbleSnippet, estDuration);
+  }
+
+  // Khởi tạo slider displays
+  updateSliderDisplays();
+
+  // Quét danh sách giọng tiếng Việt khả dụng
+  function populateVoiceList() {
+    if (!voiceSelect) return;
+    const voices = getAvailableVoices('vi', currentAccent);
+    voiceSelect.innerHTML = '';
+
+    if (voices.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Giọng mặc định hệ thống';
+      voiceSelect.appendChild(opt);
+      if (voiceDetectedBadge) {
+        voiceDetectedBadge.textContent = 'ℹ️ Chưa tìm thấy giọng tiếng Việt riêng trên máy.';
+      }
+      return;
+    }
+
+    let hasEnhanced = false;
+    let autoPickedVoice = '';
+
+    voices.forEach((v, index) => {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      const score = rateVoiceQuality(v, currentAccent);
+      const acc = getVoiceAccent(v);
+      const accTag = acc === 'bac' ? '🏛️ Miền Bắc' : acc === 'nam' ? '🌴 Miền Nam' : '🌐 Toàn quốc';
+
+      if (score >= 60) {
+        opt.textContent = `⭐ [${accTag}] ${v.name} (Khuyên dùng - Rất truyền cảm)`;
+        hasEnhanced = true;
+      } else {
+        opt.textContent = `[${accTag}] ${v.name}`;
+      }
+
+      // Tự động ưu tiên chọn giọng Bắc tốt nhất
+      if (!autoPickedVoice && (currentVoiceName ? v.name === currentVoiceName : (acc === 'bac' || index === 0))) {
+        opt.selected = true;
+        autoPickedVoice = v.name;
+      }
+      voiceSelect.appendChild(opt);
+    });
+
+    if (autoPickedVoice) {
+      currentVoiceName = autoPickedVoice;
+      setPreferredVoice('vi', currentVoiceName);
+    }
+
+    if (voiceDetectedBadge) {
+      if (currentAccent === 'bac') {
+        const enhancedNote = hasEnhanced ? ' (Chất lượng nâng cao ⭐)' : '';
+        voiceDetectedBadge.innerHTML = `🏛️ <strong>Đang ưu tiên Giọng Miền Bắc (Hà Nội):</strong> Tự động chọn <em>${currentVoiceName || 'Linh'}</em>${enhancedNote} chuẩn âm điệu và thanh điệu.`;
+        voiceDetectedBadge.style.color = '#15803d';
+        voiceDetectedBadge.style.background = '#dcfce7';
+      } else if (currentAccent === 'nam') {
+        voiceDetectedBadge.innerHTML = `🌴 <strong>Đang chọn Giọng Miền Nam:</strong> <em>${currentVoiceName}</em>`;
+        voiceDetectedBadge.style.color = '#0369a1';
+        voiceDetectedBadge.style.background = '#e0f2fe';
+      } else {
+        voiceDetectedBadge.textContent = `🌐 Đang hiển thị tất cả các giọng trên máy (${voices.length} giọng).`;
+        voiceDetectedBadge.style.color = '#334155';
+        voiceDetectedBadge.style.background = '#f1f5f9';
+      }
+    }
+  }
+
+  populateVoiceList();
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = populateVoiceList;
+    setTimeout(populateVoiceList, 400);
+  }
+
+  // Lắng nghe chọn chất giọng vùng miền (Bắc / Nam / Tất cả)
+  const accentButtons = document.querySelectorAll('#accent-buttons .accent-btn');
+  accentButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      accentButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const acc = btn.getAttribute('data-accent') as VietnameseAccent;
+      currentAccent = acc;
+      setPreferredAccent(acc);
+      currentVoiceName = ''; // reset để auto-pick giọng chuẩn nhất của vùng miền mới
+      populateVoiceList();
+
+      if (acc === 'bac') {
+        void playAudioClip('/game/audio/sample-north.mp3');
+        setNpcTalking('Mến chào bé Miu! Đây là giọng đọc Linh chuẩn Miền Bắc Hà Nội truyền cảm.', 6500);
+      } else if (acc === 'nam') {
+        void playAudioClip('/game/audio/sample-south.mp3');
+        setNpcTalking('Chào bé Miu nha! Đây là giọng đọc Hoài My mang âm điệu Miền Nam ngọt ngào.', 6500);
+      } else {
+        playSpokenPhrase('Chào bé Miu! Đây là giọng đọc hệ thống.');
+      }
+    });
+  });
+
+  voiceSelect?.addEventListener('change', () => {
+    currentVoiceName = voiceSelect.value;
+    setPreferredVoice('vi', currentVoiceName);
+  });
+
+  document.getElementById('btn-test-selected-voice')?.addEventListener('click', () => {
+    const selectedVoice = voiceSelect?.value || currentVoiceName;
+    const cleanName = selectedVoice ? selectedVoice.split(' - ')[0] : 'hệ thống';
+    playSpokenPhrase(`Mến chào bé Miu! Đây là giọng đọc ${cleanName} trên máy của bé!`);
+  });
+
+  // Lắng nghe nút chọn phong cách giọng đọc
+  const toneButtons = document.querySelectorAll('#tone-buttons .tone-btn');
+  toneButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      toneButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tone = btn.getAttribute('data-tone') as VoiceTone;
+      currentTone = tone;
+      setPreferredTone(tone);
+
+      const cfg = VOICE_TONES[tone];
+      if (cfg) {
+        currentRate = cfg.rate;
+        currentPitch = cfg.pitch;
+        updateSliderDisplays();
+      }
+
+      const samplePhrases: Record<VoiceTone, string> = {
+        story: 'Ngày xửa ngày xưa... ở Thung Lũng Con Số diệu kỳ... có một chú mèo nhỏ thông minh tên là Miu.',
+        guide: 'Mến chào Miu! Bác Cú Thông Thái sẽ luôn đồng hành và chỉ dẫn từng bước cho bé.',
+        cheer: 'Hoan hô bé Miu! Bé đã làm rất xuất sắc, nhận ngay một ngôi sao vàng lấp lánh nhé!',
+        calm: 'Không sao đâu bé ngoan... Cứ bình tĩnh thử lại nào, bác Cú luôn ở bên cạnh bé.',
+        teacher: 'Chào các em học sinh yêu quý! Hôm nay chúng ta cùng khám phá những phép tính kỳ diệu nhé.',
+        normal: 'Xin chào bé Miu! Cùng ta bước vào Cổng Vùng Toán nào.',
+      };
+      playSpokenPhrase(samplePhrases[tone] ?? 'Xin chào bé Miu!');
+    });
+  });
+
+  // Lắng nghe thanh trượt Rate & Pitch
+  rateSlider?.addEventListener('input', () => {
+    currentRate = parseFloat(rateSlider.value);
+    if (rateDisplay) rateDisplay.textContent = `${currentRate.toFixed(2)}x`;
+  });
+
+  pitchSlider?.addEventListener('input', () => {
+    currentPitch = parseFloat(pitchSlider.value);
+    if (pitchDisplay) pitchDisplay.textContent = `${currentPitch.toFixed(2)}x`;
+  });
+
+  // Lắng nghe nút kể chuyện mẫu
+  const storyTexts: Record<string, string> = {
+    intro: 'Ngày xửa ngày xưa... ở Thung Lũng Con Số diệu kỳ... có một chú mèo nhỏ thông minh tên là Miu... Hôm nay, Miu mang chiếc ba lô nhỏ xinh, đứng trước cánh cổng Vùng Toán rực rỡ sắc màu... Miu đã sẵn sàng bước vào hành trình phiêu lưu kỳ thú chưa nào?',
+    guide: 'Mến chào bé Miu thân yêu... Đừng lo lắng về những bài toán khó nhé... Cứ tự tin từng bước một, bác Cú sẽ luôn bên cạnh chỉ dẫn và nâng đỡ bé trên mọi nẻo đường!',
+    reward: 'Ôi tuyệt vời làm sao! Bé Miu đã tìm ra lời giải chính xác rồi... Rương kho báu bừng sáng, và những ngôi sao vàng lấp lánh đang mỉm cười tặng thưởng cho bé kìa!',
+    calm: 'Không sao đâu bé ngoan... Cứ bình tĩnh thử lại một lần nữa nhé... Mỗi lần thử là một lần bé thông minh hơn một chút đấy mà! Miu cố lên nào!',
+  };
+
+  const northernAudioMap: Record<string, string> = {
+    intro: '/game/audio/story-intro.mp3',
+    guide: '/game/audio/owl-greeting.mp3',
+    reward: '/game/audio/reward-cheer.mp3',
+    calm: '/game/audio/calm-encourage.mp3',
+  };
+
+  document.querySelectorAll('.story-snippet-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const storyKey = btn.getAttribute('data-story') ?? 'intro';
+      const text = storyTexts[storyKey] ?? storyTexts.intro;
+      playSfx('magic');
+
+      if (currentAccent === 'bac' && northernAudioMap[storyKey]) {
+        void playAudioClip(northernAudioMap[storyKey]);
+        const bubbleSnippet = text.length > 45 ? text.substring(0, 42) + '...' : text;
+        setNpcTalking(bubbleSnippet, 9500);
+      } else {
+        playSpokenPhrase(text);
+      }
+    });
+  });
+
+  // Nút dừng đọc
+  document.getElementById('btn-stop-speech')?.addEventListener('click', () => {
+    stopAudio();
+    stopNpcTalking();
+  });
+
+  // Bấm vào NPC Cú Thông Thái trên sân khấu
+  npcContainer?.addEventListener('click', () => {
+    playSfx('magic');
+    if (currentAccent === 'bac') {
+      void playAudioClip('/game/audio/owl-greeting.mp3');
+      setNpcTalking('Mến chào bé Miu thân yêu! Bác Cú đã đợi bé ở Cổng Vùng Toán từ sớm đấy!', 8000);
+    } else {
+      playSpokenPhrase('Mến chào bé Miu thân yêu... Bác Cú đã đợi bé ở Cổng Vùng Toán từ sớm đấy... Cùng bác bước vào thế giới diệu kỳ của những con số nhé!');
+    }
+  });
+
+  // Lắng nghe nút chọn tư thế hành động
+  const poseButtons = document.querySelectorAll('#pose-buttons .ctrl-btn');
+  poseButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      poseButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPose = btn.getAttribute('data-pose') as CatPose;
+      updateMiu();
+
+      // Phát âm thanh tương ứng với hành động để sinh động
+      if (currentPose === 'nhay') {
+        playSfx('pop');
+      } else if (currentPose === 'vui') {
+        playSfx('reward');
+      } else if (currentPose === 'te') {
+        playSfx('wrong');
+      } else if (currentPose === 'di') {
+        playSfx('pop');
+      }
+    });
+  });
+
+  // Lắng nghe nút chọn màu lông
+  const furButtons = document.querySelectorAll('#fur-buttons .ctrl-btn');
+  furButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      furButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFur = btn.getAttribute('data-fur') as CatFurColorId;
+      updateMiu();
+    });
+  });
+
+  // Lắng nghe nút chọn phụ kiện (cả 3 nhóm)
+  const accButtons = document.querySelectorAll('.acc-btn');
+  accButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const accId = btn.getAttribute('data-acc') as CatAccessoryId;
+      if (currentAccessories.includes(accId)) {
+        currentAccessories = currentAccessories.filter((id) => id !== accId);
+        btn.classList.remove('active');
+      } else {
+        currentAccessories.push(accId);
+        btn.classList.add('active');
+      }
+      updateMiu();
+    });
+  });
+
+  // Nút âm thanh hiệu ứng
+  document.getElementById('btn-sound-magic')?.addEventListener('click', () => {
+    playSfx('magic');
+  });
+
+  document.getElementById('btn-sound-coin')?.addEventListener('click', () => {
+    playSfx('reward');
+  });
+
+  document.getElementById('btn-sound-cheer')?.addEventListener('click', () => {
+    playSfx('correct');
+    const prevPose = currentPose;
+    currentPose = 'vui';
+    updateMiu();
+    setTimeout(() => {
+      currentPose = prevPose;
+      updateMiu();
+    }, 2500);
+  });
+
+  document.getElementById('btn-sound-jump')?.addEventListener('click', () => {
+    playSfx('pop');
+    const prevPose = currentPose;
+    currentPose = 'nhay';
+    updateMiu();
+    setTimeout(() => {
+      currentPose = prevPose;
+      updateMiu();
+    }, 2200);
+  });
+
+  document.getElementById('btn-sound-slip')?.addEventListener('click', () => {
+    playSfx('wrong');
+    const prevPose = currentPose;
+    currentPose = 'te';
+    updateMiu();
+    setTimeout(() => {
+      currentPose = prevPose;
+      updateMiu();
+    }, 2500);
+  });
+</script>

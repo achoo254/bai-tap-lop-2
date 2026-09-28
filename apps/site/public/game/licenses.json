@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Sổ theo dõi nguồn gốc và giấy phép của mọi tài nguyên mỹ thuật trong Thế giới học tập của Miu",
+  "packages": [
+    {
+      "id": "kenney-cc0",
+      "name": "Kenney Game Assets (Tiny Town, UI Pack, Game Icons)",
+      "author": "Kenney (https://kenney.nl)",
+      "license": "CC0 1.0 Universal (Public Domain)",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "website": "https://kenney.nl/assets",
+      "files": [
+        "kenney/tile-grass.svg",
+        "kenney/tile-stone-path.svg",
+        "kenney/gate-wood.svg",
+        "kenney/signpost.svg",
+        "kenney/tree-cartoon.svg",
+        "kenney/flowers.svg",
+        "kenney/chest-gold.svg",
+        "kenney/coin-star.svg",
+        "kenney/banner-ribbon.svg",
+        "kenney/ui-panel.svg"
+      ]
+    },
+    {
+      "id": "openmoji",
+      "name": "OpenMoji Open-Source Emoji & Icon Library",
+      "author": "OpenMoji Project Authors (https://openmoji.org)",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "website": "https://openmoji.org",
+      "files": [
+        "openmoji/1F36C.svg",
+        "openmoji/1F34E.svg",
+        "openmoji/2B50.svg",
+        "openmoji/1F4D6.svg",
+        "openmoji/1F308.svg",
+        "openmoji/23F0.svg",
+        "openmoji/1F4CF.svg",
+        "openmoji/1F96D.svg"
+      ]
+    },
+    {
+      "id": "project-original-svg",
+      "name": "Hình vẽ gốc của dự án Thế giới học tập (SVG code-drawn)",
+      "author": "Dự án Thế giới học tập của Miu",
+      "license": "Bản quyền riêng của dự án",
+      "licenseUrl": "file:///Users/hoandat/inet-gitlab/bai-tap-lop-2/LICENSE",
+      "website": "https://lop2.hoandat.com",
+      "files": ["characters/cat-character.ts", "characters/npc-guide.ts", "characters/boss-timo.ts"]
+    },
+    {
+      "id": "project-voiceover",
+      "name": "Bản thu âm giọng đọc Miền Bắc chuẩn Hà Nội cho Thế giới của Miu",
+      "author": "Dự án Thế giới học tập của Miu",
+      "license": "Bản quyền riêng của dự án",
+      "licenseUrl": "file:///Users/hoandat/inet-gitlab/bai-tap-lop-2/LICENSE",
+      "website": "https://lop2.hoandat.com",
+      "files": [
+        "audio/owl-greeting.mp3",
+        "audio/story-intro.mp3",
+        "audio/reward-cheer.mp3",
+        "audio/calm-encourage.mp3",
+        "audio/sample-north.mp3",
+        "audio/sample-south.mp3"
+      ]
+    }
+  ]
+}

@@ -51,7 +51,12 @@ export function validateLessonSource(
 
   if (!isNfc(source)) {
     const line = source.split(/\r?\n/).findIndex((text) => !isNfc(text)) + 1;
-    add('loi', 'khong-nfc', 'Chữ có dấu đang lưu sai dạng Unicode (không phải NFC). Bấm "Sửa tự động".', line || undefined);
+    add(
+      'loi',
+      'khong-nfc',
+      'Chữ có dấu đang lưu sai dạng Unicode (không phải NFC). Bấm "Sửa tự động".',
+      line || undefined,
+    );
   }
 
   const split = splitLessonSource(source);
@@ -61,13 +66,24 @@ export function validateLessonSource(
   } else {
     const parsed = lessonFrontmatterSchema.safeParse(split.rawFrontmatter);
     if (parsed.success) frontmatter = parsed.data;
-    else for (const issue of parsed.error.issues) {
-      add('loi', 'thong-tin-dau-bai', `${issue.path.join('.') || 'thông tin'}: ${issue.message}`, 1);
-    }
+    else
+      for (const issue of parsed.error.issues) {
+        add(
+          'loi',
+          'thong-tin-dau-bai',
+          `${issue.path.join('.') || 'thông tin'}: ${issue.message}`,
+          1,
+        );
+      }
   }
 
   for (const line of split.strayContentLines.slice(0, 1)) {
-    add('loi', 'noi-dung-ngoai-phan', 'Có nội dung nằm trước "## Đề bài". Hãy đưa vào phần Đề bài.', line);
+    add(
+      'loi',
+      'noi-dung-ngoai-phan',
+      'Có nội dung nằm trước "## Đề bài". Hãy đưa vào phần Đề bài.',
+      line,
+    );
   }
   for (const line of split.duplicateSectionLines) {
     add('loi', 'trung-phan', 'Phần này bị lặp lại hai lần.', line);
@@ -75,7 +91,8 @@ export function validateLessonSource(
 
   const deBai = split.sections['de-bai'];
   if (!deBai) add('loi', 'thieu-de-bai', 'Thiếu phần "## Đề bài".');
-  else if (deBai.blocks.length === 0) add('loi', 'de-bai-rong', 'Phần Đề bài đang trống.', deBai.line);
+  else if (deBai.blocks.length === 0)
+    add('loi', 'de-bai-rong', 'Phần Đề bài đang trống.', deBai.line);
 
   const availableFiles = options.availableFiles ? new Set(options.availableFiles) : null;
   for (const section of [deBai, split.sections['loi-giai']]) {
@@ -95,11 +112,18 @@ export function validateLessonSource(
   const errors = issues.filter((issue) => issue.severity === 'loi');
   const warnings = issues.filter((issue) => issue.severity === 'canh-bao');
   const lesson =
-    frontmatter && deBai ? { frontmatter, deBai, loiGiai: split.sections['loi-giai'] ?? null } : null;
+    frontmatter && deBai
+      ? { frontmatter, deBai, loiGiai: split.sections['loi-giai'] ?? null }
+      : null;
   return { ok: errors.length === 0 && lesson !== null, lesson, errors, warnings };
 }
 
-type AddIssue = (severity: LessonIssueSeverity, code: string, message: string, line?: number) => void;
+type AddIssue = (
+  severity: LessonIssueSeverity,
+  code: string,
+  message: string,
+  line?: number,
+) => void;
 
 function checkBlock(
   block: LessonBlock,
@@ -120,7 +144,12 @@ function checkBlock(
       }
       const size = fileSizes?.[block.src];
       if (block.kind === 'video' && size !== undefined && size > LARGE_VIDEO_WARNING_BYTES) {
-        add('canh-bao', 'video-nang', `Video "${block.src}" nặng hơn 20MB; nên đưa lên YouTube và dán link.`, block.line);
+        add(
+          'canh-bao',
+          'video-nang',
+          `Video "${block.src}" nặng hơn 20MB; nên đưa lên YouTube và dán link.`,
+          block.line,
+        );
       }
       return;
     }
@@ -128,8 +157,17 @@ function checkBlock(
       if (!isIllustrationName(block.name)) {
         add('loi', 'minh-hoa-khong-co', `Không có hình minh hoạ loại "${block.name}".`, block.line);
       }
-      if (!Number.isInteger(block.count) || block.count < 1 || block.count > MAX_ILLUSTRATION_COUNT) {
-        add('loi', 'minh-hoa-so-luong', `Số lượng hình phải từ 1 đến ${MAX_ILLUSTRATION_COUNT}.`, block.line);
+      if (
+        !Number.isInteger(block.count) ||
+        block.count < 1 ||
+        block.count > MAX_ILLUSTRATION_COUNT
+      ) {
+        add(
+          'loi',
+          'minh-hoa-so-luong',
+          `Số lượng hình phải từ 1 đến ${MAX_ILLUSTRATION_COUNT}.`,
+          block.line,
+        );
       }
       return;
     case 'youtube':
@@ -137,14 +175,30 @@ function checkBlock(
     case 'column-arithmetic':
       for (const item of block.items) {
         const numbers = [item.first, item.second, ...(item.result === null ? [] : [item.result])];
-        if (!numbers.every((value) => /^\d{1,5}$/.test(value)) || !['+', '–'].includes(item.operator)) {
-          add('loi', 'dat-tinh-sai', `Phép đặt tính chưa đúng cú pháp: ${item.raw} (vd. ::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}).`, item.line);
+        if (
+          !numbers.every((value) => /^\d{1,5}$/.test(value)) ||
+          !['+', '–'].includes(item.operator)
+        ) {
+          add(
+            'loi',
+            'dat-tinh-sai',
+            `Phép đặt tính chưa đúng cú pháp: ${item.raw} (vd. ::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}).`,
+            item.line,
+          );
           continue;
         }
         if (item.result !== null) {
-          const expected = item.operator === '+' ? Number(item.first) + Number(item.second) : Number(item.first) - Number(item.second);
+          const expected =
+            item.operator === '+'
+              ? Number(item.first) + Number(item.second)
+              : Number(item.first) - Number(item.second);
           if (Number(item.result) !== expected) {
-            add('loi', 'dat-tinh-sai-ket-qua', `Kết quả sai: ${item.first} ${item.operator} ${item.second} = ${expected}, không phải ${item.result}.`, item.line);
+            add(
+              'loi',
+              'dat-tinh-sai-ket-qua',
+              `Kết quả sai: ${item.first} ${item.operator} ${item.second} = ${expected}, không phải ${item.result}.`,
+              item.line,
+            );
           }
         }
       }
@@ -170,7 +224,12 @@ function checkMediaSource(
     return;
   }
   if (availableFiles && !availableFiles.has(fileName)) {
-    add('loi', 'thieu-file', `Không tìm thấy file ${label.toLowerCase()} "${fileName}" trong bài.`, line);
+    add(
+      'loi',
+      'thieu-file',
+      `Không tìm thấy file ${label.toLowerCase()} "${fileName}" trong bài.`,
+      line,
+    );
   }
 }
 
@@ -203,8 +262,16 @@ function checkTextLines(lines: SourceLine[], add: AddIssue): void {
     // Link chỉ được là http(s); ảnh chèn giữa câu chỉ được là https hoặc tên file trong bài.
     for (const match of text.matchAll(/(!?)\[[^\]]*\]\(\s*<?([^)\s>]*)/g)) {
       const href = match[2] ?? '';
-      const safe = match[1] ? /^https:\/\//i.test(href) || SAFE_FILE_NAME_PATTERN.test(href) : /^https?:\/\//i.test(href);
-      if (!safe) add('loi', 'link-khong-an-toan', `Link "${previewText(href)}" phải bắt đầu bằng https://.`, line);
+      const safe = match[1]
+        ? /^https:\/\//i.test(href) || SAFE_FILE_NAME_PATTERN.test(href)
+        : /^https?:\/\//i.test(href);
+      if (!safe)
+        add(
+          'loi',
+          'link-khong-an-toan',
+          `Link "${previewText(href)}" phải bắt đầu bằng https://.`,
+          line,
+        );
     }
     const cleaned = maskIgnoredSpans(text);
 
@@ -218,7 +285,12 @@ function checkTextLines(lines: SourceLine[], add: AddIssue): void {
     }
     for (const match of cleaned.matchAll(SENTENCE_BOUNDARY)) {
       if (isLowercaseLetter(match[1] ?? '')) {
-        add('loi', 'dau-cau-chu-thuong', `Chữ sau dấu chấm câu phải viết hoa: "${previewText(cleaned.slice(match.index))}".`, line);
+        add(
+          'loi',
+          'dau-cau-chu-thuong',
+          `Chữ sau dấu chấm câu phải viết hoa: "${previewText(cleaned.slice(match.index))}".`,
+          line,
+        );
         break;
       }
     }
@@ -226,7 +298,12 @@ function checkTextLines(lines: SourceLine[], add: AddIssue): void {
     const isHeading = /^\s*#{1,6}\s/.test(text);
     const words = start.trim().split(/\s+/).filter(Boolean);
     if (!isHeading && words.length >= 3 && /\p{Ll}$/u.test(start.trim().replace(/[*_]+$/, ''))) {
-      add('canh-bao', 'thieu-dau-cau', `Câu có thể thiếu dấu chấm cuối: "${previewText(start)}".`, line);
+      add(
+        'canh-bao',
+        'thieu-dau-cau',
+        `Câu có thể thiếu dấu chấm cuối: "${previewText(start)}".`,
+        line,
+      );
     }
   }
 }

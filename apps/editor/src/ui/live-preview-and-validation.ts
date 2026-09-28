@@ -41,9 +41,15 @@ export function validateForm(values: LessonFormValues, state: EditorState): Less
     availableFiles: [...state.stagedFiles, ...state.lessonFiles],
   });
   const extraErrors: LessonIssue[] = [];
-  if (!values.tieu_de.trim()) extraErrors.push({ severity: 'loi', code: 'thieu-tieu-de', message: 'Chưa có tiêu đề.' });
-  if (!values.ngay) extraErrors.push({ severity: 'loi', code: 'thieu-ngay', message: 'Chưa chọn ngày học.' });
-  return { ...result, ok: result.ok && extraErrors.length === 0, errors: [...extraErrors, ...result.errors] };
+  if (!values.tieu_de.trim())
+    extraErrors.push({ severity: 'loi', code: 'thieu-tieu-de', message: 'Chưa có tiêu đề.' });
+  if (!values.ngay)
+    extraErrors.push({ severity: 'loi', code: 'thieu-ngay', message: 'Chưa chọn ngày học.' });
+  return {
+    ...result,
+    ok: result.ok && extraErrors.length === 0,
+    errors: [...extraErrors, ...result.errors],
+  };
 }
 
 export function renderPreview(
@@ -59,7 +65,9 @@ export function renderPreview(
   elements.title.textContent = values.tieu_de || 'Chưa có tiêu đề';
   const lesson = result.lesson;
   elements.deBai.innerHTML = lesson ? renderLessonBlocksToHtml(lesson.deBai.blocks, options) : '';
-  elements.loiGiai.innerHTML = lesson?.loiGiai ? renderLessonBlocksToHtml(lesson.loiGiai.blocks, options) : '';
+  elements.loiGiai.innerHTML = lesson?.loiGiai
+    ? renderLessonBlocksToHtml(lesson.loiGiai.blocks, options)
+    : '';
   renderValidation(result, elements.validation);
 }
 
@@ -68,8 +76,10 @@ function describeLocation(issue: LessonIssue, result: LessonValidationResult): s
   const lesson = result.lesson;
   if (!issue.line || !lesson) return '';
   // serializeLesson luôn để một dòng trống sau tiêu đề phần.
-  if (lesson.loiGiai && issue.line > lesson.loiGiai.line) return ` — Lời giải, dòng ${issue.line - lesson.loiGiai.line - 1}`;
-  if (issue.line > lesson.deBai.line) return ` — Đề bài, dòng ${issue.line - lesson.deBai.line - 1}`;
+  if (lesson.loiGiai && issue.line > lesson.loiGiai.line)
+    return ` — Lời giải, dòng ${issue.line - lesson.loiGiai.line - 1}`;
+  if (issue.line > lesson.deBai.line)
+    return ` — Đề bài, dòng ${issue.line - lesson.deBai.line - 1}`;
   return '';
 }
 
@@ -79,8 +89,12 @@ function renderValidation(result: LessonValidationResult, container: HTMLElement
     container.append(createLine('ok', '✅ Bài trình bày đúng chuẩn.'));
     return;
   }
-  for (const issue of result.errors) container.append(createLine('loi', `❌ ${issue.message}${describeLocation(issue, result)}`));
-  for (const issue of result.warnings) container.append(createLine('canh-bao', `⚠️ ${issue.message}${describeLocation(issue, result)}`));
+  for (const issue of result.errors)
+    container.append(createLine('loi', `❌ ${issue.message}${describeLocation(issue, result)}`));
+  for (const issue of result.warnings)
+    container.append(
+      createLine('canh-bao', `⚠️ ${issue.message}${describeLocation(issue, result)}`),
+    );
 }
 
 function createLine(kind: string, text: string): HTMLElement {

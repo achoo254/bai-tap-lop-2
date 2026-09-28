@@ -3,7 +3,11 @@ import { chromium } from '@playwright/test';
 const outDir = process.argv[2] ?? 'screenshots';
 const base = process.argv[3] ?? 'http://127.0.0.1:4331';
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1180, height: 820 }, deviceScaleFactor: 1, timezoneId: 'Asia/Ho_Chi_Minh' });
+const page = await browser.newPage({
+  viewport: { width: 1180, height: 820 },
+  deviceScaleFactor: 1,
+  timezoneId: 'Asia/Ho_Chi_Minh',
+});
 await page.clock.setFixedTime(new Date('2026-09-26T09:00:00+07:00'));
 const shots = [
   ['01-trang-chu', '/'],

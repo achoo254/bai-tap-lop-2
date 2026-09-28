@@ -44,10 +44,14 @@ async function buildCatalog(): Promise<LessonCatalog> {
   for (const folder of folders) {
     const { validation } = folder;
     for (const warning of validation.warnings) {
-      console.warn(`[bai] ${folder.id}${warning.line ? `:${warning.line}` : ''} cảnh báo: ${warning.message}`);
+      console.warn(
+        `[bai] ${folder.id}${warning.line ? `:${warning.line}` : ''} cảnh báo: ${warning.message}`,
+      );
     }
     if (!validation.ok || !validation.lesson) {
-      const details = validation.errors.map((e) => `  - dòng ${e.line ?? '?'}: ${e.message}`).join('\n');
+      const details = validation.errors
+        .map((e) => `  - dòng ${e.line ?? '?'}: ${e.message}`)
+        .join('\n');
       if (isDraftSource(folder)) {
         console.warn(`[bai] Bỏ qua bài nháp có lỗi ${folder.id}:\n${details}`);
       } else {
@@ -59,7 +63,9 @@ async function buildCatalog(): Promise<LessonCatalog> {
   }
 
   if (brokenPublished.length > 0) {
-    throw new Error(`Có bài đã đăng nhưng còn lỗi, không thể build:\n${brokenPublished.join('\n')}`);
+    throw new Error(
+      `Có bài đã đăng nhưng còn lỗi, không thể build:\n${brokenPublished.join('\n')}`,
+    );
   }
   all.sort(compareLessons);
   return { all, published: all.filter((lesson) => !lesson.frontmatter.nhap) };

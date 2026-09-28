@@ -1,4 +1,9 @@
-import { extensionForMimeType, mediaExtensionOf, MCP_MAX_MEDIA_BYTES, type AllowedMediaExtension } from 'lesson-core';
+import {
+  extensionForMimeType,
+  mediaExtensionOf,
+  MCP_MAX_MEDIA_BYTES,
+  type AllowedMediaExtension,
+} from 'lesson-core';
 
 /**
  * Tải ảnh/video từ một URL để đính kèm vào bài.
@@ -16,14 +21,19 @@ export interface FetchedMedia {
 
 const TIMEOUT_MS = 20_000;
 
-export async function fetchMediaFromUrl(rawUrl: string, fetchImpl: typeof fetch = fetch): Promise<FetchedMedia> {
+export async function fetchMediaFromUrl(
+  rawUrl: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<FetchedMedia> {
   const url = parseSafeUrl(rawUrl);
   const response = await fetchImpl(url.href, {
     redirect: 'manual',
     signal: AbortSignal.timeout(TIMEOUT_MS),
     headers: { 'user-agent': 'bai-tap-lop-2-mcp' },
   }).catch((error: unknown) => {
-    throw new MediaFetchError(`Không tải được file: ${error instanceof Error ? error.message : String(error)}`);
+    throw new MediaFetchError(
+      `Không tải được file: ${error instanceof Error ? error.message : String(error)}`,
+    );
   });
   if (response.status >= 300 && response.status < 400) {
     const location = response.headers.get('location');
@@ -41,7 +51,8 @@ export async function fetchMediaFromUrl(rawUrl: string, fetchImpl: typeof fetch 
   const pathName = decodeURIComponent(url.pathname.split('/').pop() ?? '');
   const extension =
     extensionForMimeType(response.headers.get('content-type') ?? '') ?? mediaExtensionOf(pathName);
-  if (!extension) throw new MediaFetchError('Link không phải ảnh (jpg, png, webp, gif) hoặc video (mp4, webm).');
+  if (!extension)
+    throw new MediaFetchError('Link không phải ảnh (jpg, png, webp, gif) hoặc video (mp4, webm).');
 
   const bytes = await readWithLimit(response);
   const baseName = pathName.replace(/\.[^.]*$/, '') || 'tep';
@@ -55,8 +66,10 @@ function parseSafeUrl(rawUrl: string): URL {
   } catch {
     throw new MediaFetchError('Link không hợp lệ.');
   }
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') throw new MediaFetchError('Chỉ nhận link http hoặc https.');
-  if (url.port && url.port !== '80' && url.port !== '443') throw new MediaFetchError('Không nhận link có cổng đặc biệt.');
+  if (url.protocol !== 'https:' && url.protocol !== 'http:')
+    throw new MediaFetchError('Chỉ nhận link http hoặc https.');
+  if (url.port && url.port !== '80' && url.port !== '443')
+    throw new MediaFetchError('Không nhận link có cổng đặc biệt.');
   if (url.username || url.password) throw new MediaFetchError('Không nhận link có mật khẩu.');
   if (isPrivateHost(url.hostname)) throw new MediaFetchError('Không được tải từ địa chỉ nội bộ.');
   return url;
@@ -64,20 +77,33 @@ function parseSafeUrl(rawUrl: string): URL {
 
 export function isPrivateHost(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
-  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) {
+  if (
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host.endsWith('.internal')
+  ) {
     return true;
   }
   const ipv4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
   if (ipv4) {
     const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
     return (
-      a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      a >= 224
     );
   }
   if (host.includes(':')) {
     // IPv6: loopback, link-local, unique-local, IPv4-mapped.
-    return host === '::1' || host === '::' || /^(fe80|fc|fd)/.test(host) || host.startsWith('::ffff:');
+    return (
+      host === '::1' || host === '::' || /^(fe80|fc|fd)/.test(host) || host.startsWith('::ffff:')
+    );
   }
   return false;
 }

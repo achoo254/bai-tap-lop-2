@@ -7,7 +7,9 @@ import { cp, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 const LESSON_ID_PATTERN = /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const contentDir = path.resolve(process.env.CONTENT_DIR ?? path.join(process.cwd(), '../../content'));
+const contentDir = path.resolve(
+  process.env.CONTENT_DIR ?? path.join(process.cwd(), '../../content'),
+);
 const mediaDir = path.join(process.cwd(), 'public', 'media');
 
 await rm(mediaDir, { recursive: true, force: true });

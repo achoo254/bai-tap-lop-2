@@ -13,7 +13,13 @@ export interface LessonSummary {
 
 export interface LessonDetail {
   id: string;
-  frontmatter: { tieu_de?: string; ngay?: string; mon?: string; nhap?: boolean; ma_xem_truoc?: string };
+  frontmatter: {
+    tieu_de?: string;
+    ngay?: string;
+    mon?: string;
+    nhap?: boolean;
+    ma_xem_truoc?: string;
+  };
   deBai: string;
   loiGiai: string;
   files: { name: string; size: number }[];
@@ -58,7 +64,8 @@ export class EditorApiError extends Error {
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new EditorApiError(body.loi ?? `Lỗi ${response.status}`, body.chiTiet ?? []);
+  if (!response.ok)
+    throw new EditorApiError(body.loi ?? `Lỗi ${response.status}`, body.chiTiet ?? []);
   return body as T;
 }
 
@@ -74,7 +81,8 @@ export const editorApi = {
   list: () => request<LessonSummary[]>('/api/bai'),
   get: (id: string) => request<LessonDetail>(`/api/bai/${encodeURIComponent(id)}`),
   save: (data: SaveLessonRequest) => request<SaveLessonResponse>('/api/bai', json('PUT', data)),
-  remove: (id: string) => request<{ git: GitCommitResult }>(`/api/bai/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  remove: (id: string) =>
+    request<{ git: GitCommitResult }>(`/api/bai/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   upload(file: File, draftKey: string, lessonId: string | null) {
     const form = new FormData();
     form.set('file', file);

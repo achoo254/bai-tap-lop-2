@@ -97,14 +97,18 @@ describe('trang Soạn bài', () => {
     expect(existsSync(path.join(lessonDir, 'hinh-bai-1.png'))).toBe(true);
     expect(readFileSync(path.join(lessonDir, 'bai.md'), 'utf8')).toContain('nhap: false');
     expect(existsSync(path.join(paths.stagingDir, DRAFT))).toBe(false);
-    expect(git(remoteDir, 'log', '--oneline', 'main')).toContain('content: thêm bài đăng 2026-09-28-cong-co-nho');
+    expect(git(remoteDir, 'log', '--oneline', 'main')).toContain(
+      'content: thêm bài đăng 2026-09-28-cong-co-nho',
+    );
   });
 
   it('từ chối lưu bài có lỗi và không ghi gì', async () => {
     const response = await app.request('/api/bai', saveBody({ deBai: 'bài viết thường.' }));
     expect(response.status).toBe(422);
     const body = await response.json();
-    expect(body.chiTiet.map((issue: { code: string }) => issue.code)).toContain('dau-cau-chu-thuong');
+    expect(body.chiTiet.map((issue: { code: string }) => issue.code)).toContain(
+      'dau-cau-chu-thuong',
+    );
     expect(existsSync(path.join(paths.contentDir, '2026-09-28-cong-co-nho'))).toBe(false);
   });
 
@@ -118,7 +122,12 @@ describe('trang Soạn bài', () => {
     const first = await (await app.request('/api/bai', saveBody())).json();
     const updated = await app.request(
       '/api/bai',
-      saveBody({ originalId: first.id, draftKey: 'phiensoanthu02', deBai: 'Bài 1. Tính 37 + 25.', nhap: true }),
+      saveBody({
+        originalId: first.id,
+        draftKey: 'phiensoanthu02',
+        deBai: 'Bài 1. Tính 37 + 25.',
+        nhap: true,
+      }),
     );
     const second = await updated.json();
     expect(second.id).toBe(first.id);
@@ -134,10 +143,17 @@ describe('trang Soạn bài', () => {
     const first = await (await app.request('/api/bai', saveBody({ deBai: 'Bài 1. Tính.' }))).json();
     const opened = await (await app.request(`/api/bai/${first.id}`)).json();
     const file = path.join(paths.contentDir, first.id, 'bai.md');
-    writeFileSync(file, readFileSync(file, 'utf8').replace('Bài 1. Tính.', 'Bài 1. Claude vừa sửa.'));
+    writeFileSync(
+      file,
+      readFileSync(file, 'utf8').replace('Bài 1. Tính.', 'Bài 1. Claude vừa sửa.'),
+    );
     const response = await app.request(
       '/api/bai',
-      saveBody({ originalId: first.id, baseVersion: opened.version, deBai: 'Bài 1. Phụ huynh sửa.' }),
+      saveBody({
+        originalId: first.id,
+        baseVersion: opened.version,
+        deBai: 'Bài 1. Phụ huynh sửa.',
+      }),
     );
     expect(response.status).toBe(409);
     expect(readFileSync(file, 'utf8')).toContain('Claude vừa sửa');
@@ -146,7 +162,9 @@ describe('trang Soạn bài', () => {
   it('tên trùng thì thêm hậu tố cho mã bài', async () => {
     const body = saveBody({ deBai: 'Bài 1. Tính.' });
     const first = await (await app.request('/api/bai', body)).json();
-    const second = await (await app.request('/api/bai', saveBody({ deBai: 'Bài 2. Tính.' }))).json();
+    const second = await (
+      await app.request('/api/bai', saveBody({ deBai: 'Bài 2. Tính.' }))
+    ).json();
     expect(first.id).toBe('2026-09-28-cong-co-nho');
     expect(second.id).toBe('2026-09-28-cong-co-nho-2');
   });
@@ -182,12 +200,18 @@ describe('trang Soạn bài', () => {
     git(otherClone, 'config', 'user.email', 'mcp@example.com');
     const mcpLesson = path.join(otherClone, 'content/2026-10-01-bai-tu-mcp');
     mkdirSync(mcpLesson, { recursive: true });
-    writeFileSync(path.join(mcpLesson, 'bai.md'), '---\ntieu_de: Bài từ MCP\nngay: 2026-10-01\nmon: khac\nnhap: true\nma_xem_truoc: tumcp123456\n---\n\n## Đề bài\n\nBài.\n');
+    writeFileSync(
+      path.join(mcpLesson, 'bai.md'),
+      '---\ntieu_de: Bài từ MCP\nngay: 2026-10-01\nmon: khac\nnhap: true\nma_xem_truoc: tumcp123456\n---\n\n## Đề bài\n\nBài.\n',
+    );
     git(otherClone, 'add', '-A');
     git(otherClone, 'commit', '-m', 'mcp');
     git(otherClone, 'push', 'origin', 'main');
 
-    const response = await app.request('/api/bai', saveBody({ deBai: 'Bài 3. Tính.', tieu_de: 'Bài khác' }));
+    const response = await app.request(
+      '/api/bai',
+      saveBody({ deBai: 'Bài 3. Tính.', tieu_de: 'Bài khác' }),
+    );
     expect((await response.json()).git.pushed).toBe(true);
     expect(existsSync(path.join(paths.contentDir, '2026-10-01-bai-tu-mcp/bai.md'))).toBe(true);
   });

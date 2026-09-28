@@ -83,7 +83,10 @@ export class LessonFileRepository {
     const folders = await readAllLessonFolders(this.contentDir);
     return folders
       .map((folder) => {
-        const raw = (splitLessonSource(folder.source).rawFrontmatter ?? {}) as Record<string, unknown>;
+        const raw = (splitLessonSource(folder.source).rawFrontmatter ?? {}) as Record<
+          string,
+          unknown
+        >;
         return {
           id: folder.id,
           tieu_de: String(raw.tieu_de ?? folder.id),
@@ -112,15 +115,24 @@ export class LessonFileRepository {
   }
 
   /** Lưu file tải lên vào thư mục tạm của phiên soạn; trả tên file an toàn đã dùng. */
-  async stageUpload(draftKey: string, lessonId: string | null, originalName: string, bytes: Uint8Array): Promise<string> {
+  async stageUpload(
+    draftKey: string,
+    lessonId: string | null,
+    originalName: string,
+    bytes: Uint8Array,
+  ): Promise<string> {
     const dir = this.stagingDir(draftKey);
     if (bytes.byteLength > EDITOR_MAX_MEDIA_BYTES) {
-      throw new EditorInputError('File quá lớn (tối đa 50MB). Video dài nên đưa lên YouTube rồi dán link.');
+      throw new EditorInputError(
+        'File quá lớn (tối đa 50MB). Video dài nên đưa lên YouTube rồi dán link.',
+      );
     }
     const safeName = toSafeMediaFileName(originalName);
-    if (!safeName) throw new EditorInputError('Chỉ nhận ảnh (jpg, png, webp, gif) hoặc video (mp4, webm).');
+    if (!safeName)
+      throw new EditorInputError('Chỉ nhận ảnh (jpg, png, webp, gif) hoặc video (mp4, webm).');
     const existing = [...(await listFileNames(dir))];
-    if (lessonId && isValidLessonId(lessonId)) existing.push(...(await listFileNames(path.join(this.contentDir, lessonId))));
+    if (lessonId && isValidLessonId(lessonId))
+      existing.push(...(await listFileNames(path.join(this.contentDir, lessonId))));
     const fileName = uniqueFileName(safeName, existing);
     await mkdir(dir, { recursive: true });
     await writeFile(path.join(dir, fileName), bytes);
@@ -145,7 +157,10 @@ export class LessonFileRepository {
           'Bài này vừa được sửa ở nơi khác (có thể Claude qua MCP). Hãy mở lại bài để xem bản mới rồi sửa tiếp.',
         );
       }
-      const raw = (splitLessonSource(existing.source).rawFrontmatter ?? {}) as Record<string, unknown>;
+      const raw = (splitLessonSource(existing.source).rawFrontmatter ?? {}) as Record<
+        string,
+        unknown
+      >;
       previewCode = typeof raw.ma_xem_truoc === 'string' ? raw.ma_xem_truoc : generatePreviewCode();
     } else {
       id = await this.uniqueLessonId(buildLessonId(input.ngay, input.tieu_de));
@@ -173,7 +188,9 @@ export class LessonFileRepository {
     const lessonDir = path.join(this.contentDir, id);
     const lessonFiles = await listFileNames(lessonDir, LESSON_FILE_NAME);
     const stagedFiles = await listFileNames(stagingDir);
-    const validation = validateLessonSource(source, { availableFiles: [...lessonFiles, ...stagedFiles] });
+    const validation = validateLessonSource(source, {
+      availableFiles: [...lessonFiles, ...stagedFiles],
+    });
     if (!validation.ok || !validation.lesson) {
       throw new EditorInputError('Bài còn lỗi, chưa lưu được.', validation.errors);
     }
@@ -189,7 +206,8 @@ export class LessonFileRepository {
 
     await mkdir(lessonDir, { recursive: true });
     for (const name of stagedFiles) {
-      if (referenced.has(name)) await rename(path.join(stagingDir, name), path.join(lessonDir, name));
+      if (referenced.has(name))
+        await rename(path.join(stagingDir, name), path.join(lessonDir, name));
     }
     // Không xoá file đính kèm cũ: có thể nơi khác (Claude qua MCP) vừa thêm và bài bản mới đang dùng.
     await writeFile(path.join(lessonDir, LESSON_FILE_NAME), source, 'utf8');
@@ -200,13 +218,16 @@ export class LessonFileRepository {
   async remove(id: string): Promise<void> {
     if (!isValidLessonId(id)) throw new EditorInputError('Mã bài không hợp lệ.');
     const dir = path.join(this.contentDir, id);
-    const exists = await stat(dir).then((s) => s.isDirectory()).catch(() => false);
+    const exists = await stat(dir)
+      .then((s) => s.isDirectory())
+      .catch(() => false);
     if (!exists) throw new EditorInputError('Không tìm thấy bài.');
     await rm(dir, { recursive: true, force: true });
   }
 
   private stagingDir(draftKey: string): string {
-    if (!DRAFT_KEY_PATTERN.test(draftKey)) throw new EditorInputError('Mã phiên soạn không hợp lệ.');
+    if (!DRAFT_KEY_PATTERN.test(draftKey))
+      throw new EditorInputError('Mã phiên soạn không hợp lệ.');
     return path.join(this.stagingRoot, draftKey);
   }
 

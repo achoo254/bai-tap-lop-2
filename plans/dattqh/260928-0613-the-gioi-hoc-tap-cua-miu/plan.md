@@ -1,9 +1,9 @@
 ---
-title: "Thế giới học tập của Miu — mỗi năm học một thế giới, bắt đầu từ Thế giới Lớp 2 + hệ thống sự kiện (TIMO)"
-description: "Mỗi năm học một thế giới game (Lớp 2 năm 2026–2027, Lớp 3 mở 2027…); nền là chương trình của lớp (Toán, Tiếng Việt, Tiếng Anh) thành gameplay; sự kiện cắm vào thế giới, sự kiện đầu tiên là TIMO Khối 2"
+title: 'Thế giới học tập của Miu — mỗi năm học một thế giới, bắt đầu từ Thế giới Lớp 2 + hệ thống sự kiện (TIMO)'
+description: 'Mỗi năm học một thế giới game (Lớp 2 năm 2026–2027, Lớp 3 mở 2027…); nền là chương trình của lớp (Toán, Tiếng Việt, Tiếng Anh) thành gameplay; sự kiện cắm vào thế giới, sự kiện đầu tiên là TIMO Khối 2'
 status: in-progress
 priority: P1
-effort: "XL"
+effort: 'XL'
 tags: [game-based-learning, learning-world, event-system, timo, site]
 created: 2026-09-28
 ---
@@ -12,19 +12,20 @@ created: 2026-09-28
 
 ## Trạng thái hiện tại (cập nhật 2026-09-28 13:47)
 
-**Để tiếp tục:** `/ak:cook plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu` → làm tiếp từ **Phase 1 (việc còn lại) rồi Phase 2**.
+**Để tiếp tục:** `/ak:cook plans/dattqh/260928-0613-the-gioi-hoc-tap-cua-miu` để làm tiếp **Phase 5 (Vùng Toán 1: số, cộng trừ, tiền, lời văn)**.
 
-| Hạng mục | Trạng thái | Bằng chứng |
-|---|---|---|
-| Domain web | ✅ `lop2.hoandat.com` (thay `baitap.inetdev.io.vn`, đã gỡ); MCP giữ `mcp-baitap.inetdev.io.vn`, `SITE_URL` mới | commit `85defa1` |
-| Prototype "Kẹo chẵn lẻ" + trang `/luyen-timo/` + banner trang chủ | ✅ đang chạy trên web (deploy thủ công từ máy, 13:08) | commit `22e0ff5` |
-| Phase 1 — lõi game | 🟡 code xong: GRADES/`lop-2/*` skill id, 29 kỹ năng Toán lớp 2, state `the-gioi:v1`, thưởng, thích ứng, audio vi+en, kéo-thả | commits `20a427c`, `2d0d263`; 39 test site, `pnpm ci:all` exit 0 (103 test toàn repo) |
-| Phase 1 — còn lại | ⬜ code review lõi; test e2e kéo-thả (gắn vào phase 3) | — |
-| Phase 2 → 13 | ⬜ chưa bắt đầu | — |
-
-**Việc tiếp theo cụ thể (Phase 2):** tải gói Kenney CC0 + chọn hình OpenMoji → style guide → nhân vật Miu SVG → **cảnh mẫu cổng Vùng Toán để bố mẹ duyệt phong cách** (chưa duyệt thì không làm hàng loạt).
+| Hạng mục                                                          | Trạng thái                                                                                                                                                  | Bằng chứng                                                       |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Domain web                                                        | ✅ `lop2.hoandat.com` (thay `baitap.inetdev.io.vn`, đã gỡ); MCP giữ `mcp-baitap.inetdev.io.vn`, `SITE_URL` mới                                              | commit `85defa1`                                                 |
+| Prototype "Kẹo chẵn lẻ" + trang `/luyen-timo/` + banner trang chủ | ✅ đang chạy trên web (deploy thủ công từ máy, 13:08)                                                                                                       | commit `22e0ff5`                                                 |
+| Phase 1 — lõi game                                                | ✅ hoàn thành: GRADES/`lop-2/*` skill id, 29 kỹ năng Toán lớp 2, state `the-gioi:v1`, thưởng, thích ứng, audio vi+en, kéo-thả                               | commits `20a427c`, `2d0d263`; test xanh                          |
+| Phase 2 — bộ hình & mỹ thuật                                      | ✅ hoàn thành: style guide, Kenney CC0 + OpenMoji (`licenses.json`), Miu SVG 8 tư thế/10 màu/16 phụ kiện, NPC & Boss TIMO, cảnh mẫu `/the-gioi/mau-cong-toan/` | `art-manifest.test.ts` 9/9 pass, `pnpm ci:all` exit 0            |
+| Phase 3 — Cổng thế giới + Thế giới Lớp 2                           | ✅ hoàn thành: cổng `/the-gioi/`, bản đồ thế giới, bản đồ Vùng Toán, tạo nhân vật, HUD, khung nhiệm vụ `/the-gioi/choi/`                                  | `world.test.ts` 13/13 pass, `pnpm ci:all` exit 0                 |
+| Phase 4 — Event System tổng quát                                  | ✅ hoàn thành: EventDefinition, registry, schedule (giờ VN), boost độ khó, Event Map `/the-gioi/lop-2/su-kien/timo/`, EventBanner, HUD, phần thưởng & huy hiệu | `event-*.test.ts` pass, 110 unit test xanh, `pnpm ci:all` exit 0 |
+| Phase 5 → 13                                                      | ⬜ tiếp tục với Phase 5 (Vùng Toán 1)                                                                                                                      | —                                                                |
 
 **Chặn / cần bố mẹ làm:**
+
 - ~~Thiếu secret `CLOUDFLARE_API_TOKEN`~~ — đã thêm 2026-09-28; workflow "Cập nhật web của bé" deploy thành công (run 36388589597, custom domain `lop2.hoandat.com`). Từ giờ đăng bài/push `main` là web tự cập nhật.
 - Câu hỏi mở cuối file (bộ sách, bảng kỷ lục, ngày mở thế giới mới) — đang dùng mặc định.
 
@@ -57,6 +58,7 @@ Năm học = Thế giới · Chương trình của lớp = nền của Thế gi�
 Ngữ cảnh trước đó: brainstorm `plans/dattqh/reports/brainstorm-260928-1152-luyen-timo-dang-tro-choi.md`; prototype "Kẹo chẵn lẻ" (`apps/site/src/lib/timo/*`, đang chạy tại `/luyen-timo/keo-chan-le/`).
 
 ## Quyết định đã chốt (user)
+
 - Làm **đủ**, ôn luyện lâu dài, không cắt theo ngày thi.
 - Hình: **SVG tự vẽ + bộ hình miễn phí có giấy phép rõ** (Kenney CC0, OpenMoji CC BY-SA). Không sinh ảnh AI (key Gemini miễn phí, hạn mức thấp).
 - Câu hỏi **tự sinh**, không chép đề/sách có bản quyền (FERMAT, SGK); web công khai.
@@ -65,6 +67,7 @@ Ngữ cảnh trước đó: brainstorm `plans/dattqh/reports/brainstorm-260928-1
 - **Mỗi năm học một thế giới**; kế hoạch này làm Thế giới Lớp 2 + khung đa thế giới, Lớp 3 là kế hoạch của năm sau.
 
 ## Câu hỏi kiểm tra cho mọi thiết kế (tài liệu sản phẩm §12)
+
 Mỗi phase phải trả lời được: thuộc Base hay Event? có nằm trong cùng thế giới? kiến thức thành gameplay hay chỉ là worksheet? Event có dùng tiến trình/kỹ năng của Base? thêm Event mới có phá Base không? bé có cảm giác đang khám phá và chơi?
 
 ## Kiến trúc tóm tắt
@@ -95,26 +98,27 @@ apps/site/public/game/              hình Kenney/OpenMoji đã chọn + licenses
 
 ## Phases
 
-| # | Phase | Tier | Status |
-|---|-------|------|--------|
-| 1 | [Lõi game: state, kỹ năng theo môn, tiến trình](./phase-01-game-core.md) | L | In progress |
-| 2 | [Bộ hình: nhân vật SVG + bộ hình miễn phí](./phase-02-art-assets.md) | L | Pending |
-| 3 | [Cổng thế giới + Thế giới Lớp 2: tạo nhân vật, bản đồ, vùng, HUD, khung nhiệm vụ](./phase-03-world-shell.md) | L | Pending |
-| 4 | [Event System tổng quát](./phase-04-event-system.md) | M | Pending |
-| 5 | [Vùng Toán 1: số, cộng trừ, tiền, lời văn (vùng mẫu)](./phase-05-math-region-numbers.md) | L | Pending |
-| 6 | [Vùng Toán 2: nhân chia, hình học, đo lường, thời gian, thống kê](./phase-06-math-region-shapes-measures.md) | L | Pending |
-| 7 | [Sự kiện TIMO 1: Quần Đảo Số — lý thuyết số, tư duy logic, số học](./phase-07-timo-event-part-1.md) | L | Pending |
-| 8 | [Sự kiện TIMO 2: hình học, tổ hợp, đại chiến, boss cuối](./phase-08-timo-event-part-2.md) | XL | Pending |
-| 9 | [Vùng Tiếng Việt](./phase-09-vietnamese-region.md) | L | Pending |
-| 10 | [Vùng Tiếng Anh](./phase-10-english-region.md) | L | Pending |
-| 11 | [Meta: nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ, thành tích](./phase-11-meta-systems.md) | L | Pending |
-| 12 | [Trang bố mẹ, sao lưu, chuyển mục cũ](./phase-12-parent-dashboard.md) | M | Pending |
-| 13 | [QA iPad, hiệu năng, offline, tài liệu](./phase-13-qa-release.md) | M | Pending |
+| #   | Phase                                                                                                        | Tier | Status      |
+| --- | ------------------------------------------------------------------------------------------------------------ | ---- | ----------- |
+| 1   | [Lõi game: state, kỹ năng theo môn, tiến trình](./phase-01-game-core.md)                                     | L    | Completed   |
+| 2   | [Bộ hình: nhân vật SVG + bộ hình miễn phí](./phase-02-art-assets.md)                                         | L    | Completed   |
+| 3   | [Cổng thế giới + Thế giới Lớp 2: tạo nhân vật, bản đồ, vùng, HUD, khung nhiệm vụ](./phase-03-world-shell.md) | L    | Completed   |
+| 4   | [Event System tổng quát](./phase-04-event-system.md)                                                         | M    | Completed   |
+| 5   | [Vùng Toán 1: số, cộng trừ, tiền, lời văn (vùng mẫu)](./phase-05-math-region-numbers.md)                     | L    | Pending     |
+| 6   | [Vùng Toán 2: nhân chia, hình học, đo lường, thời gian, thống kê](./phase-06-math-region-shapes-measures.md) | L    | Pending     |
+| 7   | [Sự kiện TIMO 1: Quần Đảo Số — lý thuyết số, tư duy logic, số học](./phase-07-timo-event-part-1.md)          | L    | Pending     |
+| 8   | [Sự kiện TIMO 2: hình học, tổ hợp, đại chiến, boss cuối](./phase-08-timo-event-part-2.md)                    | XL   | Pending     |
+| 9   | [Vùng Tiếng Việt](./phase-09-vietnamese-region.md)                                                           | L    | Pending     |
+| 10  | [Vùng Tiếng Anh](./phase-10-english-region.md)                                                               | L    | Pending     |
+| 11  | [Meta: nhiệm vụ ngày, ôn chỗ yếu, cửa hàng, nhà, tủ đồ, thành tích](./phase-11-meta-systems.md)              | L    | Pending     |
+| 12  | [Trang bố mẹ, sao lưu, chuyển mục cũ](./phase-12-parent-dashboard.md)                                        | M    | Pending     |
+| 13  | [QA iPad, hiệu năng, offline, tài liệu](./phase-13-qa-release.md)                                            | M    | Pending     |
 
 Thứ tự: 1 → 2 → 3 → 4 → 5 (chốt khuôn mini-game + chơi thử với Miu) → 6 và 7 → 8 → 9 → 10 → 11 → 12 → 13.
 Mỗi vùng/sự kiện xong là deploy được; phần chưa làm hiện "sắp mở" trên bản đồ.
 
 ## Success Criteria
+
 - [ ] Từ trang chủ vào `/the-gioi/`: tạo nhân vật lần đầu, thấy **Cổng thế giới** (Lớp 2 đang mở, Lớp 3 "mở năm 2027"), vào Thế giới Lớp 2 thấy **một bản đồ** có 3 vùng môn học + điểm sự kiện, HUD xu/XP/level.
 - [ ] Thêm một thế giới lớp mới (thử bằng thế giới mẫu trong test) chỉ cần mục mới trong `GRADES` + thư mục `worlds/<lop>/` + danh mục kỹ năng của lớp, **không sửa nội dung/tiến trình Lớp 2**.
 - [ ] Mỗi kỹ năng trong danh mục có mini-game chơi bằng thao tác (kéo/chạm/xoay/lái…), không có nhiệm vụ chỉ chọn A–D (trừ "đại chiến" mô phỏng đề thi trong sự kiện).
@@ -128,6 +132,7 @@ Mỗi vùng/sự kiện xong là deploy được; phần chưa làm hiện "sắ
 - [ ] `pnpm ci:all` sạch.
 
 ## Rủi ro chính
+
 - **Khối lượng lớn nhất trong lịch sử repo** (3 môn + sự kiện) → mỗi phase deploy độc lập; vùng mẫu (phase 5) chốt khuôn trước khi nhân rộng.
 - **Nội dung Tiếng Việt/Tiếng Anh** không được chép SGK → bài đọc, câu mẫu do mình tự viết theo chủ đề chương trình; bố mẹ duyệt mẫu ở đầu phase 9/10.
 - **Safari xoá localStorage** web không mở 7 ngày → cài lên màn hình chính + mã sao lưu (phase 12).
@@ -135,6 +140,7 @@ Mỗi vùng/sự kiện xong là deploy được; phần chưa làm hiện "sắ
 - **Sự kiện phình thành hệ thống học riêng** (trái tài liệu §7) → sự kiện không được khai báo kỹ năng mới; chỉ tham chiếu kỹ năng trong danh mục môn (test chặn).
 
 ## Câu hỏi mở
+
 - Thế giới lớp mới mở **ngày nào**? Mặc định: đầu năm học (`GRADES[...].opensOn`, vd. 05/09), bố mẹ mở sớm/muộn được ở trang bố mẹ.
 - Miu học **bộ sách nào** (Kết nối tri thức / Chân trời sáng tạo / Cánh diều)? Mặc định: bám nội dung chương trình GDPT 2018 lớp 2 (chung cho mọi bộ), thứ tự chương theo học kỳ thông thường; biết bộ sách thì sắp lại thứ tự cho khớp lớp.
 - **Bảng kỷ lục** (tài liệu §6 "nếu phù hợp"): không có máy chủ/nhiều người chơi → mặc định là **bảng kỷ lục cá nhân theo mùa sự kiện** (so với chính mình các lần trước). Cần bảng xếp hạng với người khác không?

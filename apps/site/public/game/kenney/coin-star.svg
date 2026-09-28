@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Đồng xu vàng ngôi sao (Kenney style) -->
+  <!-- Vành ngoài đồng xu -->
+  <circle cx="32" cy="32" r="28" fill="#ca8a04" stroke="#713f12" stroke-width="3" />
+  <!-- Mặt đồng xu bóng -->
+  <circle cx="32" cy="32" r="24" fill="#facc15" stroke="#a16207" stroke-width="2" />
+  <!-- Viền sáng trên -->
+  <path d="M12 28 A22 22 0 0 1 48 14" fill="none" stroke="#fef08a" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Ngôi sao 5 cánh dập nổi giữa đồng xu -->
+  <polygon points="32,16 36,25 46,26 38,33 41,43 32,37 23,43 26,33 18,26 28,25" fill="#fef9c3" stroke="#a16207" stroke-width="2" stroke-linejoin="round" />
+</svg>

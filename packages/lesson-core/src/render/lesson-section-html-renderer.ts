@@ -1,5 +1,9 @@
 import { Marked } from 'marked';
-import { ILLUSTRATION_CATALOG, isIllustrationName, MAX_ILLUSTRATION_COUNT } from '../illustration-catalog';
+import {
+  ILLUSTRATION_CATALOG,
+  isIllustrationName,
+  MAX_ILLUSTRATION_COUNT,
+} from '../illustration-catalog';
 import type { ColumnArithmetic, LessonBlock } from '../lesson-markdown-parser';
 
 /**
@@ -34,7 +38,11 @@ function createMarkdown(options: LessonRenderOptions): Marked {
       },
       image({ href, text }) {
         // Ảnh chèn giữa đoạn chữ: chỉ nhận file trong bài hoặc link https; còn lại hiện mô tả.
-        const src = /^https:\/\//i.test(href) ? href : /^[\p{L}\p{N}][\p{L}\p{N}._-]*$/u.test(href) ? options.resolveMediaUrl(href) : '';
+        const src = /^https:\/\//i.test(href)
+          ? href
+          : /^[\p{L}\p{N}][\p{L}\p{N}._-]*$/u.test(href)
+            ? options.resolveMediaUrl(href)
+            : '';
         if (!src) return escapeHtml(text);
         return `<img class="lesson-inline-image" src="${escapeAttribute(src)}" alt="${escapeAttribute(text)}" loading="lazy">`;
       },
@@ -42,7 +50,10 @@ function createMarkdown(options: LessonRenderOptions): Marked {
   });
 }
 
-export function renderLessonBlocksToHtml(blocks: LessonBlock[], options: LessonRenderOptions): string {
+export function renderLessonBlocksToHtml(
+  blocks: LessonBlock[],
+  options: LessonRenderOptions,
+): string {
   const markdown = createMarkdown(options);
   // Đoạn chữ và phép đặt tính liền nhau nằm chung một trang vở để dòng kẻ liền mạch.
   const parts: string[] = [];
@@ -97,7 +108,10 @@ function renderBlock(block: LessonBlock, options: LessonRenderOptions, markdown:
     }
     case 'video': {
       const url = escapeAttribute(resolveSource(block.src, options));
-      const caption = block.alt && block.alt.toLowerCase() !== 'video' ? `<figcaption>${escapeHtml(block.alt)}</figcaption>` : '';
+      const caption =
+        block.alt && block.alt.toLowerCase() !== 'video'
+          ? `<figcaption>${escapeHtml(block.alt)}</figcaption>`
+          : '';
       return (
         `<figure class="lesson-video comic-frame">` +
         `<video src="${url}" controls playsinline preload="metadata"></video>${caption}</figure>`
@@ -114,7 +128,13 @@ function renderBlock(block: LessonBlock, options: LessonRenderOptions, markdown:
     case 'column-arithmetic':
       return `<div class="lesson-text">${renderColumnArithmetic(block.items)}</div>`;
     case 'illustration': {
-      if (!isIllustrationName(block.name) || !Number.isInteger(block.count) || block.count < 1 || block.count > MAX_ILLUSTRATION_COUNT) return '';
+      if (
+        !isIllustrationName(block.name) ||
+        !Number.isInteger(block.count) ||
+        block.count < 1 ||
+        block.count > MAX_ILLUSTRATION_COUNT
+      )
+        return '';
       const entry = ILLUSTRATION_CATALOG[block.name];
       const url = escapeAttribute(options.resolveIllustrationUrl(entry.openmoji));
       const items = Array.from(

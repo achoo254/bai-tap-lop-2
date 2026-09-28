@@ -23,7 +23,10 @@ const CONTENT_TYPES: Record<string, string> = {
  * Trả file nằm trong `baseDir`. Chặn mọi đường dẫn thoát ra ngoài thư mục gốc (../).
  * Trả null khi không có file để route trả 404.
  */
-export async function staticFileResponse(baseDir: string, relativePath: string): Promise<Response | null> {
+export async function staticFileResponse(
+  baseDir: string,
+  relativePath: string,
+): Promise<Response | null> {
   let decoded: string;
   try {
     decoded = decodeURIComponent(relativePath);
@@ -38,7 +41,8 @@ export async function staticFileResponse(baseDir: string, relativePath: string):
   const body = await readFile(target);
   return new Response(body, {
     headers: {
-      'content-type': CONTENT_TYPES[path.extname(target).toLowerCase()] ?? 'application/octet-stream',
+      'content-type':
+        CONTENT_TYPES[path.extname(target).toLowerCase()] ?? 'application/octet-stream',
       'cache-control': 'no-store',
     },
   });

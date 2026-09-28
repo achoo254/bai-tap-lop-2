@@ -42,7 +42,8 @@ export function insertBlockAtCursor(textarea: HTMLTextAreaElement, block: string
   const { selectionStart, selectionEnd, value } = textarea;
   const before = value.slice(0, selectionStart);
   const after = value.slice(selectionEnd);
-  const prefix = before === '' || before.endsWith('\n\n') ? '' : before.endsWith('\n') ? '\n' : '\n\n';
+  const prefix =
+    before === '' || before.endsWith('\n\n') ? '' : before.endsWith('\n') ? '\n' : '\n\n';
   const suffix = after.startsWith('\n') ? '\n' : '\n\n';
   const inserted = `${prefix}${block}${suffix}`;
   textarea.value = before + inserted + after;

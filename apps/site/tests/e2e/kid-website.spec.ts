@@ -64,9 +64,14 @@ test.describe('trang bài', () => {
     const toggle = page.locator('[data-font-toggle]');
     await expect(html).toHaveAttribute('data-font', 'viet-tay');
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    const fontFamily = await page.locator('.lesson-text').first().evaluate((el) => getComputedStyle(el).fontFamily);
+    const fontFamily = await page
+      .locator('.lesson-text')
+      .first()
+      .evaluate((el) => getComputedStyle(el).fontFamily);
     expect(fontFamily).toContain('Chu Mau Tieu Hoc');
-    expect(await page.evaluate(() => document.fonts.check('700 40px "Chu Mau Tieu Hoc"', 'Miu'))).toBe(true);
+    expect(
+      await page.evaluate(() => document.fonts.check('700 40px "Chu Mau Tieu Hoc"', 'Miu')),
+    ).toBe(true);
     await toggle.click();
     await expect(html).not.toHaveAttribute('data-font', 'viet-tay');
     await page.reload();
@@ -76,7 +81,11 @@ test.describe('trang bài', () => {
 
   test('nút A+ tăng cỡ chữ và được nhớ', async ({ page }) => {
     await page.goto('/bai/2026-09-26-dien-van-an-ang/');
-    const fontSize = () => page.locator('.lesson-text').first().evaluate((el) => getComputedStyle(el).fontSize);
+    const fontSize = () =>
+      page
+        .locator('.lesson-text')
+        .first()
+        .evaluate((el) => getComputedStyle(el).fontSize);
     const before = await fontSize();
     await page.getByRole('button', { name: 'Chữ to hơn' }).click();
     const after = await fontSize();
@@ -97,7 +106,9 @@ test.describe('trang bài', () => {
 
   test('video và YouTube được nhúng', async ({ page }) => {
     await page.goto('/bai/2026-09-27-xem-gio-dong-ho/');
-    await expect(page.locator('iframe[src*="youtube-nocookie.com/embed/dQw4w9WgXcQ"]')).toHaveCount(1);
+    await expect(page.locator('iframe[src*="youtube-nocookie.com/embed/dQw4w9WgXcQ"]')).toHaveCount(
+      1,
+    );
     await page.getByText('Miu xem lời giải').click();
     await expect(page.locator('video[src$="clip.mp4"]')).toHaveCount(1);
   });
@@ -129,7 +140,9 @@ test.describe('khả năng tiếp cận', () => {
     test(`không có lỗi a11y nghiêm trọng ở ${url}`, async ({ page }) => {
       await page.goto(url);
       const results = await new AxeBuilder({ page }).analyze();
-      const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+      const serious = results.violations.filter(
+        (v) => v.impact === 'serious' || v.impact === 'critical',
+      );
       expect(serious.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
     });
   }
@@ -138,16 +151,26 @@ test.describe('khả năng tiếp cận', () => {
 test.describe('PWA', () => {
   test('có manifest hợp lệ và service worker hoạt động', async ({ page, request }) => {
     const manifest = await (await request.get('/manifest.webmanifest')).json();
-    expect(manifest).toMatchObject({ short_name: 'Miu học bài', display: 'standalone', start_url: '/?nguon=pwa' });
+    expect(manifest).toMatchObject({
+      short_name: 'Miu học bài',
+      display: 'standalone',
+      start_url: '/?nguon=pwa',
+    });
     for (const icon of manifest.icons) expect((await request.get(icon.src)).ok()).toBe(true);
 
     await page.goto('/');
-    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/manifest.webmanifest');
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+      'href',
+      '/manifest.webmanifest',
+    );
     const scope = await page.evaluate(async () => (await navigator.serviceWorker.ready).scope);
     expect(scope).toMatch(/\/$/);
   });
 
-  test('mất mạng vẫn mở lại được bài đã xem, trang lạ thì hiện trang ngoại tuyến', async ({ page, context }) => {
+  test('mất mạng vẫn mở lại được bài đã xem, trang lạ thì hiện trang ngoại tuyến', async ({
+    page,
+    context,
+  }) => {
     await page.goto('/');
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;

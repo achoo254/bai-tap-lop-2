@@ -23,8 +23,14 @@
             <li>
               Nhập chủ đề rồi bấm <b>Sao chép prompt mẫu</b>, dán vào ChatGPT hoặc Claude.
               <div class="row">
-                <input type="text" data-prompt-topic placeholder="vd. bảng nhân 2, điền vần an/ang" />
-                <button type="button" class="btn" data-action="sao-chep-prompt">Sao chép prompt mẫu</button>
+                <input
+                  type="text"
+                  data-prompt-topic
+                  placeholder="vd. bảng nhân 2, điền vần an/ang"
+                />
+                <button type="button" class="btn" data-action="sao-chep-prompt">
+                  Sao chép prompt mẫu
+                </button>
               </div>
             </li>
             <li>
@@ -38,7 +44,12 @@
         <form class="lesson-form" data-lesson-form autocomplete="off">
           <label class="field field--wide">
             <span>Tiêu đề</span>
-            <input name="tieu_de" required maxlength="120" placeholder="vd. Cộng có nhớ trong phạm vi 100" />
+            <input
+              name="tieu_de"
+              required
+              maxlength="120"
+              placeholder="vd. Cộng có nhớ trong phạm vi 100"
+            />
           </label>
           <label class="field">
             <span>Ngày học</span>
@@ -55,10 +66,22 @@
 
           <div class="insert-toolbar" role="toolbar" aria-label="Chèn vào bài">
             <span class="insert-toolbar__hint">Chèn vào ô đang chọn:</span>
-            <button type="button" class="btn btn--small" data-action="chon-file">🖼️ Ảnh / Video</button>
-            <button type="button" class="btn btn--small" data-action="mo-youtube">▶️ YouTube</button>
-            <button type="button" class="btn btn--small" data-action="mo-minh-hoa">🍎 Hình đếm</button>
-            <input type="file" data-file-input accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" multiple hidden />
+            <button type="button" class="btn btn--small" data-action="chon-file">
+              🖼️ Ảnh / Video
+            </button>
+            <button type="button" class="btn btn--small" data-action="mo-youtube">
+              ▶️ YouTube
+            </button>
+            <button type="button" class="btn btn--small" data-action="mo-minh-hoa">
+              🍎 Hình đếm
+            </button>
+            <input
+              type="file"
+              data-file-input
+              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+              multiple
+              hidden
+            />
           </div>
           <div class="insert-popover" data-popover="youtube" hidden>
             <input type="url" data-youtube-url placeholder="Dán link YouTube…" />
@@ -66,17 +89,34 @@
           </div>
           <div class="insert-popover" data-popover="minh-hoa" hidden>
             <select data-illustration-name></select>
-            <input type="number" data-illustration-count min="1" max="20" value="5" aria-label="Số lượng" />
+            <input
+              type="number"
+              data-illustration-count
+              min="1"
+              max="20"
+              value="5"
+              aria-label="Số lượng"
+            />
             <button type="button" class="btn btn--small" data-action="chen-minh-hoa">Chèn</button>
           </div>
 
           <label class="field field--wide">
             <span>Đề bài</span>
-            <textarea name="deBai" rows="12" data-markdown-input placeholder="Viết đề bài ở đây. Kéo thả ảnh/video vào ô này."></textarea>
+            <textarea
+              name="deBai"
+              rows="12"
+              data-markdown-input
+              placeholder="Viết đề bài ở đây. Kéo thả ảnh/video vào ô này."
+            ></textarea>
           </label>
           <label class="field field--wide">
             <span>Lời giải <small>(bé bấm nút mới thấy)</small></span>
-            <textarea name="loiGiai" rows="8" data-markdown-input placeholder="Viết lời giải ở đây."></textarea>
+            <textarea
+              name="loiGiai"
+              rows="8"
+              data-markdown-input
+              placeholder="Viết lời giải ở đây."
+            ></textarea>
           </label>
           <ul class="file-chips" data-file-chips aria-label="File đính kèm"></ul>
         </form>
@@ -104,7 +144,9 @@
       <div class="action-bar__buttons">
         <button type="button" class="btn" data-action="sua-tu-dong">🪄 Sửa tự động</button>
         <button type="button" class="btn" data-action="luu-nhap">💾 Lưu nháp</button>
-        <button type="button" class="btn btn--primary" data-action="luu-dang">🚀 Lưu &amp; đăng</button>
+        <button type="button" class="btn btn--primary" data-action="luu-dang">
+          🚀 Lưu &amp; đăng
+        </button>
       </div>
       <p class="save-result" data-save-result aria-live="polite"></p>
     </footer>

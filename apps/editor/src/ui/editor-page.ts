@@ -19,8 +19,9 @@ const $ = <T extends Element>(selector: string) => document.querySelector<T>(sel
 
 const state = createEditorState();
 const form = $<HTMLFormElement>('[data-lesson-form]');
-const field = <T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(name: string) =>
-  form.elements.namedItem(name) as T;
+const field = <T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+  name: string,
+) => form.elements.namedItem(name) as T;
 const titleInput = field<HTMLInputElement>('tieu_de');
 const dateInput = field<HTMLInputElement>('ngay');
 const subjectSelect = field<HTMLSelectElement>('mon');
@@ -121,7 +122,9 @@ async function loadLessonList() {
   try {
     lessons = await editorApi.list();
   } catch {
-    list.replaceChildren(Object.assign(document.createElement('li'), { textContent: 'Không đọc được danh sách bài.' }));
+    list.replaceChildren(
+      Object.assign(document.createElement('li'), { textContent: 'Không đọc được danh sách bài.' }),
+    );
     return;
   }
   list.replaceChildren();
@@ -134,7 +137,11 @@ async function loadLessonList() {
     const label = document.createElement('span');
     const status = lesson.soLoi > 0 ? '❗ có lỗi' : lesson.nhap ? '📝 nháp' : '✅ đã đăng';
     label.textContent = `${lesson.ngay} · ${lesson.tieu_de} · ${status}`;
-    const openButton = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn--small', textContent: 'Mở' });
+    const openButton = Object.assign(document.createElement('button'), {
+      type: 'button',
+      className: 'btn btn--small',
+      textContent: 'Mở',
+    });
     openButton.addEventListener('click', () => void openLesson(lesson.id).catch(showError));
     const deleteButton = Object.assign(document.createElement('button'), {
       type: 'button',
@@ -247,7 +254,11 @@ async function save(publish: boolean) {
     });
     const link = result.linkXemTruoc ? ` Xem trước: ${result.linkXemTruoc}` : '';
     await openLessonAfterSave(result.id);
-    const headline = !publish ? '💾 Đã lưu nháp.' : result.git.pushed ? '🚀 Đã đăng!' : '✅ Đã lưu bài ở chế độ đăng.';
+    const headline = !publish
+      ? '💾 Đã lưu nháp.'
+      : result.git.pushed
+        ? '🚀 Đã đăng!'
+        : '✅ Đã lưu bài ở chế độ đăng.';
     saveResult.textContent = `${headline} ${result.git.message}${link}`;
     await loadLessonList();
   } catch (error) {
@@ -263,7 +274,8 @@ async function openLessonAfterSave(id: string) {
 }
 
 function setBusy(busy: boolean) {
-  for (const button of document.querySelectorAll<HTMLButtonElement>('.action-bar button')) button.disabled = busy;
+  for (const button of document.querySelectorAll<HTMLButtonElement>('.action-bar button'))
+    button.disabled = busy;
 }
 
 function showError(error: unknown) {
@@ -293,8 +305,14 @@ const actions: Record<string, () => void | Promise<void>> = {
     togglePopover('');
   },
   'chen-minh-hoa': () => {
-    const count = Math.min(20, Math.max(1, Number($<HTMLInputElement>('[data-illustration-count]').value) || 1));
-    insertBlockAtCursor(state.activeTextarea ?? deBaiInput, `::hinh{loai=${illustrationSelect.value} so-luong=${count}}`);
+    const count = Math.min(
+      20,
+      Math.max(1, Number($<HTMLInputElement>('[data-illustration-count]').value) || 1),
+    );
+    insertBlockAtCursor(
+      state.activeTextarea ?? deBaiInput,
+      `::hinh{loai=${illustrationSelect.value} so-luong=${count}}`,
+    );
     togglePopover('');
   },
   'sua-tu-dong': () => {
@@ -342,7 +360,9 @@ async function start() {
   resetForm();
   try {
     const status = await editorApi.status();
-    syncState.textContent = status.coGithub ? '🔗 Đã kết nối GitHub' : '💻 Chưa kết nối GitHub (chỉ lưu trên máy)';
+    syncState.textContent = status.coGithub
+      ? '🔗 Đã kết nối GitHub'
+      : '💻 Chưa kết nối GitHub (chỉ lưu trên máy)';
   } catch {
     syncState.textContent = '⚠️ Không kết nối được server soạn bài';
   }

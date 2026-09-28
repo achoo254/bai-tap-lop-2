@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Bụi hoa cúc và hoa tulip nhỏ xinh (Kenney style) -->
+  <!-- Cành & Lá -->
+  <g stroke="#15803d" stroke-width="2.5" stroke-linecap="round">
+    <path d="M18 60 Q16 44 20 32" />
+    <path d="M32 60 Q32 40 32 26" />
+    <path d="M46 60 Q48 44 44 34" />
+    <!-- Lá nhỏ -->
+    <path d="M20 46 Q12 44 14 40" />
+    <path d="M32 44 Q40 42 38 38" />
+  </g>
+  
+  <!-- Bông hoa trái (Vàng) -->
+  <circle cx="20" cy="30" r="8" fill="#facc15" stroke="#854d0e" stroke-width="2" />
+  <circle cx="20" cy="30" r="3.5" fill="#f97316" />
+  
+  <!-- Bông hoa giữa (Đỏ hồng - tulip) -->
+  <path d="M26 24 C24 16 32 14 32 20 C32 14 40 16 38 24 Z" fill="#fb7185" stroke="#9f1239" stroke-width="2" stroke-linejoin="round" />
+  <circle cx="32" cy="22" r="3" fill="#fff" opacity="0.6" />
+
+  <!-- Bông hoa phải (Xanh dương pastel) -->
+  <circle cx="44" cy="32" r="7" fill="#67e8f9" stroke="#0e7490" stroke-width="2" />
+  <circle cx="44" cy="32" r="3" fill="#0284c7" />
+</svg>

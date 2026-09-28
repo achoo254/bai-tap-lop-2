@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ContentConflictError, type CommitRequest, type LessonFileStore } from '../src/github/github-content-store';
+import {
+  ContentConflictError,
+  type CommitRequest,
+  type LessonFileStore,
+} from '../src/github/github-content-store';
 import { isPrivateHost } from '../src/github/media-fetcher';
 import { LessonService, LessonServiceError } from '../src/lessons/lesson-service';
 
@@ -26,12 +30,16 @@ class MemoryStore implements LessonFileStore {
     return typeof value === 'string' ? value : null;
   }
   async readTexts(paths: string[]) {
-    return new Map(await Promise.all(paths.map(async (path) => [path, await this.readText(path)] as const)));
+    return new Map(
+      await Promise.all(paths.map(async (path) => [path, await this.readText(path)] as const)),
+    );
   }
   async commit(request: CommitRequest) {
     if (request.baseSha !== undefined && request.guardPaths) {
       const changedSince = this.changes.slice(Number(request.baseSha)).flat();
-      const touched = changedSince.filter((path) => request.guardPaths!.some((guard) => path.startsWith(guard)));
+      const touched = changedSince.filter((path) =>
+        request.guardPaths!.some((guard) => path.startsWith(guard)),
+      );
       if (touched.length > 0) throw new ContentConflictError(touched);
     }
     this.commits.push(request);
@@ -73,9 +81,13 @@ describe('LessonService', () => {
 
   it('không lưu bài sai quy tắc và trả danh sách lỗi', async () => {
     const { store, service } = setup();
-    const error = await service.create({ ...input, de_bai: 'bài viết thường.' }).catch((e: unknown) => e);
+    const error = await service
+      .create({ ...input, de_bai: 'bài viết thường.' })
+      .catch((e: unknown) => e);
     expect(error).toBeInstanceOf(LessonServiceError);
-    expect((error as LessonServiceError).issues.map((issue) => issue.code)).toContain('dau-cau-chu-thuong');
+    expect((error as LessonServiceError).issues.map((issue) => issue.code)).toContain(
+      'dau-cau-chu-thuong',
+    );
     expect(store.commits).toHaveLength(0);
   });
 
@@ -108,7 +120,10 @@ describe('LessonService', () => {
   it('sửa bài giữ mã bài và mã xem trước', async () => {
     const { service } = setup();
     const created = await service.create(input);
-    const updated = await service.update(created.id, { tieu_de: 'Cộng có nhớ (sửa)', loi_giai: 'Đáp số: 62 quả.' });
+    const updated = await service.update(created.id, {
+      tieu_de: 'Cộng có nhớ (sửa)',
+      loi_giai: 'Đáp số: 62 quả.',
+    });
     expect(updated.id).toBe(created.id);
     expect(updated.frontmatter.ma_xem_truoc).toBe(created.frontmatter.ma_xem_truoc);
     expect((await service.get(created.id)).loiGiai).toBe('Đáp số: 62 quả.');
@@ -145,7 +160,9 @@ describe('LessonService', () => {
   it('từ chối file sai loại và mã bài lạ', async () => {
     const { service } = setup();
     const created = await service.create(input);
-    await expect(service.addMedia(created.id, { bytes: new Uint8Array(1), fileName: 'x.exe' })).rejects.toThrow('Chỉ nhận');
+    await expect(
+      service.addMedia(created.id, { bytes: new Uint8Array(1), fileName: 'x.exe' }),
+    ).rejects.toThrow('Chỉ nhận');
     await expect(service.get('../../etc')).rejects.toThrow('không hợp lệ');
     await expect(service.get('2026-01-01-khong-co')).rejects.toThrow('Không tìm thấy');
   });
@@ -155,7 +172,10 @@ describe('LessonService', () => {
     const a = await service.create({ ...input, ngay: '2026-09-01', tieu_de: 'Bài A' });
     await service.create({ ...input, ngay: '2026-09-20', tieu_de: 'Bài B' });
     await service.publish(a.id);
-    expect((await service.list()).lessons.map((l) => l.frontmatter.tieu_de)).toEqual(['Bài B', 'Bài A']);
+    expect((await service.list()).lessons.map((l) => l.frontmatter.tieu_de)).toEqual([
+      'Bài B',
+      'Bài A',
+    ]);
     expect((await service.list({ nhap: false })).lessons.map((l) => l.id)).toEqual([a.id]);
     expect((await service.list({ tu_ngay: '2026-09-10' })).lessons).toHaveLength(1);
   });
@@ -178,10 +198,20 @@ describe('LessonService', () => {
     const realGet = service.get.bind(service);
     service.get = async (id) => {
       const record = await realGet(id);
-      store.write([{ path, content: (store.files.get(path) as string).replace('Đáp số: 62.', 'Đáp số: 62 (phụ huynh sửa).') }]);
+      store.write([
+        {
+          path,
+          content: (store.files.get(path) as string).replace(
+            'Đáp số: 62.',
+            'Đáp số: 62 (phụ huynh sửa).',
+          ),
+        },
+      ]);
       return record;
     };
-    await expect(service.update(created.id, { loi_giai: 'Đáp số: 62 (Claude sửa).' })).rejects.toBeInstanceOf(ContentConflictError);
+    await expect(
+      service.update(created.id, { loi_giai: 'Đáp số: 62 (Claude sửa).' }),
+    ).rejects.toBeInstanceOf(ContentConflictError);
     expect(store.files.get(path)).toContain('phụ huynh sửa');
   });
 
@@ -194,13 +224,24 @@ describe('LessonService', () => {
       store.write([{ path: 'content/2026-10-01-bai-khac/bai.md', content: 'x' }]);
       return record;
     };
-    await expect(service.publish(created.id)).resolves.toMatchObject({ frontmatter: { nhap: false } });
+    await expect(service.publish(created.id)).resolves.toMatchObject({
+      frontmatter: { nhap: false },
+    });
   });
 });
 
 describe('chống SSRF khi tải media', () => {
   it('chặn địa chỉ nội bộ', () => {
-    for (const host of ['localhost', '127.0.0.1', '10.1.2.3', '192.168.1.1', '172.20.0.1', '169.254.169.254', '[::1]', 'nas.local']) {
+    for (const host of [
+      'localhost',
+      '127.0.0.1',
+      '10.1.2.3',
+      '192.168.1.1',
+      '172.20.0.1',
+      '169.254.169.254',
+      '[::1]',
+      'nas.local',
+    ]) {
       expect(isPrivateHost(host)).toBe(true);
     }
     expect(isPrivateHost('upload.wikimedia.org')).toBe(false);

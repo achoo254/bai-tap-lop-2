@@ -1,0 +1,101 @@
+---
+/**
+ * apps/site/src/components/game/event-countdown.astro
+ *
+ * Huy hiệu đếm ngược thời gian sự kiện (giờ VN):
+ * - Đang diễn ra: "⏳ Còn X ngày" hoặc "🔥 Ngày cuối cùng!"
+ * - Sắp diễn ra: "⏰ Sắp mở sau X ngày"
+ * - Đã kết thúc: "🏁 Đã kết thúc"
+ */
+import { getEventScheduleStatus } from '../../lib/game/events/event-schedule';
+import type { EventSchedule } from '../../lib/game/events/event-types';
+
+interface Props {
+  schedule: EventSchedule;
+  now?: string;
+  class?: string;
+}
+
+const { schedule, now, class: className = '' } = Astro.props;
+const status = getEventScheduleStatus(schedule, now);
+---
+
+<div class={`event-countdown-pill status-${status.status} ${className}`}>
+  {
+    status.status === 'active' && status.daysRemaining !== undefined && (
+      <>
+        {status.daysRemaining === 0 ? (
+          <span class="countdown-text pulse-urgent">🔥 Ngày cuối cùng!</span>
+        ) : status.daysRemaining === 1 ? (
+          <span class="countdown-text pulse-warning">⚡ Còn 1 ngày nữa!</span>
+        ) : (
+          <span class="countdown-text">⏳ Còn {status.daysRemaining} ngày</span>
+        )}
+      </>
+    )
+  }
+
+  {
+    status.status === 'upcoming' && status.startsInDays !== undefined && (
+      <span class="countdown-text">⏰ Mở sau {status.startsInDays} ngày</span>
+    )
+  }
+
+  {
+    status.status === 'concluded' && (
+      <span class="countdown-text">🏁 Đã khép lại mùa này</span>
+    )
+  }
+</div>
+
+<style>
+  .event-countdown-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
+  }
+
+  .status-active {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+  }
+
+  .status-upcoming {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-color: #bae6fd;
+  }
+
+  .status-concluded {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #cbd5e1;
+  }
+
+  .pulse-urgent {
+    animation: countdown-pulse 1.2s ease-in-out infinite;
+    color: #dc2626;
+  }
+
+  .pulse-warning {
+    animation: countdown-pulse 1.6s ease-in-out infinite;
+    color: #b45309;
+  }
+
+  @keyframes countdown-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+</style>

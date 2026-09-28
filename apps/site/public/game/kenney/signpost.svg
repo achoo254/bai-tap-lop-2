@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 120" width="80" height="120">
+  <!-- Biển chỉ đường bằng gỗ (Kenney style) -->
+  <!-- Cọc cắm đất -->
+  <rect x="34" y="24" width="12" height="92" rx="3" fill="#a16207" stroke="#451a03" stroke-width="3" />
+  <polygon points="34,116 46,116 40,120" fill="#451a03" />
+
+  <!-- Tấm biển gỗ chỉ sang phải -->
+  <path d="M10 24 H60 L74 38 L60 52 H10 Z" fill="#d97706" stroke="#451a03" stroke-width="3.5" stroke-linejoin="round" />
+  <path d="M12 28 H58 L68 38 L58 48 H12 Z" fill="#f59e0b" />
+  
+  <!-- Chốt đinh tán -->
+  <circle cx="40" cy="38" r="3" fill="#78350f" stroke="#451a03" stroke-width="1.5" />
+  
+  <!-- Mũi tên dẫn lối -->
+  <path d="M22 38 H48 M42 32 L48 38 L42 44" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

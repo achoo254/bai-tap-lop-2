@@ -11,3 +11,5 @@ playwright-report/
 *.log
 content/.soan-tam/
 apps/editor/dist-ui/
+.DS_Store
+.agentkit/

@@ -1,0 +1,411 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/[lop]/index.astro
+ *
+ * Bản đồ Thế giới học tập (World Map):
+ * - Hiển thị 3 Vùng môn học (Toán, Tiếng Việt, Tiếng Anh)
+ * - Hiển thị các điểm neo Sự kiện (như Quần đảo TIMO)
+ * - Nhân vật Miu đứng ở vùng chơi gần nhất
+ * - Chạm vào Vùng Toán để mở Bản đồ vùng (các chương và nhiệm vụ).
+ */
+import KidPageLayout from '../../../layouts/kid-page-layout.astro';
+import Hud from '../../../components/game/hud.astro';
+import EventBanner from '../../../components/game/event-banner.astro';
+import { getAllWorlds, getWorld } from '../../../lib/game/world/world-registry';
+import { getActiveEventsForWorld, getEventsForWorld } from '../../../lib/game/events/event-registry';
+import type { World } from '../../../lib/game/world/world-types';
+
+export function getStaticPaths() {
+  const worlds = getAllWorlds();
+  return worlds.map((world) => ({
+    params: { lop: world.grade },
+    props: { world },
+  }));
+}
+
+interface Props {
+  world: World;
+}
+
+const { lop } = Astro.params;
+const world = Astro.props.world ?? getWorld(lop ?? 'lop-2')!;
+const activeEvents = getActiveEventsForWorld(world.grade);
+const featuredEvent = activeEvents[0];
+const worldEvents = getEventsForWorld(world.grade);
+---
+
+<KidPageLayout
+  title={`${world.name} — Thế giới học tập của Miu`}
+  showToolbar={false}
+>
+  <link rel="stylesheet" href="/game/characters/character-poses.css" />
+  <link rel="stylesheet" href="/styles/game.css" />
+
+  <Hud title={world.name} backUrl="/the-gioi/" backLabel="Cổng thế giới" />
+
+  <main class="world-container">
+    {featuredEvent && <EventBanner event={featuredEvent} />}
+
+    <div class="world-map-wrapper">
+      <div class="world-title-ribbon">
+        <h1 class="world-ribbon-text">🗺️ {world.name} (Năm học {world.schoolYear})</h1>
+      </div>
+
+      <!-- Khung bản đồ đồ họa SVG & DOM -->
+      <div class="interactive-world-map" id="world-map-canvas">
+        <!-- Vùng 1: Vùng Toán (Đang mở) -->
+        <a href={`/the-gioi/${world.grade}/toan/`} class="region-landmark toan-landmark" title="Vào Vùng Toán">
+          <div class="landmark-badge">
+            <span class="landmark-icon">📐</span>
+            <div class="landmark-info">
+              <strong>Vùng Toán Học</strong>
+              <small id="toan-prog-badge">Đang mở • 3 Nhiệm vụ</small>
+            </div>
+            <span class="enter-arrow">👉</span>
+          </div>
+
+          <div class="landmark-scene-box">
+            <div class="castle-illustration">🏰</div>
+            <div class="npc-mini-avatar" title="Bác Cú Thông Thái">🦉</div>
+          </div>
+        </a>
+
+        <!-- Vùng 2: Vùng Tiếng Việt (Sắp mở) -->
+        <div class="region-landmark tieng-viet-landmark coming-soon" title="Vùng Tiếng Việt (Sắp mở)">
+          <div class="landmark-badge">
+            <span class="landmark-icon">📖</span>
+            <div class="landmark-info">
+              <strong>Vùng Tiếng Việt</strong>
+              <small>Mở học kỳ 2 🌸</small>
+            </div>
+            <span class="lock-tag">🔒</span>
+          </div>
+
+          <div class="landmark-scene-box">
+            <div class="castle-illustration">🌳</div>
+            <div class="npc-mini-avatar">🐿️</div>
+          </div>
+        </div>
+
+        <!-- Vùng 3: Vùng Tiếng Anh (Sắp mở) -->
+        <div class="region-landmark tieng-anh-landmark coming-soon" title="Vùng Tiếng Anh (Sắp mở)">
+          <div class="landmark-badge">
+            <span class="landmark-icon">🇬🇧</span>
+            <div class="landmark-info">
+              <strong>Vùng Tiếng Anh</strong>
+              <small>Mở học kỳ 2 🌲</small>
+            </div>
+            <span class="lock-tag">🔒</span>
+          </div>
+
+          <div class="landmark-scene-box">
+            <div class="castle-illustration">⛵</div>
+            <div class="npc-mini-avatar">🐦</div>
+          </div>
+        </div>
+
+        <!-- Điểm neo Sự kiện được nạp động từ Event Registry -->
+        {
+          worldEvents.map((evt) => {
+            const evtUrl = `/the-gioi/${world.grade}/su-kien/${evt.metadata.id}/`;
+            return (
+              <a
+                href={evtUrl}
+                class="event-anchor-landmark"
+                title={`Tham gia Sự kiện ${evt.metadata.name}`}
+                style={`left: ${evt.location.worldAnchor.x}%; top: ${evt.location.worldAnchor.y}%;`}
+              >
+                <div class="event-glow-ring" />
+                <div class="event-badge">
+                  <span class="event-icon">{evt.metadata.theme.icon}</span>
+                  <div class="event-info">
+                    <strong>{evt.metadata.name}</strong>
+                    <small>Sự kiện đang diễn ra ⭐</small>
+                  </div>
+                </div>
+                <div class="event-island-box">
+                  {evt.location.islandGraphic || '🏝️'}
+                </div>
+              </a>
+            );
+          })
+        }
+
+        <!-- Nhân vật Miu đứng trên bản đồ -->
+        <div class="map-character-marker" id="map-miu-marker" style="top: 38%; left: 24%;">
+          <div class="miu-mini-figure" id="map-miu-figure">
+            <!-- Miu SVG -->
+          </div>
+          <div class="miu-name-tag" id="map-miu-tag">Miu</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</KidPageLayout>
+
+<style>
+  .world-map-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1024px;
+    background: #ffffff;
+    border: 4px solid #0f172a;
+    border-radius: 32px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .world-title-ribbon {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    padding: 0.85rem 1.5rem;
+    text-align: center;
+    border-bottom: 3px solid #0f172a;
+  }
+
+  .world-ribbon-text {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .interactive-world-map {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background:
+      radial-gradient(ellipse at 80% 80%, #bae6fd 0%, transparent 45%),
+      linear-gradient(180deg, #dcfce7 0%, #fef3c7 50%, #e0f2fe 100%);
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .interactive-world-map {
+      height: 720px;
+    }
+  }
+
+  /* Các công trình vùng môn học */
+  .region-landmark {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    touch-action: manipulation;
+  }
+
+  .region-landmark:hover {
+    transform: scale(1.04);
+  }
+
+  .toan-landmark {
+    top: 15%;
+    left: 12%;
+  }
+
+  .tieng-viet-landmark {
+    top: 18%;
+    right: 14%;
+  }
+
+  .tieng-anh-landmark {
+    bottom: 16%;
+    left: 18%;
+  }
+
+  .event-anchor-landmark {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .event-anchor-landmark:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  .landmark-badge,
+  .event-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: #ffffff;
+    border: 3px solid #0f172a;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+  }
+
+  .event-badge {
+    border-color: #dc2626;
+    background: #fff1f2;
+  }
+
+  .landmark-icon,
+  .event-icon {
+    font-size: 1.5rem;
+  }
+
+  .landmark-info,
+  .event-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .landmark-info strong,
+  .event-info strong {
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  .landmark-info small,
+  .event-info small {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .event-info strong {
+    color: #991b1b;
+  }
+
+  .enter-arrow {
+    font-size: 1.1rem;
+    margin-left: 0.25rem;
+  }
+
+  .lock-tag {
+    font-size: 0.9rem;
+  }
+
+  .landmark-scene-box {
+    position: relative;
+    width: 120px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -0.5rem;
+  }
+
+  .castle-illustration {
+    font-size: 4.5rem;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+  }
+
+  .npc-mini-avatar {
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+    font-size: 2.2rem;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  }
+
+  .event-island-box {
+    font-size: 5rem;
+    filter: drop-shadow(0 8px 20px rgba(220, 38, 38, 0.2));
+  }
+
+  .region-landmark.coming-soon {
+    opacity: 0.75;
+    cursor: default;
+  }
+
+  .region-landmark.coming-soon:hover {
+    transform: none;
+  }
+
+  /* Marker nhân vật Miu */
+  .map-character-marker {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.5s ease;
+  }
+
+  .miu-mini-figure {
+    width: 90px;
+    height: 90px;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+  }
+
+  .miu-name-tag {
+    margin-top: -0.25rem;
+    padding: 0.2rem 0.6rem;
+    background: #ffb45c;
+    border: 2px solid #0f172a;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #0f172a;
+  }
+</style>
+
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../../../components/game/characters/cat-character';
+  import { getBrowserGameStore } from '../../../lib/game/state/game-store';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+  const state = store.getState();
+
+  // Kiểm tra nếu chưa tạo nhân vật
+  if (!state.avatar.createdOn) {
+    window.location.replace('/the-gioi/tao-nhan-vat/');
+  }
+
+  const miuFigure = document.getElementById('map-miu-figure');
+  const miuTag = document.getElementById('map-miu-tag');
+
+  if (miuFigure) {
+    miuFigure.innerHTML = renderCatSvgHtml({
+      pose: 'dung',
+      furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
+      accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
+      size: 90,
+      label: `Bé ${state.avatar.name}`,
+    });
+  }
+
+  if (miuTag) {
+    miuTag.textContent = state.avatar.name || 'Miu';
+  }
+
+  // Đếm số sao đạt được ở Vùng Toán
+  const toanBadge = document.getElementById('toan-prog-badge');
+  if (toanBadge) {
+    const toanQuests = ['lop-2/toan/ch1/q1-dem-so', 'lop-2/toan/ch1/q2-chan-le', 'lop-2/toan/ch1/q3-thu-thach-bac-cu'];
+    let stars = 0;
+    toanQuests.forEach((qId) => {
+      stars += state.quests[qId]?.stars || 0;
+    });
+    if (stars > 0) {
+      toanBadge.textContent = `⭐ ${stars}/9 sao • Đang mở`;
+    }
+  }
+</script>

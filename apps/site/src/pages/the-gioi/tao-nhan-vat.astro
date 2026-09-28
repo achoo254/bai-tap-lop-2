@@ -1,0 +1,518 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/tao-nhan-vat.astro
+ *
+ * Màn tạo & tùy biến nhân vật cho bé (Character Creator):
+ * - Đặt tên cho mèo con (mặc định Miu, gợi ý Bo, Bơ...)
+ * - Chọn màu lông đa dạng (10 màu từ cat-character.ts)
+ * - Chọn phụ kiện xinh xắn (nơ, mũ, balo, kính...)
+ * - Xem trước nhân vật chuyển động trực quan theo thời gian thực
+ * - Bấm "Lên đường! 🚀" để lưu tiến trình và bước vào Thế giới Lớp 2.
+ */
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import Hud from '../../components/game/hud.astro';
+import {
+  CAT_FUR_COLORS,
+  CAT_ACCESSORIES,
+} from '../../components/game/characters/cat-character';
+
+const furColors = Object.values(CAT_FUR_COLORS);
+const accessories = Object.values(CAT_ACCESSORIES);
+---
+
+<KidPageLayout
+  title="Tạo nhân vật của bé — Thế giới học tập của Miu"
+  showToolbar={false}
+>
+  <link rel="stylesheet" href="/game/characters/character-poses.css" />
+  <link rel="stylesheet" href="/styles/game.css" />
+
+  <Hud title="Tạo nhân vật của bé" backUrl="/the-gioi/" backLabel="Về Cổng thế giới" />
+
+  <main class="creator-main-container">
+    <div class="creator-card">
+      <div class="creator-header">
+        <h1 class="creator-title">✨ Bạn đồng hành của bé ✨</h1>
+        <p class="creator-subtitle">Hãy chọn cho bạn mèo nhỏ cái tên đáng yêu và bộ cánh thật ngầu nhé!</p>
+      </div>
+
+      <div class="creator-content-grid">
+        <!-- Cột trái: Khung xem trước Miu trực tiếp -->
+        <div class="creator-preview-pane">
+          <div class="creator-bubble" id="creator-bubble">
+            Mến chào bé! Hãy tạo hình cho mình nhé! 🐾
+          </div>
+
+          <div class="creator-cat-stage" id="creator-cat-stage">
+            <!-- SVG sẽ được render bằng script -->
+          </div>
+
+          <div class="creator-pose-triggers">
+            <button type="button" class="mini-pose-btn active" data-pose="chao">👋 Vẫy tay</button>
+            <button type="button" class="mini-pose-btn" data-pose="vui">🎉 Nhảy múa</button>
+            <button type="button" class="mini-pose-btn" data-pose="suy-nghi">🤔 Suy nghĩ</button>
+            <button type="button" class="mini-pose-btn" data-pose="dung">✨ Đứng</button>
+          </div>
+        </div>
+
+        <!-- Cột phải: Các bảng lựa chọn -->
+        <div class="creator-options-pane">
+          <!-- 1. Đặt tên -->
+          <div class="option-group">
+            <label class="group-label" for="char-name-input">🏷️ 1. Tên bạn mèo:</label>
+            <div class="name-input-wrapper">
+              <input
+                type="text"
+                id="char-name-input"
+                class="char-input"
+                maxlength="20"
+                value="Miu"
+                placeholder="Nhập tên..."
+              />
+              <div class="preset-name-pills">
+                <button type="button" class="name-pill active" data-name="Miu">Miu</button>
+                <button type="button" class="name-pill" data-name="Bo">Bo</button>
+                <button type="button" class="name-pill" data-name="Bơ">Bơ</button>
+                <button type="button" class="name-pill" data-name="Sóc">Sóc</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Chọn màu lông -->
+          <div class="option-group">
+            <label class="group-label">🎨 2. Chọn màu lông:</label>
+            <div class="fur-color-grid" id="fur-color-grid">
+              {furColors.map((color, index) => (
+                <button
+                  type="button"
+                  class={`fur-chip ${index === 0 ? 'active' : ''}`}
+                  data-fur-id={color.id}
+                  data-fur-color={color.fur}
+                  title={color.name}
+                >
+                  <span class="fur-swatch" style={`background-color: ${color.fur}; border-color: ${color.furDark};`}></span>
+                  <span class="fur-name">{color.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <!-- 3. Chọn phụ kiện -->
+          <div class="option-group">
+            <label class="group-label">🎀 3. Phụ kiện đeo kèm (chọn tự do):</label>
+            <div class="accessory-grid" id="accessory-grid">
+              {accessories.map((acc, index) => (
+                <button
+                  type="button"
+                  class={`acc-chip ${index === 0 ? 'active' : ''}`}
+                  data-acc-id={acc.id}
+                >
+                  <span class="acc-name">{acc.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <!-- Nút chốt Lưu & Lên đường -->
+          <button type="button" class="confirm-launch-btn" id="btn-launch-game">
+            🚀 Lên đường vào Thế giới Lớp 2!
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</KidPageLayout>
+
+<style>
+  .creator-main-container {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    min-height: calc(100vh - 72px);
+    background: linear-gradient(180deg, #fef3c7 0%, #e0f2fe 100%);
+  }
+
+  .creator-card {
+    width: 100%;
+    max-width: 980px;
+    background: #ffffff;
+    border: 4px solid #0f172a;
+    border-radius: 32px;
+    padding: 2rem;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .creator-header {
+    text-align: center;
+  }
+
+  .creator-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .creator-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    margin-top: 0.35rem;
+  }
+
+  .creator-content-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (max-width: 840px) {
+    .creator-content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Cột xem trước nhân vật */
+  .creator-preview-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border: 3px solid #cbd5e1;
+    border-radius: 24px;
+    gap: 1.25rem;
+  }
+
+  .creator-bubble {
+    padding: 0.6rem 1rem;
+    background: #ffffff;
+    border: 2px solid #0284c7;
+    border-radius: 16px;
+    font-weight: 800;
+    color: #0369a1;
+    text-align: center;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+  }
+
+  .creator-cat-stage {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .creator-pose-triggers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .mini-pose-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .mini-pose-btn.active,
+  .mini-pose-btn:hover {
+    border-color: #0284c7;
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  /* Cột tùy chọn */
+  .creator-options-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .group-label {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .name-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .char-input {
+    flex: 1 1 200px;
+    min-height: 52px;
+    padding: 0.6rem 1rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    background: #ffffff;
+    border: 3px solid #cbd5e1;
+    border-radius: 16px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .char-input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+  }
+
+  .preset-name-pills {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .name-pill {
+    min-height: 48px;
+    padding: 0.4rem 0.85rem;
+    font-size: 1rem;
+    font-weight: 800;
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .name-pill.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0369a1;
+  }
+
+  /* Grid màu lông */
+  .fur-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .fur-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    min-height: 52px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .fur-chip.active {
+    border-color: #0284c7;
+    background: #f0f9ff;
+    box-shadow: 0 0 0 2px #0284c7;
+  }
+
+  .fur-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid;
+    flex-shrink: 0;
+  }
+
+  .fur-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1e293b;
+  }
+
+  /* Grid phụ kiện */
+  .accessory-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .acc-chip {
+    padding: 0.5rem 0.85rem;
+    min-height: 50px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #334155;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .acc-chip.active {
+    background: #fdf2f8;
+    border-color: #ec4899;
+    color: #be185d;
+    box-shadow: 0 0 0 2px #ec4899;
+  }
+
+  /* Nút xuất phát */
+  .confirm-launch-btn {
+    width: 100%;
+    min-height: 64px;
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffffff;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 3px solid #047857;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+    margin-top: 0.5rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+    touch-action: manipulation;
+  }
+
+  .confirm-launch-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(16, 185, 129, 0.45);
+  }
+
+  .confirm-launch-btn:active {
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatPose,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../../components/game/characters/cat-character';
+  import { getBrowserGameStore } from '../../lib/game/state/game-store';
+  import { speak, playSfx } from '../../lib/game/media/audio';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+  const initialState = store.getState();
+
+  let currentName = initialState.avatar.name || 'Miu';
+  let currentFur: CatFurColorId = (initialState.avatar.furColor as CatFurColorId) || 'vang-cam';
+  let currentAccessories: CatAccessoryId[] = (initialState.avatar.accessories as CatAccessoryId[]) || ['no-hong'];
+  let currentPose: CatPose = 'chao';
+
+  const catStage = document.getElementById('creator-cat-stage');
+  const nameInput = document.getElementById('char-name-input') as HTMLInputElement | null;
+  const bubble = document.getElementById('creator-bubble');
+
+  function renderPreview() {
+    if (!catStage) return;
+    catStage.innerHTML = renderCatSvgHtml({
+      pose: currentPose,
+      furColor: currentFur,
+      accessories: currentAccessories,
+      size: 180,
+      label: `Bạn mèo ${currentName}`,
+    });
+  }
+
+  renderPreview();
+
+  // Đổi tư thế
+  const poseButtons = document.querySelectorAll('.mini-pose-btn');
+  poseButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      poseButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPose = btn.getAttribute('data-pose') as CatPose;
+      renderPreview();
+    });
+  });
+
+  // Tên
+  nameInput?.addEventListener('input', () => {
+    currentName = nameInput.value.trim() || 'Miu';
+    if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được gặp bạn! 🐾`;
+  });
+
+  const namePills = document.querySelectorAll('.name-pill');
+  namePills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      namePills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      const val = pill.getAttribute('data-name') || 'Miu';
+      currentName = val;
+      if (nameInput) nameInput.value = val;
+      if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được gặp bạn! 🐾`;
+    });
+  });
+
+  // Chọn màu lông
+  const furChips = document.querySelectorAll('.fur-chip');
+  furChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      furChips.forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentFur = (chip.getAttribute('data-fur-id') as CatFurColorId) || 'vang-cam';
+      renderPreview();
+      playSfx('click');
+    });
+  });
+
+  // Chọn phụ kiện
+  const accChips = document.querySelectorAll('.acc-chip');
+  accChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const accId = chip.getAttribute('data-acc-id');
+      if (!accId) return;
+
+      if (chip.classList.contains('active')) {
+        chip.classList.remove('active');
+        currentAccessories = currentAccessories.filter((id) => id !== accId);
+      } else {
+        chip.classList.add('active');
+        currentAccessories.push(accId as CatAccessoryId);
+      }
+      renderPreview();
+      playSfx('click');
+    });
+  });
+
+  // Nút Lưu và Vào Game
+  document.getElementById('btn-launch-game')?.addEventListener('click', () => {
+    store.update((state) => ({
+      ...state,
+      avatar: {
+        ...state.avatar,
+        name: currentName,
+        furColor: currentFur,
+        accessories: currentAccessories,
+        createdOn: today,
+      },
+    }));
+    store.flush();
+
+    playSfx('levelUp');
+    speak(`Hoan hô! Bạn ${currentName} đã sẵn sàng bước vào Thế giới Lớp 2!`, { tone: 'cheer' });
+
+    setTimeout(() => {
+      window.location.href = '/the-gioi/lop-2/';
+    }, 800);
+  });
+</script>

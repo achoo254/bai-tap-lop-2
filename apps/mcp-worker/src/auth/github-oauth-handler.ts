@@ -38,7 +38,8 @@ app.get('/authorize', async (c) => {
     csrfToken,
     server: {
       name: 'Góc học tập của bé',
-      description: 'Cho phép AI soạn, xem trước và đăng bài tập lên web của bé. Chỉ tài khoản của phụ huynh được đăng nhập.',
+      description:
+        'Cho phép AI soạn, xem trước và đăng bài tập lên web của bé. Chỉ tài khoản của phụ huynh được đăng nhập.',
     },
     setCookie,
     state: { oauthReqInfo },
@@ -59,7 +60,11 @@ app.post('/authorize', async (c) => {
     }
     if (!state.oauthReqInfo?.clientId) return c.text('Yêu cầu không hợp lệ', 400);
 
-    const approvedCookie = await addApprovedClient(c.req.raw, state.oauthReqInfo.clientId, c.env.COOKIE_ENCRYPTION_KEY);
+    const approvedCookie = await addApprovedClient(
+      c.req.raw,
+      state.oauthReqInfo.clientId,
+      c.env.COOKIE_ENCRYPTION_KEY,
+    );
     const { stateToken } = await createOAuthState(state.oauthReqInfo, c.env.OAUTH_KV);
     const { setCookie: sessionCookie } = await bindStateToSession(stateToken);
     const headers = new Headers();
@@ -86,7 +91,11 @@ app.get('/callback', async (c) => {
   }
   if (!oauthReqInfo.clientId) return c.text('Yêu cầu không hợp lệ', 400);
 
-  const accessToken = await exchangeCodeForToken(c.env, c.req.query('code'), new URL('/callback', c.req.url).href);
+  const accessToken = await exchangeCodeForToken(
+    c.env,
+    c.req.query('code'),
+    new URL('/callback', c.req.url).href,
+  );
   if (!accessToken) return c.text('Không đăng nhập được GitHub', 400);
   const login = await fetchGithubLogin(accessToken);
   if (!login || login.toLowerCase() !== c.env.ALLOWED_GITHUB_LOGIN.toLowerCase()) {
@@ -106,7 +115,12 @@ app.get('/callback', async (c) => {
   return new Response(null, { status: 302, headers });
 });
 
-function redirectToGithub(request: Request, env: Env, stateToken: string, headers: HeadersInit = {}): Response {
+function redirectToGithub(
+  request: Request,
+  env: Env,
+  stateToken: string,
+  headers: HeadersInit = {},
+): Response {
   const upstream = new URL('https://github.com/login/oauth/authorize');
   upstream.searchParams.set('client_id', env.GITHUB_CLIENT_ID);
   upstream.searchParams.set('redirect_uri', new URL('/callback', request.url).href);
@@ -118,7 +132,11 @@ function redirectToGithub(request: Request, env: Env, stateToken: string, header
   return new Response(null, { status: 302, headers: responseHeaders });
 }
 
-async function exchangeCodeForToken(env: Env, code: string | undefined, redirectUri: string): Promise<string | null> {
+async function exchangeCodeForToken(
+  env: Env,
+  code: string | undefined,
+  redirectUri: string,
+): Promise<string | null> {
   if (!code) return null;
   const response = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',

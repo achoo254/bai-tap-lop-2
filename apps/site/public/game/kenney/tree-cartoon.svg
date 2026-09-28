@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" width="120" height="160">
+  <!-- Cây hoạt hình bo tròn đáng yêu (Kenney style) -->
+  <!-- Thân cây -->
+  <path d="M50 90 L46 150 C46 154 74 154 74 150 L70 90 Z" fill="#92400e" stroke="#451a03" stroke-width="4" stroke-linejoin="round" />
+  <path d="M54 100 L52 144" stroke="#78350f" stroke-width="2.5" stroke-linecap="round" />
+  
+  <!-- Tán lá dạng các đám mây bo tròn xếp lớp -->
+  <!-- Lớp sau tối màu -->
+  <circle cx="60" cy="62" r="46" fill="#15803d" stroke="#14532d" stroke-width="4" />
+  <!-- Lớp trước sáng màu -->
+  <circle cx="42" cy="64" r="28" fill="#22c55e" />
+  <circle cx="78" cy="64" r="28" fill="#22c55e" />
+  <circle cx="60" cy="42" r="32" fill="#4ade80" />
+  <circle cx="60" cy="74" r="24" fill="#22c55e" />
+  
+  <!-- Quả / Hoa điểm xuyết -->
+  <circle cx="40" cy="48" r="5" fill="#f43f5e" stroke="#9f1239" stroke-width="1.5" />
+  <circle cx="76" cy="46" r="5" fill="#f43f5e" stroke="#9f1239" stroke-width="1.5" />
+  <circle cx="58" cy="68" r="5" fill="#f43f5e" stroke="#9f1239" stroke-width="1.5" />
+</svg>

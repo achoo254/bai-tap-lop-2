@@ -6,6 +6,8 @@ import {
   loadGameState,
   migrateGameState,
   saveGameState,
+  recordEventQuestCompletion,
+  ensureEventProgress,
   type KeyValueStorage,
 } from '../../../src/lib/game/state/game-state';
 import { SKILL_IDS } from '../../../src/lib/game/skills/skill-types';
@@ -74,5 +76,35 @@ describe('lưu và đọc tiến độ', () => {
     delete rest['lop-2/khoi-3d'];
     const migrated = migrateGameState({ ...state, mastery: rest });
     expect(migrated?.mastery['lop-2/khoi-3d']?.level).toBe(1);
+  });
+
+  it('bản lưu cũ không có trường events (Phase 1-3) vẫn đọc được và mặc định events là {}', () => {
+    const state = createInitialState(TODAY, 'Miu');
+    const oldState: Record<string, unknown> = { ...state };
+    delete oldState.events;
+    const migrated = migrateGameState(oldState);
+    expect(migrated).not.toBeNull();
+    expect(migrated?.events).toEqual({});
+  });
+
+  it('ghi nhận hoàn thành nhiệm vụ sự kiện và cập nhật sao tốt nhất', () => {
+    const state = createInitialState(TODAY, 'Miu');
+    const fullEventId = 'lop-2/timo';
+    const questId = 'q1-dem-sao';
+
+    const state1 = recordEventQuestCompletion(state, fullEventId, questId, 2, TODAY);
+    expect(ensureEventProgress(state1, fullEventId).completedQuests[questId]).toEqual({
+      stars: 2,
+      completedOn: TODAY,
+    });
+    expect(ensureEventProgress(state1, fullEventId).lastVisited).toBe(TODAY);
+
+    // Chơi lại được 3 sao -> cập nhật lên 3
+    const state2 = recordEventQuestCompletion(state1, fullEventId, questId, 3, '2026-09-29');
+    expect(ensureEventProgress(state2, fullEventId).completedQuests[questId]?.stars).toBe(3);
+
+    // Chơi lại được 1 sao -> giữ nguyên 3 sao tốt nhất
+    const state3 = recordEventQuestCompletion(state2, fullEventId, questId, 1, '2026-09-30');
+    expect(ensureEventProgress(state3, fullEventId).completedQuests[questId]?.stars).toBe(3);
   });
 });

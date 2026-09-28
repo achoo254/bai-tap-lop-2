@@ -3,7 +3,12 @@ import { bodyLimit } from 'hono/body-limit';
 import { EDITOR_MAX_MEDIA_BYTES, isValidLessonId } from 'lesson-core';
 import type { EditorPaths } from './editor-paths';
 import type { GitSyncService } from './git-sync-service';
-import { EditorConflictError, EditorInputError, type LessonFileRepository, type SaveLessonInput } from './lesson-file-repository';
+import {
+  EditorConflictError,
+  EditorInputError,
+  type LessonFileRepository,
+  type SaveLessonInput,
+} from './lesson-file-repository';
 import { staticFileResponse } from './static-file-response';
 
 export const EDITOR_PORT = 4321;
@@ -31,7 +36,11 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
       const host = new URL(c.req.url).host;
       if (!ALLOWED_HOSTS.has(host)) return c.text('Host không hợp lệ', 403);
       const origin = c.req.header('origin');
-      if (c.req.method !== 'GET' && origin && !ALLOWED_HOSTS.has(origin.replace(/^https?:\/\//, ''))) {
+      if (
+        c.req.method !== 'GET' &&
+        origin &&
+        !ALLOWED_HOSTS.has(origin.replace(/^https?:\/\//, ''))
+      ) {
         return c.text('Origin không hợp lệ', 403);
       }
     }
@@ -39,8 +48,10 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
   });
 
   app.onError((error, c) => {
-    if (error instanceof EditorInputError) return c.json({ loi: error.message, chiTiet: error.issues }, 422);
-    if (error instanceof EditorConflictError) return c.json({ loi: error.message, xungDot: true }, 409);
+    if (error instanceof EditorInputError)
+      return c.json({ loi: error.message, chiTiet: error.issues }, 422);
+    if (error instanceof EditorConflictError)
+      return c.json({ loi: error.message, xungDot: true }, 409);
     console.error('[soan-bai]', error);
     return c.json({ loi: 'Có lỗi không mong muốn, xem cửa sổ dòng lệnh.' }, 500);
   });
@@ -70,7 +81,12 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
       const draftKey = String(form.draftKey ?? '');
       const lessonId = form.lessonId ? String(form.lessonId) : null;
       if (!(file instanceof File)) throw new EditorInputError('Không nhận được file.');
-      const fileName = await repository.stageUpload(draftKey, lessonId, file.name, new Uint8Array(await file.arrayBuffer()));
+      const fileName = await repository.stageUpload(
+        draftKey,
+        lessonId,
+        file.name,
+        new Uint8Array(await file.arrayBuffer()),
+      );
       return c.json({ fileName });
     },
   );
@@ -79,17 +95,24 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
     const input = (await c.req.json()) as SaveLessonInput;
     const pulled = await git.pull();
     if (!pulled.ok) {
-      throw new EditorInputError(`${pulled.message}. Chưa lưu để tránh ghi đè bài mới trên GitHub. Kiểm tra mạng rồi bấm lưu lại.`);
+      throw new EditorInputError(
+        `${pulled.message}. Chưa lưu để tránh ghi đè bài mới trên GitHub. Kiểm tra mạng rồi bấm lưu lại.`,
+      );
     }
     const result = await repository.save(input);
     const action = input.originalId ? 'cập nhật' : 'thêm';
     const state = result.frontmatter.nhap ? 'nháp' : 'đăng';
-    const commit = await git.commitAndPush(`content/${result.id}`, `content: ${action} bài ${state} ${result.id}`);
+    const commit = await git.commitAndPush(
+      `content/${result.id}`,
+      `content: ${action} bài ${state} ${result.id}`,
+    );
     return c.json({
       ...result,
       dongBo: pulled,
       git: commit,
-      linkXemTruoc: deps.siteUrl ? `${deps.siteUrl}/xem-truoc/${result.frontmatter.ma_xem_truoc}/` : null,
+      linkXemTruoc: deps.siteUrl
+        ? `${deps.siteUrl}/xem-truoc/${result.frontmatter.ma_xem_truoc}/`
+        : null,
     });
   });
 
@@ -102,17 +125,28 @@ export function createEditorApp(deps: EditorAppDependencies): Hono {
   });
 
   // File media: bài đã lưu, file vừa tải lên, hình minh hoạ và font của web.
-  const sendOr404 = async (c: Context, response: Promise<Response | null>) => (await response) ?? c.notFound();
+  const sendOr404 = async (c: Context, response: Promise<Response | null>) =>
+    (await response) ?? c.notFound();
   app.get('/media/:id/:file', (c) => {
     const id = c.req.param('id');
     if (!isValidLessonId(id)) return c.notFound();
     return sendOr404(c, staticFileResponse(paths.contentDir, `${id}/${c.req.param('file')}`));
   });
   app.get('/media-tam/:key/:file', (c) => {
-    const filePath = repository.stagedFilePath(c.req.param('key'), decodeURIComponent(c.req.param('file')));
-    return filePath ? sendOr404(c, staticFileResponse(paths.stagingDir, filePath.slice(paths.stagingDir.length + 1))) : c.notFound();
+    const filePath = repository.stagedFilePath(
+      c.req.param('key'),
+      decodeURIComponent(c.req.param('file')),
+    );
+    return filePath
+      ? sendOr404(
+          c,
+          staticFileResponse(paths.stagingDir, filePath.slice(paths.stagingDir.length + 1)),
+        )
+      : c.notFound();
   });
-  app.get('/illustrations/*', (c) => sendOr404(c, staticFileResponse(paths.sitePublicDir, c.req.path)));
+  app.get('/illustrations/*', (c) =>
+    sendOr404(c, staticFileResponse(paths.sitePublicDir, c.req.path)),
+  );
   app.get('/fonts/*', (c) => sendOr404(c, staticFileResponse(paths.sitePublicDir, c.req.path)));
   app.get('/*', (c) => {
     const requested = c.req.path === '/' ? '/index.html' : c.req.path;

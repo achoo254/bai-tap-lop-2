@@ -23,7 +23,10 @@ export interface LessonFolder {
   validation: LessonValidationResult;
 }
 
-export async function readLessonFolder(contentDir: string, id: string): Promise<LessonFolder | null> {
+export async function readLessonFolder(
+  contentDir: string,
+  id: string,
+): Promise<LessonFolder | null> {
   if (!isValidLessonId(id)) return null;
   const dir = path.join(contentDir, id);
   let source: string;

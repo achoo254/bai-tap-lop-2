@@ -43,6 +43,29 @@ const questProgressSchema = z.object({
   completedOn: isoDay,
 });
 
+const eventProgressSchema = z.object({
+  completedQuests: z
+    .record(
+      z.string(),
+      z.object({
+        stars: z.number().int().min(1).max(3),
+        completedOn: isoDay,
+      }),
+    )
+    .default({}),
+  completedChallenges: z.array(z.string()).default([]),
+  unlockedBadges: z.array(z.string()).default([]),
+  personalBest: z
+    .object({
+      score: z.number().int().min(0).default(0),
+      fastestSeconds: z.number().int().min(0).optional(),
+      achievedOn: isoDay.optional(),
+    })
+    .default({ score: 0 }),
+  hasSeenIntro: z.boolean().default(false),
+  lastVisited: isoDay.nullable().default(null),
+});
+
 const gameStateSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
   createdOn: isoDay,
@@ -58,6 +81,8 @@ const gameStateSchema = z.object({
   mastery: z.record(z.string(), skillMasterySchema),
   /** Sao tốt nhất của từng nhiệm vụ, khoá là "<lớp>/<vùng hoặc sự kiện>/<nhiệm vụ>". */
   quests: z.record(z.string(), questProgressSchema),
+  /** Tiến độ sự kiện, khoá là "<lớp>/<eventId>", ví dụ "lop-2/timo". */
+  events: z.record(z.string(), eventProgressSchema).default({}),
   inventory: z.array(z.string()),
   achievements: z.array(z.string()),
   streak: z.object({
@@ -69,6 +94,7 @@ const gameStateSchema = z.object({
 
 export type SkillMastery = z.infer<typeof skillMasterySchema>;
 export type QuestProgress = z.infer<typeof questProgressSchema>;
+export type EventProgress = z.infer<typeof eventProgressSchema>;
 export type GameState = Omit<z.infer<typeof gameStateSchema>, 'mastery'> & {
   mastery: Record<SkillId, SkillMastery>;
 };
@@ -109,9 +135,83 @@ export function createInitialState(today: string, avatarName: string): GameState
     },
     mastery,
     quests: {},
+    events: {},
     inventory: [],
     achievements: [],
     streak: { current: 0, best: 0, lastDay: null },
+  };
+}
+
+export function createInitialEventProgress(): EventProgress {
+  return {
+    completedQuests: {},
+    completedChallenges: [],
+    unlockedBadges: [],
+    personalBest: { score: 0 },
+    hasSeenIntro: false,
+    lastVisited: null,
+  };
+}
+
+export function ensureEventProgress(state: GameState, eventFullId: string): EventProgress {
+  return (
+    state.events[eventFullId] ?? {
+      completedQuests: {},
+      completedChallenges: [],
+      unlockedBadges: [],
+      personalBest: { score: 0 },
+      hasSeenIntro: false,
+      lastVisited: null,
+    }
+  );
+}
+
+export function recordEventQuestCompletion(
+  state: GameState,
+  eventFullId: string,
+  questId: string,
+  stars: number,
+  today: string,
+): GameState {
+  const currentEvent = ensureEventProgress(state, eventFullId);
+  const prevQuest = currentEvent.completedQuests[questId];
+  const bestStars = Math.max(prevQuest?.stars ?? 0, Math.min(3, Math.max(1, stars)));
+
+  return {
+    ...state,
+    events: {
+      ...state.events,
+      [eventFullId]: {
+        ...currentEvent,
+        completedQuests: {
+          ...currentEvent.completedQuests,
+          [questId]: {
+            stars: bestStars,
+            completedOn: today,
+          },
+        },
+        lastVisited: today,
+      },
+    },
+  };
+}
+
+export function markEventIntroSeen(
+  state: GameState,
+  eventFullId: string,
+  today: string,
+): GameState {
+  const currentEvent = ensureEventProgress(state, eventFullId);
+  return {
+    ...state,
+    events: {
+      ...state.events,
+      [eventFullId]: {
+        ...currentEvent,
+        hasSeenIntro: true,
+        lastVisited: today,
+      },
+    },
   };
 }
 

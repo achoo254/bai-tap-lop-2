@@ -1,0 +1,461 @@
+/**
+ * apps/site/src/components/game/characters/character-poses.css
+ *
+ * Hệ thống hoạt hình hành động thực sự (Real Action Animations) cho Miu
+ * Đạt chuẩn >= 50fps trên iPad Safari, chuyển động sinh động, mượt mà và trực quan.
+ */
+
+.cat-character {
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+  overflow: visible !important;
+}
+
+/* ==========================================================================
+   1. TƯ THẾ ĐỨNG (IDLE) - Thở nhẹ nhàng, đuôi vẫy, tai giật nhẹ
+   ========================================================================== */
+.cat-pose-dung {
+  animation: cat-idle-breathing 3s ease-in-out infinite;
+}
+.cat-pose-dung .cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: cat-tail-sway 2.8s ease-in-out infinite alternate;
+}
+.cat-pose-dung .cat-ear-left {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: cat-ear-twitch-left 4s ease-in-out infinite;
+}
+.cat-pose-dung .cat-ear-right {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: cat-ear-twitch-right 4s ease-in-out infinite 0.5s;
+}
+
+@keyframes cat-idle-breathing {
+  0%,
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+  50% {
+    transform: scale(1.02, 0.98) translateY(-2px);
+  }
+}
+
+@keyframes cat-tail-sway {
+  0% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes cat-ear-twitch-left {
+  0%,
+  90%,
+  100% {
+    transform: rotate(0deg);
+  }
+  93% {
+    transform: rotate(-10deg);
+  }
+  96% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes cat-ear-twitch-right {
+  0%,
+  90%,
+  100% {
+    transform: rotate(0deg);
+  }
+  93% {
+    transform: rotate(10deg);
+  }
+  96% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* ==========================================================================
+   2. TƯ THẾ VẪY CHÀO (WAVE) - Tay vẫy nhiệt tình, người nghiêng vui vẻ
+   ========================================================================== */
+.cat-pose-chao {
+  animation: cat-greet-tilt 2.4s ease-in-out infinite;
+}
+.cat-pose-chao .cat-paw-wave {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: cat-wave-active 1.2s ease-in-out infinite;
+}
+.cat-pose-chao .cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: cat-tail-fast 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes cat-greet-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes cat-wave-active {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-22deg);
+  }
+  50% {
+    transform: rotate(12deg);
+  }
+  75% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes cat-tail-fast {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+/* ==========================================================================
+   3. TƯ THẾ ĐI BỘ (WALK) - Chân bước so le thật, thân nhấp nhô
+   ========================================================================== */
+.cat-pose-di {
+  animation: cat-walk-body 0.6s ease-in-out infinite alternate;
+}
+.cat-pose-di .cat-feet-left {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: cat-leg-left 0.6s ease-in-out infinite alternate;
+}
+.cat-pose-di .cat-feet-right {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: cat-leg-right 0.6s ease-in-out infinite alternate;
+}
+.cat-pose-di .cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: cat-tail-walk 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes cat-walk-body {
+  0% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes cat-leg-left {
+  0% {
+    transform: translateY(-4px) scaleY(0.9) rotate(-14deg);
+  }
+  100% {
+    transform: translateY(4px) scaleY(1.1) rotate(14deg);
+  }
+}
+
+@keyframes cat-leg-right {
+  0% {
+    transform: translateY(4px) scaleY(1.1) rotate(14deg);
+  }
+  100% {
+    transform: translateY(-4px) scaleY(0.9) rotate(-14deg);
+  }
+}
+
+@keyframes cat-tail-walk {
+  0% {
+    transform: rotate(-14deg);
+  }
+  100% {
+    transform: rotate(18deg);
+  }
+}
+
+/* ==========================================================================
+   4. TƯ THẾ NHẢY (JUMP) - Lấy đà, phóng vút lên cao rồi hạ cánh đàn hồi
+   ========================================================================== */
+.cat-pose-nhay {
+  animation: cat-high-jump 1.1s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+}
+.cat-pose-nhay .cat-ear-left,
+.cat-pose-nhay .cat-ear-right {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: cat-ears-perk 1.1s ease-in-out infinite;
+}
+
+@keyframes cat-high-jump {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  15% {
+    /* Nhún người lấy đà (Squash) */
+    transform: translateY(12px) scale(1.18, 0.82);
+  }
+  45% {
+    /* Bật vút lên cao nhất (Stretch) */
+    transform: translateY(-56px) scale(0.88, 1.16);
+  }
+  75% {
+    /* Rơi chạm đất nảy nhẹ */
+    transform: translateY(4px) scale(1.08, 0.94);
+  }
+  88% {
+    transform: translateY(-3px) scale(0.98, 1.02);
+  }
+}
+
+@keyframes cat-ears-perk {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ==========================================================================
+   5. TƯ THẾ ĂN MỪNG / VUI (CHEER / VICTORY) - Nhảy tưng bừng, sao lấp lánh
+   ========================================================================== */
+.cat-pose-vui {
+  animation: cat-victory-dance 0.8s ease-in-out infinite alternate;
+}
+.cat-pose-vui .cat-stars {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cat-sparkle-burst 0.8s ease-in-out infinite;
+}
+.cat-pose-vui .cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: cat-tail-happy 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes cat-victory-dance {
+  0% {
+    transform: translateY(0) rotate(-6deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(-20px) rotate(0deg) scale(1.08);
+  }
+  100% {
+    transform: translateY(0) rotate(6deg) scale(1.05);
+  }
+}
+
+@keyframes cat-sparkle-burst {
+  0% {
+    transform: scale(0.6) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.3) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8) rotate(90deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes cat-tail-happy {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+/* ==========================================================================
+   6. TƯ THẾ SUY NGHĨ (THINK) - Nghiêng đầu, dấu hỏi bay bổng
+   ========================================================================== */
+.cat-pose-suy-nghi {
+  animation: cat-think-sway 2.4s ease-in-out infinite;
+}
+.cat-pose-suy-nghi .cat-head {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cat-head-tilt 2.4s ease-in-out infinite;
+}
+.cat-pose-suy-nghi .cat-question-mark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cat-float-question 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes cat-think-sway {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes cat-head-tilt {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes cat-float-question {
+  0% {
+    transform: translateY(0) scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-12px) scale(1.15);
+    opacity: 1;
+    filter: drop-shadow(0 0 6px #818cf8);
+  }
+}
+
+/* ==========================================================================
+   7. TƯ THẾ BUỒN (SAD) - Tai rũ, đầu cúi, giọt nước mắt rơi
+   ========================================================================== */
+.cat-pose-buon {
+  animation: cat-sad-droop 2.5s ease-in-out infinite;
+}
+.cat-pose-buon .cat-head {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: translateY(8px);
+}
+.cat-pose-buon .cat-ear-left {
+  transform-box: fill-box;
+  transform-origin: bottom right;
+  animation: cat-ear-droop-left 2.5s ease-in-out infinite;
+}
+.cat-pose-buon .cat-ear-right {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: cat-ear-droop-right 2.5s ease-in-out infinite;
+}
+.cat-pose-buon .cat-teardrop {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: cat-tear-fall 1.5s cubic-bezier(0.4, 0, 1, 1) infinite;
+}
+
+@keyframes cat-sad-droop {
+  0%,
+  100% {
+    transform: translateY(0) scale(0.97, 1.02);
+  }
+  50% {
+    transform: translateY(6px) scale(1.02, 0.95);
+  }
+}
+
+@keyframes cat-ear-droop-left {
+  0%,
+  100% {
+    transform: rotate(-18deg);
+  }
+  50% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes cat-ear-droop-right {
+  0%,
+  100% {
+    transform: rotate(18deg);
+  }
+  50% {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes cat-tear-fall {
+  0% {
+    transform: translateY(-6px) scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(22px) scale(1, 1.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(32px) scale(1.4, 0.4);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   8. TƯ THẾ NGÃ (FALL / TUMBLE) - Trượt chân, ngã ngồi bệt, sao xoay tít
+   ========================================================================== */
+.cat-pose-te {
+  animation: cat-fall-tumble 1.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+.cat-pose-te .cat-dizzy-stars {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: cat-dizzy-spin 1.2s linear infinite;
+}
+
+@keyframes cat-fall-tumble {
+  0% {
+    /* Đang trượt chân */
+    transform: translateY(-8px) rotate(-16deg) scale(0.95, 1.05);
+  }
+  30% {
+    /* Ngã đập mông xuống đất (Thud) */
+    transform: translateY(18px) rotate(14deg) scale(1.22, 0.78);
+  }
+  50% {
+    /* Nảy lên nhẹ */
+    transform: translateY(10px) rotate(6deg) scale(1.05, 0.95);
+  }
+  70% {
+    /* Ngồi bệt choáng váng */
+    transform: translateY(16px) rotate(8deg) scale(1.15, 0.85);
+  }
+  100% {
+    transform: translateY(16px) rotate(8deg) scale(1.15, 0.85);
+  }
+}
+
+@keyframes cat-dizzy-spin {
+  0% {
+    transform: rotate(0deg) scale(0.9);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.9);
+  }
+}

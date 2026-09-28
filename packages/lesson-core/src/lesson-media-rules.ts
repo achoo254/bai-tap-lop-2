@@ -20,7 +20,9 @@ export const MCP_MAX_MEDIA_BYTES = 10 * 1024 * 1024;
 
 export function mediaExtensionOf(fileName: string): AllowedMediaExtension | null {
   const extension = fileName.split('.').pop()?.toLowerCase() ?? '';
-  return Object.hasOwn(ALLOWED_MEDIA_TYPES, extension) ? (extension as AllowedMediaExtension) : null;
+  return Object.hasOwn(ALLOWED_MEDIA_TYPES, extension)
+    ? (extension as AllowedMediaExtension)
+    : null;
 }
 
 export function extensionForMimeType(mimeType: string): AllowedMediaExtension | null {

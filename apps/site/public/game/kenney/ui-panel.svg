@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="200" height="120">
+  <!-- Khung bảng giao diện gỗ/parchment (Kenney UI style) -->
+  <!-- Khung viền gỗ ngoài -->
+  <rect x="4" y="4" width="192" height="112" rx="14" fill="#a16207" stroke="#451a03" stroke-width="4" />
+  <!-- Nền giấy da / kem bên trong -->
+  <rect x="12" y="12" width="176" height="96" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="2.5" />
+  
+  <!-- 4 đinh tán đồng ở 4 góc -->
+  <circle cx="16" cy="16" r="3.5" fill="#facc15" stroke="#713f12" stroke-width="1.5" />
+  <circle cx="184" cy="16" r="3.5" fill="#facc15" stroke="#713f12" stroke-width="1.5" />
+  <circle cx="16" cy="104" r="3.5" fill="#facc15" stroke="#713f12" stroke-width="1.5" />
+  <circle cx="184" cy="104" r="3.5" fill="#facc15" stroke="#713f12" stroke-width="1.5" />
+</svg>

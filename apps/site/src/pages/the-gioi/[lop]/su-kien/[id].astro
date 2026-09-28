@@ -1,0 +1,803 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/[lop]/su-kien/[id].astro
+ *
+ * Bản đồ Sự kiện (Event Map):
+ * - Hiển thị quần đảo / khu vực sự kiện mở rộng cắm vào Thế giới lớp.
+ * - Con đường hải trình nối các hòn đảo câu đố (quests) và ải Boss cuối.
+ * - Bảng thành tích, huy hiệu độc quyền, và kỷ lục cá nhân.
+ */
+import KidPageLayout from '../../../../layouts/kid-page-layout.astro';
+import Hud from '../../../../components/game/hud.astro';
+import EventCountdown from '../../../../components/game/event-countdown.astro';
+import { getAllEvents, getEvent } from '../../../../lib/game/events/event-registry';
+import type { EventDefinition } from '../../../../lib/game/events/event-types';
+import type { GradeId } from '../../../../lib/game/skills/skill-types';
+
+export function getStaticPaths() {
+  const events = getAllEvents();
+  return events.map((event) => ({
+    params: {
+      lop: event.metadata.grade,
+      id: event.metadata.id,
+    },
+    props: { event },
+  }));
+}
+
+interface Props {
+  event?: EventDefinition;
+}
+
+const { lop, id } = Astro.params;
+const event =
+  Astro.props.event ?? (lop && id ? getEvent(lop as GradeId, id) : undefined);
+
+if (!event) {
+  throw new Error(`Không tìm thấy sự kiện ${lop}/${id}`);
+}
+
+const { metadata, schedule, quests, rewards, finalBoss } = event;
+const fullEventId = `${metadata.grade}/${metadata.id}`;
+---
+
+<KidPageLayout
+  title={`${metadata.name} — Sự kiện Thế giới Lớp 2`}
+  showToolbar={false}
+>
+  <link rel="stylesheet" href="/game/characters/character-poses.css" />
+  <link rel="stylesheet" href="/styles/game.css" />
+
+  <Hud
+    title={metadata.name}
+    backUrl={`/the-gioi/${metadata.grade}/`}
+    backLabel="Bản đồ thế giới"
+  />
+
+  <main class="event-map-container">
+    <!-- Header sự kiện -->
+    <header class="event-header-card">
+      <div class="header-main-info">
+        <div class="event-icon-badge">{metadata.theme.icon}</div>
+        <div>
+          <div class="event-meta-line">
+            <span class="event-type-badge">🎪 SỰ KIỆN MỞ RỘNG</span>
+            <EventCountdown schedule={schedule} />
+          </div>
+          <h1 class="event-title">{metadata.name}</h1>
+          <p class="event-subtitle">{metadata.subtitle}</p>
+        </div>
+      </div>
+
+      <!-- Lời nhắn từ NPC hướng dẫn -->
+      <div class="event-npc-brief">
+        <div class="npc-avatar-box">🦉</div>
+        <div class="npc-bubble">
+          <p class="npc-text">{metadata.description}</p>
+          <button type="button" class="listen-btn" id="btn-listen-intro" aria-label="Nghe đọc hướng dẫn">
+            🔊 Nghe Bác Cú dặn
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="event-layout-grid">
+      <!-- Khung hải trình / Bản đồ Quần Đảo -->
+      <section class="archipelago-viewport">
+        <div class="archipelago-canvas" id="event-canvas">
+          <!-- Biển & sóng trang trí -->
+          <div class="sea-wave wave-1"></div>
+          <div class="sea-wave wave-2"></div>
+
+          <!-- Đường nối hải trình SVG -->
+          <svg class="sea-trail-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path
+              id="sea-trail-path"
+              d="M 22 75 Q 36 62, 50 50 T 78 25"
+              fill="none"
+              stroke="#fed7aa"
+              stroke-width="2.5"
+              stroke-dasharray="3, 2"
+              stroke-linecap="round"
+            ></path>
+          </svg>
+
+          <!-- Danh sách đảo câu đố (quests) -->
+          {
+            quests.map((quest, index) => {
+              const questUrl = `/the-gioi/choi/?nv=${quest.id}&su-kien=${metadata.id}&boost=${quest.difficultyBoost}`;
+              const isFirst = index === 0;
+
+              return (
+                <div
+                  class={`island-node ${isFirst ? 'unlocked' : 'locked'}`}
+                  id={`island-node-${quest.id}`}
+                  style={`left: ${quest.mapCoordinates.x}%; top: ${quest.mapCoordinates.y}%;`}
+                  data-quest-id={quest.id}
+                  data-quest-url={questUrl}
+                  data-is-first={isFirst ? 'true' : 'false'}
+                >
+                  <a href={isFirst ? questUrl : '#'} class="island-anchor">
+                    <div class="island-body">
+                      <div class="island-crest">
+                        {quest.isBoss ? '🐉' : '🏝️'}
+                      </div>
+                      <div class="island-stars" id={`stars-${quest.id}`}>
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                        <span class="star">☆</span>
+                      </div>
+                    </div>
+
+                    <div class="island-label">
+                      <span class="island-num">Ải {index + 1}</span>
+                      <strong class="island-name">{quest.title.split(':')[0]}</strong>
+                      <span class="status-indicator">
+                        {isFirst ? '👉 Vào chơi' : '🔒 Khóa'}
+                      </span>
+                    </div>
+                  </a>
+                </div>
+              );
+            })
+          }
+
+          <!-- Miu nhân vật trên bản đồ sự kiện -->
+          <div class="miu-sailor-marker" id="miu-sailor" style="left: 22%; top: 75%;">
+            <div class="miu-figure-box" id="miu-event-figure">
+              <!-- Miu SVG -->
+            </div>
+            <div class="miu-tag" id="miu-event-tag">Miu</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cột thông tin: Phần thưởng & Kỷ lục cá nhân -->
+      <aside class="event-sidebar">
+        <!-- Rương phần thưởng độc quyền -->
+        <div class="sidebar-card reward-showcase-card">
+          <h2 class="sidebar-title">🎁 Quà Độc Quyền</h2>
+          <div class="reward-item-row">
+            <div class="reward-icon-box">{rewards.badgeIcon}</div>
+            <div class="reward-desc">
+              <strong>{rewards.badgeName}</strong>
+              <small>{rewards.badgeDescription}</small>
+            </div>
+          </div>
+
+          {
+            rewards.accessoryId && (
+              <div class="reward-item-row">
+                <div class="reward-icon-box">👑</div>
+                <div class="reward-desc">
+                  <strong>Vương Miện Sao</strong>
+                  <small>Phụ kiện đội đầu lấp lánh cho mèo Miu</small>
+                </div>
+              </div>
+            )
+          }
+
+          <div class="reward-item-row">
+            <div class="reward-icon-box">🪙</div>
+            <div class="reward-desc">
+              <strong>+{rewards.bonusCoins} Xu thưởng</strong>
+              <small>Thưởng khi hoàn thành toàn bộ sự kiện</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng thành tích cá nhân -->
+        <div class="sidebar-card personal-stats-card">
+          <h2 class="sidebar-title">⭐ Tiến Độ Của Bé</h2>
+          <div class="stats-row">
+            <span class="stat-label">Số ải đã qua:</span>
+            <strong class="stat-val" id="stat-completed-quests">0 / {quests.length}</strong>
+          </div>
+          <div class="stats-row">
+            <span class="stat-label">Tổng sao TIMO:</span>
+            <strong class="stat-val" id="stat-total-stars">0 ⭐</strong>
+          </div>
+          <div class="stats-row">
+            <span class="stat-label">Danh hiệu:</span>
+            <span class="stat-badge" id="stat-event-rank">Tập Sự Biển Cả ⛵</span>
+          </div>
+        </div>
+
+        {
+          finalBoss && (
+            <div class="sidebar-card boss-preview-card">
+              <h2 class="sidebar-title">⚠️ Trùm Cuối Quần Đảo</h2>
+              <div class="boss-flex">
+                <span class="boss-emoji">{finalBoss.avatar}</span>
+                <div>
+                  <strong>{finalBoss.name}</strong>
+                  <small>{finalBoss.title}</small>
+                </div>
+              </div>
+              <p class="boss-quote">"{finalBoss.intro}"</p>
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </main>
+</KidPageLayout>
+
+<script define:vars={{ fullEventId, quests, metadata }}>
+  import { renderCatSvgHtml } from '/src/components/game/characters/cat-character.ts';
+
+  const STORAGE_KEY = 'the-gioi:v1';
+
+  function loadGameState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function updateEventMap() {
+    const state = loadGameState();
+    const eventProgress = state?.events?.[fullEventId] || {
+      completedQuests: {},
+      completedChallenges: [],
+      unlockedBadges: [],
+    };
+
+    let completedCount = 0;
+    let totalStars = 0;
+
+    // Render Miu nhân vật
+    const miuFigure = document.getElementById('miu-event-figure');
+    const miuTag = document.getElementById('miu-event-tag');
+    if (miuFigure && state?.avatar) {
+      miuFigure.innerHTML = renderCatSvgHtml({
+        pose: 'dung',
+        furColor: state.avatar.furColor || 'vang-cam',
+        accessories: state.avatar.accessories || ['no-hong'],
+        size: 72,
+      });
+      if (miuTag) miuTag.textContent = state.avatar.name || 'Miu';
+    }
+
+    // Duyệt qua từng ải để mở khoá và hiển thị sao
+    let currentActiveQuestCoords = null;
+
+    quests.forEach((quest, index) => {
+      const nodeEl = document.getElementById(`island-node-${quest.id}`);
+      if (!nodeEl) return;
+
+      const completion = eventProgress.completedQuests[quest.id];
+      const starsEl = document.getElementById(`stars-${quest.id}`);
+
+      // Kiểm tra điều kiện mở khoá
+      let isUnlocked = false;
+      if (index === 0 || quest.unlock.type === 'always') {
+        isUnlocked = true;
+      } else if (quest.unlock.type === 'quest-completed') {
+        const reqQuestId = quest.unlock.questId;
+        isUnlocked = !!eventProgress.completedQuests[reqQuestId];
+      }
+
+      if (completion) {
+        completedCount++;
+        totalStars += completion.stars;
+        nodeEl.classList.remove('locked');
+        nodeEl.classList.add('completed');
+        const link = nodeEl.querySelector('a');
+        if (link) {
+          link.href = nodeEl.dataset.questUrl;
+          const statusSpan = nodeEl.querySelector('.status-indicator');
+          if (statusSpan) statusSpan.textContent = '✅ Đã xong';
+        }
+        if (starsEl) {
+          starsEl.innerHTML = '★'.repeat(completion.stars) + '☆'.repeat(3 - completion.stars);
+          starsEl.classList.add('has-stars');
+        }
+      } else if (isUnlocked) {
+        nodeEl.classList.remove('locked', 'completed');
+        nodeEl.classList.add('unlocked');
+        const link = nodeEl.querySelector('a');
+        if (link) {
+          link.href = nodeEl.dataset.questUrl;
+          const statusSpan = nodeEl.querySelector('.status-indicator');
+          if (statusSpan) statusSpan.textContent = '👉 Vào chơi';
+        }
+        if (!currentActiveQuestCoords) {
+          currentActiveQuestCoords = quest.mapCoordinates;
+        }
+      } else {
+        nodeEl.classList.remove('unlocked', 'completed');
+        nodeEl.classList.add('locked');
+        const link = nodeEl.querySelector('a');
+        if (link) {
+          link.href = '#';
+          link.onclick = (e) => {
+            e.preventDefault();
+            alert('Bé hãy hoàn thành ải trước đó để mở khoá đảo này nhé! 🏝️');
+          };
+          const statusSpan = nodeEl.querySelector('.status-indicator');
+          if (statusSpan) statusSpan.textContent = '🔒 Khóa';
+        }
+      }
+    });
+
+    // Cập nhật vị trí Miu đứng tại ải đang mở gần nhất
+    const miuSailor = document.getElementById('miu-sailor');
+    if (miuSailor && currentActiveQuestCoords) {
+      miuSailor.style.left = `${currentActiveQuestCoords.x}%`;
+      miuSailor.style.top = `${currentActiveQuestCoords.y}%`;
+    }
+
+    // Cập nhật số liệu thống kê
+    const completedEl = document.getElementById('stat-completed-quests');
+    const totalStarsEl = document.getElementById('stat-total-stars');
+    const rankEl = document.getElementById('stat-event-rank');
+
+    if (completedEl) completedEl.textContent = `${completedCount} / ${quests.length}`;
+    if (totalStarsEl) totalStarsEl.textContent = `${totalStars} ⭐`;
+
+    if (rankEl) {
+      if (completedCount === quests.length) {
+        rankEl.textContent = '🏅 Vua Hải Tặc TIMO!';
+        rankEl.style.color = '#d97706';
+      } else if (completedCount > 0) {
+        rankEl.textContent = '⭐ Thủy Thủ Can Đảm';
+        rankEl.style.color = '#0284c7';
+      }
+    }
+  }
+
+  // Đọc hướng dẫn to rõ
+  const listenBtn = document.getElementById('btn-listen-intro');
+  if (listenBtn) {
+    listenBtn.addEventListener('click', () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(metadata.description);
+        utterance.lang = 'vi-VN';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert(metadata.description);
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', updateEventMap);
+</script>
+
+<style>
+  .event-map-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 3rem 1.5rem;
+  }
+
+  /* Header */
+  .event-header-card {
+    background: #ffffff;
+    border: 3px solid #fde68a;
+    border-radius: 24px;
+    padding: 1.25rem 1.75rem;
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .header-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .event-icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: #fffbeb;
+    border: 3px solid #f59e0b;
+    border-radius: 18px;
+    font-size: 2.25rem;
+    flex-shrink: 0;
+  }
+
+  .event-meta-line {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .event-type-badge {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+  }
+
+  .event-title {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .event-subtitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0.2rem 0 0 0;
+  }
+
+  .event-npc-brief {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: #fffbeb;
+    border: 2px dashed #fde68a;
+    border-radius: 16px;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .npc-avatar-box {
+    font-size: 1.75rem;
+  }
+
+  .npc-bubble {
+    flex: 1;
+  }
+
+  .npc-text {
+    font-size: 0.95rem;
+    color: #451a03;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+  }
+
+  .listen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #ffffff;
+    border: 2px solid #f59e0b;
+    color: #b45309;
+    padding: 0.35rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  .listen-btn:hover {
+    transform: scale(1.04);
+  }
+
+  /* Layout Grid */
+  .event-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* Bản đồ Quần Đảo Hải Trình */
+  .archipelago-viewport {
+    background: #ffffff;
+    border: 4px solid #0f172a;
+    border-radius: 28px;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+  }
+
+  .archipelago-canvas {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: radial-gradient(circle at 60% 40%, #bae6fd 0%, #38bdf8 60%, #0284c7 100%);
+    overflow: hidden;
+  }
+
+  .sea-wave {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 15%, transparent 20%);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .wave-1 {
+    top: 0;
+    left: 0;
+    animation: drift 20s linear infinite;
+  }
+
+  .sea-trail-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Đảo / Điểm dừng hải trình */
+  .island-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+
+  .island-anchor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .island-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    background: #ffffff;
+    border: 4px solid #0f172a;
+    border-radius: 50%;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .island-crest {
+    font-size: 2.2rem;
+  }
+
+  .island-stars {
+    position: absolute;
+    bottom: -6px;
+    background: #0f172a;
+    color: #facc15;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 900;
+  }
+
+  .island-label {
+    margin-top: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #0f172a;
+    padding: 0.3rem 0.65rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 100px;
+  }
+
+  .island-num {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #f59e0b;
+  }
+
+  .island-name {
+    font-size: 0.85rem;
+    color: #0f172a;
+    white-space: nowrap;
+  }
+
+  .status-indicator {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0284c7;
+  }
+
+  /* Trạng thái */
+  .island-node.locked .island-body {
+    background: #94a3b8;
+    filter: grayscale(1);
+    opacity: 0.75;
+  }
+
+  .island-node.locked .island-label {
+    opacity: 0.7;
+  }
+
+  .island-node.unlocked .island-body {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.35), 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: island-bob 2s ease-in-out infinite;
+  }
+
+  .island-node.completed .island-body {
+    border-color: #10b981;
+    background: #ecfdf5;
+  }
+
+  .island-node:hover:not(.locked) .island-body {
+    transform: scale(1.12);
+  }
+
+  @keyframes island-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  /* Miu Marker */
+  .miu-sailor-marker {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    z-index: 10;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .miu-figure-box {
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+  }
+
+  .miu-tag {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    border: 2px solid #ffffff;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Sidebar */
+  .event-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .sidebar-card {
+    background: #ffffff;
+    border: 3px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  }
+
+  .sidebar-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .reward-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .reward-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .reward-desc {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .reward-desc strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+  }
+
+  .reward-desc small {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+
+  .stats-row:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  .stat-val {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .stat-badge {
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  .boss-preview-card {
+    border-color: #fed7aa;
+    background: #fff7ed;
+  }
+
+  .boss-flex {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .boss-emoji {
+    font-size: 2rem;
+  }
+
+  .boss-flex strong {
+    font-size: 1rem;
+    color: #9a3412;
+    display: block;
+  }
+
+  .boss-flex small {
+    font-size: 0.8rem;
+    color: #ea580c;
+  }
+
+  .boss-quote {
+    font-size: 0.85rem;
+    color: #7c2d12;
+    font-style: italic;
+    margin: 0;
+    background: #ffffff;
+    border: 1px solid #fed7aa;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 900px) {
+    .event-layout-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

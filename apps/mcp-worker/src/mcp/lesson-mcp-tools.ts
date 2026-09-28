@@ -7,21 +7,38 @@ import {
   LESSON_SUBJECTS,
   type LessonIssue,
 } from 'lesson-core';
-import { base64ToBytes, ContentConflictError, GitHubApiError } from '../github/github-content-store';
+import {
+  base64ToBytes,
+  ContentConflictError,
+  GitHubApiError,
+} from '../github/github-content-store';
 import { fetchMediaFromUrl, MediaFetchError } from '../github/media-fetcher';
-import { LessonServiceError, subjectLabel, type LessonRecord, type LessonService } from '../lessons/lesson-service';
+import {
+  LessonServiceError,
+  subjectLabel,
+  type LessonRecord,
+  type LessonService,
+} from '../lessons/lesson-service';
 
 /** Đăng ký các tool MCP. Mô tả viết tiếng Việt, nêu rõ định dạng để Claude soạn đúng ngay lần đầu. */
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày dạng YYYY-MM-DD');
-const lessonId = z.string().describe('Mã bài, vd. 2026-09-28-cong-co-nho (lấy từ create_lesson hoặc list_lessons).');
+const lessonId = z
+  .string()
+  .describe('Mã bài, vd. 2026-09-28-cong-co-nho (lấy từ create_lesson hoặc list_lessons).');
 const subject = z.enum(LESSON_SUBJECTS).describe('Môn: toan | tieng-viet | khac');
 const deBai = z.string().min(1).describe('Markdown phần Đề bài (không gồm tiêu đề "## Đề bài").');
-const loiGiai = z.string().describe('Markdown phần Lời giải (không gồm tiêu đề "## Lời giải"). Bé bấm nút mới thấy.');
+const loiGiai = z
+  .string()
+  .describe('Markdown phần Lời giải (không gồm tiêu đề "## Lời giải"). Bé bấm nút mới thấy.');
 
 const FORMAT_NOTE = `Định dạng nội dung:\n${LESSON_FORMAT_GUIDE}\nHình minh hoạ có sẵn: ${illustrationListText()}.`;
 
-export function registerLessonTools(server: McpServer, service: LessonService, siteUrl: string): void {
+export function registerLessonTools(
+  server: McpServer,
+  service: LessonService,
+  siteUrl: string,
+): void {
   server.registerTool(
     'create_lesson',
     {
@@ -54,7 +71,10 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
         lesson_id: lessonId,
         url: z.string().url().optional().describe('Link trực tiếp tới file ảnh/video.'),
         base64: z.string().optional().describe('Nội dung file dạng base64 (khi không có link).'),
-        ten_file: z.string().optional().describe('Tên file kèm đuôi, bắt buộc khi dùng base64, vd. hinh-bai-1.png.'),
+        ten_file: z
+          .string()
+          .optional()
+          .describe('Tên file kèm đuôi, bắt buộc khi dùng base64, vd. hinh-bai-1.png.'),
         mo_ta: z.string().max(120).optional().describe('Mô tả ngắn hiện dưới ảnh.'),
         chen_vao: z.enum(['de-bai', 'loi-giai']).optional(),
       },
@@ -74,7 +94,12 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
         } else {
           throw new LessonServiceError('Cần url, hoặc base64 kèm ten_file.');
         }
-        const result = await service.addMedia(lesson_id, { bytes, fileName, moTa: mo_ta, chenVao: chen_vao });
+        const result = await service.addMedia(lesson_id, {
+          bytes,
+          fileName,
+          moTa: mo_ta,
+          chenVao: chen_vao,
+        });
         const placed = chen_vao
           ? `Đã chèn vào cuối phần ${chen_vao === 'de-bai' ? 'Đề bài' : 'Lời giải'}.`
           : `Chưa chèn vào bài. Thêm dòng sau vào nội dung bằng update_lesson: ${result.markdown}`;
@@ -103,7 +128,9 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
       run(async () => {
         if (input.lesson_id) {
           const lesson = await service.get(input.lesson_id);
-          return text(lesson.warnings.length ? formatIssues(lesson.warnings) : '✅ Bài trình bày đúng chuẩn.');
+          return text(
+            lesson.warnings.length ? formatIssues(lesson.warnings) : '✅ Bài trình bày đúng chuẩn.',
+          );
         }
         const result = service.validateDraft({
           tieu_de: input.tieu_de ?? 'Kiểm tra',
@@ -121,7 +148,8 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
     'list_lessons',
     {
       title: 'Danh sách bài',
-      description: 'Liệt kê tối đa 40 bài mới nhất (theo ngày học), lọc theo khoảng ngày, môn, trạng thái nháp/đã đăng.',
+      description:
+        'Liệt kê tối đa 40 bài mới nhất (theo ngày học), lọc theo khoảng ngày, môn, trạng thái nháp/đã đăng.',
       inputSchema: {
         tu_ngay: isoDate.optional(),
         den_ngay: isoDate.optional(),
@@ -139,7 +167,8 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
             `${subjectLabel(lesson.frontmatter.mon)} · ${lesson.frontmatter.nhap ? 'nháp' : 'đã đăng'}`,
         );
         if (lines.length === 0) lines.push('Chưa có bài nào khớp điều kiện.');
-        if (broken.length > 0) lines.push(`⚠️ Không đọc được các bài: ${broken.join(', ')} (file bài bị hỏng).`);
+        if (broken.length > 0)
+          lines.push(`⚠️ Không đọc được các bài: ${broken.join(', ')} (file bài bị hỏng).`);
         return text(lines.join('\n'));
       }),
   );
@@ -148,7 +177,8 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
     'get_lesson',
     {
       title: 'Xem một bài',
-      description: 'Đọc toàn bộ nội dung một bài (Markdown Đề bài, Lời giải) và danh sách file đính kèm.',
+      description:
+        'Đọc toàn bộ nội dung một bài (Markdown Đề bài, Lời giải) và danh sách file đính kèm.',
       inputSchema: { lesson_id: lessonId },
       annotations: { readOnlyHint: true },
     },
@@ -179,7 +209,8 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
       },
       annotations: { destructiveHint: false, idempotentHint: true },
     },
-    ({ lesson_id, ...changes }) => run(async () => describeLesson(await service.update(lesson_id, changes), 'Đã lưu thay đổi.')),
+    ({ lesson_id, ...changes }) =>
+      run(async () => describeLesson(await service.update(lesson_id, changes), 'Đã lưu thay đổi.')),
   );
 
   server.registerTool(
@@ -192,7 +223,13 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
       inputSchema: { lesson_id: lessonId },
       annotations: { destructiveHint: false, idempotentHint: true },
     },
-    ({ lesson_id }) => run(async () => describeLesson(await service.publish(lesson_id), '🚀 Đã đăng bài. Web cập nhật sau 1-3 phút.')),
+    ({ lesson_id }) =>
+      run(async () =>
+        describeLesson(
+          await service.publish(lesson_id),
+          '🚀 Đã đăng bài. Web cập nhật sau 1-3 phút.',
+        ),
+      ),
   );
 
   server.registerTool(
@@ -224,7 +261,10 @@ export function registerLessonTools(server: McpServer, service: LessonService, s
       inputSchema: {},
       annotations: { readOnlyHint: true },
     },
-    () => run(async () => text(`${illustrationListText()}\n\nVí dụ: ::hinh{loai=tao so-luong=5}\nWeb: ${siteUrl}`)),
+    () =>
+      run(async () =>
+        text(`${illustrationListText()}\n\nVí dụ: ::hinh{loai=tao so-luong=5}\nWeb: ${siteUrl}`),
+      ),
   );
 }
 
@@ -233,13 +273,23 @@ async function run(task: () => Promise<CallToolResult>): Promise<CallToolResult>
     return await task();
   } catch (error) {
     if (error instanceof LessonServiceError) {
-      return { isError: true, content: [{ type: 'text', text: `${error.message}\n${formatIssues(error.issues)}`.trim() }] };
+      return {
+        isError: true,
+        content: [{ type: 'text', text: `${error.message}\n${formatIssues(error.issues)}`.trim() }],
+      };
     }
-    if (error instanceof MediaFetchError || error instanceof ContentConflictError || error instanceof GitHubApiError) {
+    if (
+      error instanceof MediaFetchError ||
+      error instanceof ContentConflictError ||
+      error instanceof GitHubApiError
+    ) {
       return { isError: true, content: [{ type: 'text', text: error.message }] };
     }
     console.error('[mcp] lỗi', error);
-    return { isError: true, content: [{ type: 'text', text: 'Có lỗi khi làm việc với kho bài. Thử lại sau ít phút.' }] };
+    return {
+      isError: true,
+      content: [{ type: 'text', text: 'Có lỗi khi làm việc với kho bài. Thử lại sau ít phút.' }],
+    };
   }
 }
 
@@ -247,7 +297,10 @@ function text(value: string): CallToolResult {
   return { content: [{ type: 'text', text: value }] };
 }
 
-function describeLesson(lesson: LessonRecord, headline: string): CallToolResult & { content: { type: 'text'; text: string }[] } {
+function describeLesson(
+  lesson: LessonRecord,
+  headline: string,
+): CallToolResult & { content: { type: 'text'; text: string }[] } {
   const lines = [
     headline,
     `Mã bài: ${lesson.id}`,
@@ -262,5 +315,7 @@ function describeLesson(lesson: LessonRecord, headline: string): CallToolResult 
 }
 
 function formatIssues(issues: LessonIssue[]): string {
-  return issues.map((issue) => `${issue.severity === 'loi' ? '❌' : '⚠️'} ${issue.message}`).join('\n');
+  return issues
+    .map((issue) => `${issue.severity === 'loi' ? '❌' : '⚠️'} ${issue.message}`)
+    .join('\n');
 }

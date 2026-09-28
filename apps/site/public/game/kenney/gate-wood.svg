@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" width="200" height="180">
+  <!-- Cổng gỗ chào đón vào Vùng Toán (Kenney style) -->
+  <!-- Cột trụ trái -->
+  <rect x="24" y="50" width="28" height="120" rx="4" fill="#a16207" stroke="#451a03" stroke-width="4" />
+  <rect x="20" y="160" width="36" height="18" rx="3" fill="#78350f" stroke="#451a03" stroke-width="4" />
+  <rect x="22" y="44" width="32" height="12" rx="3" fill="#ca8a04" stroke="#451a03" stroke-width="3" />
+  
+  <!-- Cột trụ phải -->
+  <rect x="148" y="50" width="28" height="120" rx="4" fill="#a16207" stroke="#451a03" stroke-width="4" />
+  <rect x="144" y="160" width="36" height="18" rx="3" fill="#78350f" stroke="#451a03" stroke-width="4" />
+  <rect x="146" y="44" width="32" height="12" rx="3" fill="#ca8a04" stroke="#451a03" stroke-width="3" />
+
+  <!-- Xà ngang trên -->
+  <rect x="12" y="32" width="176" height="24" rx="6" fill="#ca8a04" stroke="#451a03" stroke-width="4" />
+  <rect x="16" y="36" width="168" height="8" rx="3" fill="#fde047" opacity="0.6" />
+
+  <!-- Mái ngói vòm gỗ -->
+  <path d="M6 34 L100 8 L194 34 Z" fill="#b45309" stroke="#451a03" stroke-width="4" stroke-linejoin="round" />
+  <path d="M16 32 L100 14 L184 32 Z" fill="#d97706" />
+
+  <!-- Bảng tên cổng hình oval gắn giữa xà ngang -->
+  <rect x="60" y="60" width="80" height="32" rx="8" fill="#fef08a" stroke="#78350f" stroke-width="3" />
+  <text x="100" y="82" font-family="Andika, sans-serif" font-size="16" font-weight="900" fill="#78350f" text-anchor="middle">VÙNG TOÁN</text>
+
+  <!-- Đèn lồng treo 2 bên -->
+  <g stroke="#451a03" stroke-width="2">
+    <line x1="38" y1="56" x2="38" y2="70" />
+    <circle cx="38" cy="78" r="8" fill="#fde047" />
+    <line x1="162" y1="56" x2="162" y2="70" />
+    <circle cx="162" cy="78" r="8" fill="#fde047" />
+  </g>
+</svg>

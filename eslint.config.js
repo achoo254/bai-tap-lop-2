@@ -29,6 +29,9 @@ export default tseslint.config(
   {
     // File chép nguyên từ mẫu của Cloudflare; giữ đúng bản gốc để dễ cập nhật.
     files: ['apps/mcp-worker/src/auth/workers-oauth-utils.ts'],
-    rules: { '@typescript-eslint/no-unused-vars': 'off', '@typescript-eslint/no-explicit-any': 'off' },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   },
 );

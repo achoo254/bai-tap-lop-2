@@ -6,14 +6,16 @@
 @font-face {
   font-family: 'Chu Mau Tieu Hoc';
   font-weight: 400;
-  src: url('/fonts/chu-mau-tieu-hoc.woff2') format('woff2'),
+  src:
+    url('/fonts/chu-mau-tieu-hoc.woff2') format('woff2'),
     url('/fonts/chu-mau-tieu-hoc.ttf') format('truetype');
   font-display: swap;
 }
 @font-face {
   font-family: 'Chu Mau Tieu Hoc';
   font-weight: 700;
-  src: url('/fonts/chu-mau-tieu-hoc-dam.woff2') format('woff2'),
+  src:
+    url('/fonts/chu-mau-tieu-hoc-dam.woff2') format('woff2'),
     url('/fonts/chu-mau-tieu-hoc-dam.ttf') format('truetype');
   font-display: swap;
 }
@@ -38,7 +40,8 @@
   --notebook-pad-top: calc(var(--oli) * 2);
   /* Vị trí chân chữ dòng đầu, tính từ mép trên (trừ 1px để dòng kẻ đậm 2px nằm giữa chân chữ). */
   --notebook-baseline: calc(
-    var(--notebook-pad-top) + var(--line-height-notebook) / 2 + var(--notebook-font-size) * var(--baseline-ratio) - 1px
+    var(--notebook-pad-top) + var(--line-height-notebook) / 2 + var(--notebook-font-size) *
+      var(--baseline-ratio) - 1px
   );
   font-family: var(--font-print);
   font-size: var(--notebook-font-size);
@@ -46,7 +49,13 @@
   color: var(--color-ink);
   background-color: var(--color-notebook-bg);
   background-image:
-    linear-gradient(to right, transparent calc(var(--oli) * 5 - 2px), var(--color-notebook-margin) calc(var(--oli) * 5 - 2px), var(--color-notebook-margin) calc(var(--oli) * 5), transparent calc(var(--oli) * 5)),
+    linear-gradient(
+      to right,
+      transparent calc(var(--oli) * 5 - 2px),
+      var(--color-notebook-margin) calc(var(--oli) * 5 - 2px),
+      var(--color-notebook-margin) calc(var(--oli) * 5),
+      transparent calc(var(--oli) * 5)
+    ),
     linear-gradient(to bottom, var(--color-notebook-line-bold) 2px, transparent 2px),
     linear-gradient(to bottom, var(--color-notebook-line) 1px, transparent 1px),
     linear-gradient(to right, var(--color-notebook-line) 1px, transparent 1px);
@@ -56,7 +65,11 @@
     100% var(--oli),
     calc(var(--oli) * 4) 100%;
   background-repeat: no-repeat, repeat, repeat, repeat;
-  background-position: 0 0, 0 var(--notebook-baseline), 0 var(--notebook-baseline), 0 0;
+  background-position:
+    0 0,
+    0 var(--notebook-baseline),
+    0 var(--notebook-baseline),
+    0 0;
   border: var(--border-comic);
   border-radius: var(--radius-md);
   padding: var(--notebook-pad-top) calc(var(--oli) * 3) calc(var(--oli) * 2) calc(var(--oli) * 7);

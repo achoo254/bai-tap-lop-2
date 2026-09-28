@@ -85,9 +85,7 @@ describe('ghi và đọc bài', () => {
   });
 
   it('không coi "## Đề bài" trong khối code là tiêu đề phần', () => {
-    const split = splitLessonSource(
-      '---\ntieu_de: a\n---\n## Đề bài\n\n```\n## Lời giải\n```\n',
-    );
+    const split = splitLessonSource('---\ntieu_de: a\n---\n## Đề bài\n\n```\n## Lời giải\n```\n');
     expect(split.sections['loi-giai']).toBeUndefined();
   });
 });
@@ -101,7 +99,13 @@ describe('render HTML', () => {
   it('render đủ loại khối và thoát HTML thô', () => {
     const { lesson } = validateLessonSource(
       serializeLesson({
-        frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'khac', nhap: false, ma_xem_truoc: 'abc123xyz9' },
+        frontmatter: {
+          tieu_de: 'A',
+          ngay: '2026-09-28',
+          mon: 'khac',
+          nhap: false,
+          ma_xem_truoc: 'abc123xyz9',
+        },
         deBai: [
           'Chữ <script>alert(1)</script> **đậm**.',
           '',
@@ -164,7 +168,11 @@ describe('prompt mẫu và tách câu trả lời AI', () => {
 
   it('không có tiêu đề phần thì coi toàn bộ là đề bài', async () => {
     const { parseAiLessonReply } = await import('../src/index');
-    expect(parseAiLessonReply('Tính nhẩm: 5 + 5.')).toMatchObject({ deBai: 'Tính nhẩm: 5 + 5.', loiGiai: '', tieuDe: null });
+    expect(parseAiLessonReply('Tính nhẩm: 5 + 5.')).toMatchObject({
+      deBai: 'Tính nhẩm: 5 + 5.',
+      loiGiai: '',
+      tieuDe: null,
+    });
   });
 });
 
@@ -176,7 +184,13 @@ describe('chống chèn mã độc qua Markdown', () => {
   const render = (markdown: string) => {
     const { lesson } = validateLessonSource(
       serializeLesson({
-        frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'khac', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+        frontmatter: {
+          tieu_de: 'A',
+          ngay: '2026-09-28',
+          mon: 'khac',
+          nhap: true,
+          ma_xem_truoc: 'abc123xyz9',
+        },
         deBai: markdown,
         loiGiai: '',
       }),
@@ -199,17 +213,26 @@ describe('chống chèn mã độc qua Markdown', () => {
 
   it('validator chặn link không phải http(s)', () => {
     const source = serializeLesson({
-      frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'khac', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+      frontmatter: {
+        tieu_de: 'A',
+        ngay: '2026-09-28',
+        mon: 'khac',
+        nhap: true,
+        ma_xem_truoc: 'abc123xyz9',
+      },
       deBai: 'Bé [bấm](javascript:alert(1)) nhé.',
       loiGiai: '',
     });
-    expect(validateLessonSource(source).errors.map((issue) => issue.code)).toContain('link-khong-an-toan');
+    expect(validateLessonSource(source).errors.map((issue) => issue.code)).toContain(
+      'link-khong-an-toan',
+    );
   });
 });
 
 describe('hồ sơ của bé', () => {
   it('nhận ra ngày sinh nhật và gợi ý tên người thân trong prompt', async () => {
-    const { CHILD_PROFILE, isBirthdayOn, buildLessonAuthoringPrompt } = await import('../src/index');
+    const { CHILD_PROFILE, isBirthdayOn, buildLessonAuthoringPrompt } =
+      await import('../src/index');
     expect(isBirthdayOn('2026-12-15', CHILD_PROFILE.birthday)).toBe(true);
     expect(isBirthdayOn('2026-12-16', CHILD_PROFILE.birthday)).toBe(false);
     expect(isBirthdayOn('2027-03-19', CHILD_PROFILE.sibling.birthday)).toBe(true);
@@ -225,14 +248,22 @@ describe('đặt tính theo cột', () => {
   const parse = (deBai: string) =>
     validateLessonSource(
       serializeLesson({
-        frontmatter: { tieu_de: 'A', ngay: '2026-09-28', mon: 'toan', nhap: true, ma_xem_truoc: 'abc123xyz9' },
+        frontmatter: {
+          tieu_de: 'A',
+          ngay: '2026-09-28',
+          mon: 'toan',
+          nhap: true,
+          ma_xem_truoc: 'abc123xyz9',
+        },
         deBai,
         loiGiai: '',
       }),
     );
 
   it('gom các phép liền nhau thành một hàng và render đúng', () => {
-    const result = parse('::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}\n\n::dat-tinh{so-1=72 phep=- so-2=11}');
+    const result = parse(
+      '::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=99}\n\n::dat-tinh{so-1=72 phep=- so-2=11}',
+    );
     expect(result.errors).toEqual([]);
     const blocks = result.lesson!.deBai.blocks;
     expect(blocks).toHaveLength(1);
@@ -244,7 +275,11 @@ describe('đặt tính theo cột', () => {
   });
 
   it('báo lỗi cú pháp và kết quả sai', () => {
-    expect(parse('::dat-tinh{so-1=45 phep=x so-2=54}').errors.map((e) => e.code)).toContain('dat-tinh-sai');
-    expect(parse('::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=98}').errors.map((e) => e.code)).toContain('dat-tinh-sai-ket-qua');
+    expect(parse('::dat-tinh{so-1=45 phep=x so-2=54}').errors.map((e) => e.code)).toContain(
+      'dat-tinh-sai',
+    );
+    expect(
+      parse('::dat-tinh{so-1=45 phep=+ so-2=54 ket-qua=98}').errors.map((e) => e.code),
+    ).toContain('dat-tinh-sai-ket-qua');
   });
 });

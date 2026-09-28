@@ -1,0 +1,519 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/choi.astro
+ *
+ * Khung Nhiệm Vụ (Quest Playing Frame):
+ * Đọc tham số nhiệm vụ từ URL (?nv=<questId>).
+ * - Lời dẫn NPC (<= 2s, skippable, đọc to truyền cảm)
+ * - Vùng chơi Mini-game (chạm >= 56px, phản hồi tức thì)
+ * - Nút 💡 Gợi ý 3 bậc & 🔊 Đọc lại câu hỏi
+ * - Màn thưởng rực rỡ khi hoàn thành: nhận Sao, Xu, XP, lên cấp và mở đường!
+ */
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import Hud from '../../components/game/hud.astro';
+---
+
+<KidPageLayout
+  title="Nhiệm vụ phiêu lưu — Thế giới học tập của Miu"
+  showToolbar={false}
+>
+  <link rel="stylesheet" href="/styles/game.css" />
+
+  <Hud title="Đang làm nhiệm vụ" backUrl="/the-gioi/lop-2/toan/" backLabel="Rời nhiệm vụ" showHearts={true} />
+
+  <main class="quest-page-container">
+    <div class="quest-card">
+      <!-- Thanh tiến trình nhiệm vụ -->
+      <div class="quest-header-bar">
+        <div class="quest-step-indicator" id="quest-step-text">
+          ⭐ Câu 1 / 3
+        </div>
+        <div class="quest-title-pill" id="quest-header-title">
+          Thu Thập Kẹo Ngọt
+        </div>
+      </div>
+
+      <!-- Lời dẫn của NPC -->
+      <div class="quest-npc-intro" id="quest-npc-box">
+        <div class="npc-avatar-box" id="npc-avatar-icon">
+          🦉
+        </div>
+        <div class="npc-speech-bubble-text" id="npc-bubble-text">
+          Đang nạp nhiệm vụ của bé Miu...
+        </div>
+        <button type="button" class="npc-skip-btn" id="btn-skip-npc" title="Bỏ qua lời dẫn">
+          Bỏ qua ⏩
+        </button>
+      </div>
+
+      <!-- Sân khấu Mini-game -->
+      <div class="quest-stage-wrapper" id="minigame-stage">
+        <!-- MiniGame sẽ được mount tại đây -->
+      </div>
+
+      <!-- Thanh công cụ trợ giúp dưới đáy -->
+      <div class="quest-controls-row">
+        <button type="button" class="quest-action-btn speak-btn" id="btn-speak-question">
+          <span>🔊</span>
+          <span>Đọc lại</span>
+        </button>
+
+        <button type="button" class="quest-action-btn hint-btn" id="btn-hint-trigger">
+          <span>💡</span>
+          <span id="hint-btn-label">Gợi ý (Bậc 1)</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Màn Thưởng Rực Rỡ -->
+  <div class="reward-modal-overlay" id="reward-modal" style="display: none;">
+    <div class="reward-modal-card">
+      <div class="reward-sparkles-top">✨ 🌟 ✨</div>
+      <h2 style="font-size: 2rem; font-weight: 900; color: #0f172a; margin: 0;">
+        🎉 XUẤT SẮC BÉ MIU! 🎉
+      </h2>
+      <p style="color: #64748b; font-size: 1.05rem; margin: 0;">
+        Bé đã hoàn thành nhiệm vụ và mở ra vùng đất mới!
+      </p>
+
+      <div class="reward-stars-row" id="reward-stars-container">
+        <span class="reward-star-icon">⭐</span>
+        <span class="reward-star-icon">⭐</span>
+        <span class="reward-star-icon">⭐</span>
+      </div>
+
+      <div class="reward-stats-box">
+        <div class="reward-stat-item">
+          <span>🪙 Xu vàng</span>
+          <strong id="reward-coins-text">+15</strong>
+        </div>
+        <div class="reward-stat-item">
+          <span>⚡ Kinh nghiệm</span>
+          <strong id="reward-xp-text" style="color: #0284c7;">+40 XP</strong>
+        </div>
+      </div>
+
+      <div id="reward-level-up-banner" style="display: none; padding: 0.6rem 1rem; background: #fef08a; border: 2px dashed #ca8a04; border-radius: 14px; font-weight: 900; color: #854d0e;">
+        🌟 CHÚC MỪNG BÉ ĐÃ LÊN CẤP MỚI! 🌟
+      </div>
+
+      <button type="button" class="reward-continue-btn" id="btn-reward-continue">
+        Tiếp tục hành trình 🗺️
+      </button>
+    </div>
+  </div>
+</KidPageLayout>
+
+<style>
+  .quest-stage-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+  }
+
+  .quest-step-indicator {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0284c7;
+  }
+
+  .quest-title-pill {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+    padding: 0.25rem 0.75rem;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 999px;
+  }
+
+  .npc-skip-btn {
+    margin-left: auto;
+    padding: 0.35rem 0.7rem;
+    background: #ffffff;
+    border: 2px solid #93c5fd;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    cursor: pointer;
+    touch-action: manipulation;
+    white-space: nowrap;
+  }
+
+  .npc-skip-btn:hover {
+    background: #dbeafe;
+  }
+
+  .reward-sparkles-top {
+    font-size: 2rem;
+    animation: demo-pop 0.6s ease;
+  }
+</style>
+
+<script>
+  import { DemoMiniGame, type DemoChallenge } from '../../minigames/demo-minigame';
+  import type { QuestApi, HintTier } from '../../minigames/minigame-types';
+  import { getBrowserGameStore } from '../../lib/game/state/game-store';
+  import { recordEventQuestCompletion } from '../../lib/game/state/game-state';
+  import { applyQuestResult, type AnswerRecord } from '../../lib/game/progression/rewards';
+  import { findQuest } from '../../lib/game/world/world-registry';
+  import { getEvent } from '../../lib/game/events/event-registry';
+  import { speak, playSfx } from '../../lib/game/media/audio';
+  import type { SkillId } from '../../lib/game/skills/skill-types';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+
+  // Lấy ID nhiệm vụ & sự kiện từ query string
+  const urlParams = new URLSearchParams(window.location.search);
+  const questId = urlParams.get('nv') || 'lop-2/toan/ch1/q1-dem-so';
+  const eventId = urlParams.get('su-kien');
+  const fullEventId = eventId ? `lop-2/${eventId}` : null;
+  const currentEvent = eventId ? getEvent('lop-2', eventId) : null;
+
+  let questTitle = 'Thu Thập Kẹo Ngọt';
+  let questIntro = 'Mến chào bé Miu! Cùng bác Cú đếm xem có bao nhiêu viên kẹo nhé!';
+  let isBoss = false;
+  let skillId: SkillId = 'lop-2/so-den-1000';
+  let returnUrl = '/the-gioi/lop-2/toan/';
+
+  if (currentEvent) {
+    const evtQuest = currentEvent.quests.find((q) => q.id === questId);
+    if (evtQuest) {
+      questTitle = evtQuest.title;
+      questIntro = evtQuest.intro;
+      isBoss = !!evtQuest.isBoss;
+      skillId = evtQuest.skill;
+      returnUrl = `/the-gioi/lop-2/su-kien/${eventId}/`;
+    }
+  } else {
+    const questInfo = findQuest(questId);
+    if (questInfo) {
+      questTitle = questInfo.quest.title;
+      questIntro = questInfo.quest.intro;
+      isBoss = !!questInfo.quest.isBoss;
+      skillId = questInfo.quest.skill;
+      returnUrl = `/the-gioi/${questInfo.world.grade}/${questInfo.region.id}/`;
+    }
+  }
+
+  // Cập nhật nút quay lại trên HUD
+  const hudBackBtn = document.querySelector('.hud-back-btn') as HTMLAnchorElement | null;
+  if (hudBackBtn && returnUrl) {
+    hudBackBtn.href = returnUrl;
+    if (currentEvent) {
+      hudBackBtn.title = `Rời khỏi ${currentEvent.metadata.name}`;
+    }
+  }
+
+  // Cập nhật tiêu đề & Lời dẫn
+  const headerTitleEl = document.getElementById('quest-header-title');
+  const bubbleTextEl = document.getElementById('npc-bubble-text');
+  const stepTextEl = document.getElementById('quest-step-text');
+
+  if (headerTitleEl) headerTitleEl.textContent = questTitle;
+  if (bubbleTextEl) bubbleTextEl.textContent = questIntro;
+
+  // Đọc to lời dẫn Bác Cú
+  speak(questIntro, { tone: 'guide' });
+
+  document.getElementById('btn-skip-npc')?.addEventListener('click', () => {
+    const npcBox = document.getElementById('quest-npc-box');
+    if (npcBox) npcBox.style.display = 'none';
+  });
+
+  // Sinh 3 câu hỏi mẫu tương tác
+  function createChallengesForQuest(qId: string): DemoChallenge[] {
+    if (qId.includes('chan-le')) {
+      return [
+        {
+          id: 'c1',
+          type: 'chan-le',
+          number: 14,
+          prompt: 'Số 14 là số chẵn hay số lẻ?',
+          speakText: 'Số mười bốn là số chẵn hay số lẻ hả bé Miu?',
+          difficulty: 1,
+          data: {},
+          expectedAnswer: 'chan',
+          hintText: {
+            1: '💡 Gợi ý: Hãy nhìn vào chữ số tận cùng của số 14!',
+            2: '💡 Chữ số tận cùng là số 4 đấy!',
+            3: '💡 Các số tận cùng là 0, 2, 4, 6, 8 đều là số Chẵn!',
+          },
+        },
+        {
+          id: 'c2',
+          type: 'chan-le',
+          number: 27,
+          prompt: 'Số 27 là số chẵn hay số lẻ?',
+          speakText: 'Số hai mươi bảy là số chẵn hay số lẻ nào?',
+          difficulty: 1,
+          data: {},
+          expectedAnswer: 'le',
+          hintText: {
+            1: '💡 Chữ số tận cùng của 27 là mấy nhỉ?',
+            2: '💡 Chữ số tận cùng là 7!',
+            3: '💡 Tận cùng là 1, 3, 5, 7, 9 là số Lẻ nhé!',
+          },
+        },
+        {
+          id: 'c3',
+          type: 'chan-le',
+          number: 50,
+          prompt: 'Số 50 là số chẵn hay số lẻ?',
+          speakText: 'Số năm mươi là số chẵn hay số lẻ?',
+          difficulty: 1,
+          data: {},
+          expectedAnswer: 'chan',
+          hintText: {
+            1: '💡 Tận cùng là số 0 đấy!',
+            2: '💡 Số chia hết cho 2 là số chẵn!',
+            3: '💡 50 là số Chẵn chính xác!',
+          },
+        },
+      ];
+    }
+
+    // Mặc định: Thu thập & đếm kẹo
+    return [
+      {
+        id: 'c1',
+        type: 'dem-keo',
+        itemsCount: 5,
+        prompt: 'Đếm xem có bao nhiêu viên kẹo?',
+        speakText: 'Bé hãy đếm xem trên bàn có tất cả bao nhiêu viên kẹo nhé!',
+        difficulty: 1,
+        options: [4, 5, 6, 7],
+        data: {},
+        expectedAnswer: 5,
+        hintText: {
+          1: '💡 Hãy chạm vào từng viên kẹo để đếm lần lượt nhé!',
+          2: '💡 Có nhiều hơn 4 viên kẹo đấy!',
+          3: '💡 Chính xác là có 5 viên kẹo!',
+        },
+      },
+      {
+        id: 'c2',
+        type: 'dem-keo',
+        itemsCount: 8,
+        prompt: 'Có bao nhiêu viên kẹo ngọt ở đây?',
+        speakText: 'Lần này có bao nhiêu viên kẹo ngọt nhỉ?',
+        difficulty: 1,
+        options: [6, 7, 8, 9],
+        data: {},
+        expectedAnswer: 8,
+        hintText: {
+          1: '💡 Hãy đếm chậm rãi từ trái sang phải!',
+          2: '💡 Hàng trên có 4 viên, hàng dưới cũng có 4 viên!',
+          3: '💡 4 cộng 4 bằng 8 viên kẹo!',
+        },
+      },
+      {
+        id: 'c3',
+        type: 'dem-keo',
+        itemsCount: 6,
+        prompt: 'Thử thách cuối cùng: Bao nhiêu viên kẹo?',
+        speakText: 'Câu cuối cùng rồi: Có bao nhiêu viên kẹo nào?',
+        difficulty: 1,
+        options: [5, 6, 7, 8],
+        data: {},
+        expectedAnswer: 6,
+        hintText: {
+          1: '💡 Đếm thật kỹ nào bé ngoan!',
+          2: '💡 Số kẹo này chia đều được cho 2 nhóm đấy!',
+          3: '💡 Đáp án chính xác là 6 viên kẹo!',
+        },
+      },
+    ];
+  }
+
+  const challenges = createChallengesForQuest(questId);
+  let currentQuestionIndex = 0;
+  let currentHintTier: HintTier = 1;
+  let hintsUsedForCurrentQuestion = 0;
+  let answerRecords: AnswerRecord[] = [];
+  let heartsLeft = 3;
+
+  const stageEl = document.getElementById('minigame-stage');
+  const minigame = new DemoMiniGame();
+
+  function renderHearts() {
+    const heartsContainer = document.getElementById('hud-hearts');
+    if (!heartsContainer) return;
+    heartsContainer.innerHTML = '❤️'.repeat(heartsLeft) + '🤍'.repeat(3 - heartsLeft);
+  }
+
+  function mountCurrentQuestion() {
+    if (!stageEl || currentQuestionIndex >= challenges.length) return;
+
+    if (stepTextEl) {
+      stepTextEl.textContent = `⭐ Câu ${currentQuestionIndex + 1} / ${challenges.length}`;
+    }
+
+    currentHintTier = 1;
+    hintsUsedForCurrentQuestion = 0;
+    const hintLabel = document.getElementById('hint-btn-label');
+    if (hintLabel) hintLabel.textContent = 'Gợi ý (Bậc 1)';
+
+    const challenge = challenges[currentQuestionIndex];
+
+    const api: QuestApi = {
+      submit(answer) {
+        const isCorrect = String(answer) === String(challenge.expectedAnswer);
+        if (isCorrect) {
+          answerRecords.push({
+            skill: skillId,
+            correctFirstTry: hintsUsedForCurrentQuestion === 0,
+            hintsUsed: hintsUsedForCurrentQuestion,
+          });
+
+          setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < challenges.length) {
+              mountCurrentQuestion();
+            } else {
+              finishQuest();
+            }
+          }, 800);
+
+          return { correct: true };
+        } else {
+          heartsLeft = Math.max(0, heartsLeft - 1);
+          renderHearts();
+          if (heartsLeft === 0) {
+            speak('Không sao đâu bé ngoan! Cứ bình tĩnh thử lại nào!', { tone: 'calm' });
+            heartsLeft = 3;
+            setTimeout(renderHearts, 1200);
+          }
+          return { correct: false };
+        }
+      },
+      speak(text, lang) {
+        speak(text, { language: lang || 'vi', tone: 'story' });
+      },
+      sfx(name) {
+        playSfx(name);
+      },
+      completeQuest(_stars) {
+        finishQuest();
+      },
+    };
+
+    minigame.mount(stageEl, challenge, api);
+  }
+
+  // Đọc lại câu hỏi
+  document.getElementById('btn-speak-question')?.addEventListener('click', () => {
+    const challenge = challenges[currentQuestionIndex];
+    if (challenge?.speakText) {
+      speak(challenge.speakText, { tone: 'story' });
+    } else if (challenge?.prompt) {
+      speak(challenge.prompt, { tone: 'story' });
+    }
+  });
+
+  // Bấm nút gợi ý
+  document.getElementById('btn-hint-trigger')?.addEventListener('click', () => {
+    minigame.showHint(currentHintTier);
+    hintsUsedForCurrentQuestion++;
+    playSfx('click');
+
+    if (currentHintTier < 3) {
+      currentHintTier = (currentHintTier + 1) as HintTier;
+      const hintLabel = document.getElementById('hint-btn-label');
+      if (hintLabel) hintLabel.textContent = `Gợi ý (Bậc ${currentHintTier})`;
+    }
+  });
+
+  // Hoàn thành nhiệm vụ
+  function finishQuest() {
+    const currentState = store.getState();
+    const result = {
+      questId,
+      isBoss,
+      answers: answerRecords,
+    };
+
+    let { state: updatedState, reward } = applyQuestResult(currentState, result, today);
+
+    // Nếu đây là nhiệm vụ sự kiện, ghi nhận tiến độ sự kiện
+    if (fullEventId && currentEvent) {
+      updatedState = recordEventQuestCompletion(
+        updatedState,
+        fullEventId,
+        questId,
+        reward.stars,
+        today,
+      );
+
+      // Thưởng thêm xu sự kiện nếu thắng ải Boss
+      if (currentEvent.rewards?.bonusCoins && isBoss) {
+        updatedState.coins += currentEvent.rewards.bonusCoins;
+      }
+
+      // Kiểm tra nếu hoàn thành toàn bộ quests trong sự kiện
+      const evtProgress = updatedState.events[fullEventId];
+      if (evtProgress) {
+        const allCompleted = currentEvent.quests.every(
+          (q) => !!evtProgress.completedQuests[q.id],
+        );
+
+        if (allCompleted) {
+          if (!evtProgress.unlockedBadges.includes(currentEvent.rewards.badgeId)) {
+            evtProgress.unlockedBadges.push(currentEvent.rewards.badgeId);
+            if (!updatedState.achievements.includes(currentEvent.rewards.badgeId)) {
+              updatedState.achievements.push(currentEvent.rewards.badgeId);
+            }
+          }
+          if (
+            currentEvent.rewards.accessoryId &&
+            !updatedState.inventory.includes(currentEvent.rewards.accessoryId)
+          ) {
+            updatedState.inventory.push(currentEvent.rewards.accessoryId);
+          }
+        }
+      }
+    }
+
+    store.update(() => updatedState);
+    store.flush();
+
+    // Hiển thị Modal Màn Thưởng
+    const modal = document.getElementById('reward-modal');
+    const starsContainer = document.getElementById('reward-stars-container');
+    const coinsText = document.getElementById('reward-coins-text');
+    const xpText = document.getElementById('reward-xp-text');
+    const levelUpBanner = document.getElementById('reward-level-up-banner');
+
+    if (starsContainer) {
+      starsContainer.innerHTML = '⭐'.repeat(reward.stars) + '☆'.repeat(3 - reward.stars);
+    }
+    if (coinsText) coinsText.textContent = `+${reward.coins}`;
+    if (xpText) xpText.textContent = `+${reward.xp} XP`;
+
+    if (reward.playerLevelAfter > reward.playerLevelBefore && levelUpBanner) {
+      levelUpBanner.style.display = 'block';
+    }
+
+    if (modal) modal.style.display = 'flex';
+    playSfx('levelUp');
+    speak(
+      `Hoan hô bé Miu! Bé đã nhận được ${reward.stars} ngôi sao và ${reward.coins} xu vàng!`,
+      { tone: 'cheer' },
+    );
+  }
+
+  document.getElementById('btn-reward-continue')?.addEventListener('click', () => {
+    // Quay lại bản đồ khu vực hoặc sự kiện tương ứng
+    window.location.href = returnUrl;
+  });
+
+  // Bắt đầu câu hỏi đầu tiên
+  mountCurrentQuestion();
+</script>

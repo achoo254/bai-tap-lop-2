@@ -28,7 +28,8 @@ export function todayInVietnam(now: Date = new Date()): string {
 }
 
 export function pickLessonsForToday(lessons: DatedLesson[], today: string): TodayPick {
-  const onDate = (ngay: string) => lessons.filter((lesson) => lesson.ngay === ngay).map((l) => l.id);
+  const onDate = (ngay: string) =>
+    lessons.filter((lesson) => lesson.ngay === ngay).map((l) => l.id);
   if (lessons.some((lesson) => lesson.ngay === today)) {
     return { mode: 'hom-nay', ngay: today, ids: onDate(today) };
   }
@@ -42,5 +43,11 @@ export function pickLessonsForToday(lessons: DatedLesson[], today: string): Toda
 
 /** Giờ hiện tại (0–23) theo giờ Việt Nam. */
 export function hourInVietnam(now: Date = new Date()): number {
-  return Number(new Intl.DateTimeFormat('en-GB', { timeZone: VIETNAM_TIME_ZONE, hour: '2-digit', hourCycle: 'h23' }).format(now));
+  return Number(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: VIETNAM_TIME_ZONE,
+      hour: '2-digit',
+      hourCycle: 'h23',
+    }).format(now),
+  );
 }

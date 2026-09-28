@@ -13,8 +13,14 @@ export default defineConfig({
     timezoneId: 'Asia/Ho_Chi_Minh',
   },
   projects: [
-    { name: 'may-tinh-bang', use: { ...devices['Desktop Chrome'], viewport: { width: 1180, height: 820 }, hasTouch: true } },
-    { name: 'laptop', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 1024 } } },
+    {
+      name: 'may-tinh-bang',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1180, height: 820 }, hasTouch: true },
+    },
+    {
+      name: 'laptop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 1024 } },
+    },
   ],
   webServer: {
     // Build vào thư mục riêng để không đè lên dist/ (bản thật dùng khi deploy).

@@ -31,6 +31,10 @@ server.on('error', (error: NodeJS.ErrnoException) => {
 
 function openBrowser(target: string) {
   const command =
-    process.platform === 'win32' ? ['cmd', ['/c', 'start', '', target]] : process.platform === 'darwin' ? ['open', [target]] : ['xdg-open', [target]];
+    process.platform === 'win32'
+      ? ['cmd', ['/c', 'start', '', target]]
+      : process.platform === 'darwin'
+        ? ['open', [target]]
+        : ['xdg-open', [target]];
   spawn(command[0] as string, command[1] as string[], { stdio: 'ignore', detached: true }).unref();
 }

@@ -1,0 +1,132 @@
+---
+/**
+ * apps/site/src/components/game/hud.astro
+ *
+ * Thanh trạng thái HUD gắn trên cùng cho mọi màn hình game:
+ * - Avatar nhân vật, Cấp độ (Level) & Thanh kinh nghiệm (XP)
+ * - Số Xu vàng 🪙 và Chuỗi ngày học tập 🔥
+ * - Nút bật/tắt âm thanh 🔊/🔇
+ * - Nút điều hướng quay lại bản đồ 🗺️
+ */
+interface Props {
+  title?: string;
+  backUrl?: string;
+  backLabel?: string;
+  showHearts?: boolean;
+}
+
+const {
+  title = 'Thế giới của Miu',
+  backUrl = '/the-gioi/',
+  backLabel = 'Cổng thế giới',
+  showHearts = false,
+} = Astro.props;
+---
+
+<header class="game-hud" id="game-hud">
+  <div class="hud-left">
+    <a href="/the-gioi/tao-nhan-vat/" class="hud-avatar-chip" title="Chỉnh sửa nhân vật của bé">
+      <div class="hud-avatar-circle" id="hud-avatar-icon">
+        🐱
+      </div>
+      <div class="hud-avatar-info">
+        <span class="hud-avatar-name" id="hud-avatar-name">Miu</span>
+        <span class="hud-level-badge" id="hud-level-badge">Cấp 1</span>
+      </div>
+    </a>
+
+    <div class="hud-xp-container" title="Điểm kinh nghiệm để lên cấp tiếp theo">
+      <div class="hud-xp-label">
+        <span>XP</span>
+        <span id="hud-xp-text">0 / 100</span>
+      </div>
+      <div class="hud-xp-bar-bg">
+        <div class="hud-xp-bar-fill" id="hud-xp-fill" style="width: 0%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud-center">
+    {showHearts ? (
+      <div class="quest-hearts" id="hud-hearts" title="Lượt thử còn lại">
+        <span>❤️</span><span>❤️</span><span>❤️</span>
+      </div>
+    ) : (
+      <span class="hud-title-badge" style="font-weight: 900; font-size: 1.1rem; color: #0f172a;">
+        {title}
+      </span>
+    )}
+  </div>
+
+  <div class="hud-right">
+    <div class="hud-stat-pill coins" title="Số xu vàng đã thu thập">
+      <span>🪙</span>
+      <span id="hud-coins-val">0</span>
+    </div>
+
+    <div class="hud-stat-pill streak" title="Chuỗi ngày phiêu lưu liên tục">
+      <span>🔥</span>
+      <span id="hud-streak-val">1</span>
+    </div>
+
+    <button type="button" class="hud-btn" id="hud-sound-toggle" title="Bật/Tắt âm thanh">
+      <span id="hud-sound-icon">🔊</span>
+    </button>
+
+    {backUrl && (
+      <a href={backUrl} class="hud-btn" title={backLabel}>
+        🗺️
+      </a>
+    )}
+  </div>
+</header>
+
+<script>
+  import { getBrowserGameStore } from '../../lib/game/state/game-store';
+  import { isMuted, setMuted } from '../../lib/game/media/audio';
+  import { levelProgress } from '../../lib/game/progression/level-table';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+
+  function updateHudElements(state: ReturnType<typeof store.getState>) {
+    const avatarNameEl = document.getElementById('hud-avatar-name');
+    const levelBadgeEl = document.getElementById('hud-level-badge');
+    const xpTextEl = document.getElementById('hud-xp-text');
+    const xpFillEl = document.getElementById('hud-xp-fill');
+    const coinsEl = document.getElementById('hud-coins-val');
+    const streakEl = document.getElementById('hud-streak-val');
+
+    if (avatarNameEl) avatarNameEl.textContent = state.avatar.name || 'Miu';
+
+    const { level, ratio, toNext } = levelProgress(state.xp);
+    if (levelBadgeEl) levelBadgeEl.textContent = `Cấp ${level}`;
+
+    const pct = Math.min(100, Math.max(0, Math.round(ratio * 100)));
+    if (xpTextEl) xpTextEl.textContent = `${toNext > 0 ? toNext + ' XP nữa' : 'Tối đa'}`;
+    if (xpFillEl) xpFillEl.style.width = `${pct}%`;
+
+    if (coinsEl) coinsEl.textContent = String(state.coins);
+    if (streakEl) streakEl.textContent = String(state.streak.current || 1);
+  }
+
+  // Khởi tạo ban đầu và đăng ký lắng nghe thay đổi trạng thái
+  updateHudElements(store.getState());
+  store.subscribe(updateHudElements);
+
+  // Âm thanh Bật/Tắt
+  const soundBtn = document.getElementById('hud-sound-toggle');
+  const soundIcon = document.getElementById('hud-sound-icon');
+
+  function updateSoundIcon() {
+    if (soundIcon) {
+      soundIcon.textContent = isMuted() ? '🔇' : '🔊';
+    }
+  }
+
+  updateSoundIcon();
+  soundBtn?.addEventListener('click', () => {
+    setMuted(!isMuted());
+    updateSoundIcon();
+  });
+</script>

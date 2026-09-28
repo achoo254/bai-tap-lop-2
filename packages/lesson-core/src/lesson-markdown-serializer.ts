@@ -13,8 +13,14 @@ export interface LessonDraftContent {
 /** Ghi bài ra nội dung `bai.md` theo thứ tự trường cố định để diff git gọn. */
 export function serializeLesson(content: LessonDraftContent): string {
   const { tieu_de, ngay, mon, nhap, ma_xem_truoc } = content.frontmatter;
-  const yaml = stringifyYaml({ tieu_de, ngay, mon, nhap, ma_xem_truoc }, { lineWidth: 0 }).trimEnd();
-  const parts = [`---\n${yaml}\n---`, `## ${SECTION_HEADINGS['de-bai']}\n\n${normalizeBody(content.deBai)}`];
+  const yaml = stringifyYaml(
+    { tieu_de, ngay, mon, nhap, ma_xem_truoc },
+    { lineWidth: 0 },
+  ).trimEnd();
+  const parts = [
+    `---\n${yaml}\n---`,
+    `## ${SECTION_HEADINGS['de-bai']}\n\n${normalizeBody(content.deBai)}`,
+  ];
   const loiGiai = normalizeBody(content.loiGiai);
   if (loiGiai) parts.push(`## ${SECTION_HEADINGS['loi-giai']}\n\n${loiGiai}`);
   return `${parts.join('\n\n')}\n`.normalize('NFC');

@@ -18,11 +18,17 @@ describe('pickLessonsForToday', () => {
   });
 
   it('không có bài hôm nay thì lấy ngày gần nhất đã qua', () => {
-    expect(pickLessonsForToday(lessons, '2026-09-28').ids).toEqual(['2026-09-26-b', '2026-09-26-c']);
+    expect(pickLessonsForToday(lessons, '2026-09-28').ids).toEqual([
+      '2026-09-26-b',
+      '2026-09-26-c',
+    ]);
   });
 
   it('chưa có bài nào đã qua thì lấy bài sắp tới', () => {
-    expect(pickLessonsForToday(lessons, '2026-09-01')).toMatchObject({ mode: 'sap-toi', ngay: '2026-09-25' });
+    expect(pickLessonsForToday(lessons, '2026-09-01')).toMatchObject({
+      mode: 'sap-toi',
+      ngay: '2026-09-25',
+    });
   });
 
   it('không có bài', () => {

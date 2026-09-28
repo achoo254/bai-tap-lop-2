@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- Rương kho báu vàng (Kenney style) -->
+  <!-- Bóng đổ -->
+  <ellipse cx="40" cy="72" rx="34" ry="7" fill="#000" opacity="0.15" />
+
+  <!-- Thân rương -->
+  <rect x="8" y="36" width="64" height="34" rx="6" fill="#b45309" stroke="#451a03" stroke-width="3.5" />
+  <rect x="12" y="40" width="56" height="26" rx="4" fill="#d97706" />
+
+  <!-- Nẹp kim loại dọc thân -->
+  <rect x="18" y="36" width="8" height="34" fill="#facc15" stroke="#78350f" stroke-width="2" />
+  <rect x="54" y="36" width="8" height="34" fill="#facc15" stroke="#78350f" stroke-width="2" />
+
+  <!-- Nắp rương vòm cong -->
+  <path d="M6 36 C6 20 22 14 40 14 C58 14 74 20 74 36 Z" fill="#b45309" stroke="#451a03" stroke-width="3.5" stroke-linejoin="round" />
+  <path d="M10 34 C10 22 24 18 40 18 C56 18 70 22 70 34 Z" fill="#f59e0b" />
+
+  <!-- Nẹp kim loại trên nắp -->
+  <path d="M18 36 C18 24 24 20 26 20 H20 C18 20 18 36 18 36 Z" fill="#facc15" stroke="#78350f" stroke-width="2" />
+  <path d="M54 36 C54 24 60 20 62 20 H56 C54 20 54 36 54 36 Z" fill="#facc15" stroke="#78350f" stroke-width="2" />
+
+  <!-- Ổ khoá vàng chính giữa -->
+  <rect x="34" y="30" width="12" height="16" rx="3" fill="#fef08a" stroke="#78350f" stroke-width="2.5" />
+  <circle cx="40" cy="36" r="2" fill="#451a03" />
+  <line x1="40" y1="38" x2="40" y2="42" stroke="#451a03" stroke-width="2" />
+</svg>

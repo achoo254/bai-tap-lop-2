@@ -1,0 +1,441 @@
+---
+/**
+ * apps/site/src/pages/the-gioi/[lop]/[vung].astro
+ *
+ * Bản đồ Vùng môn học (Region Map):
+ * - Hiển thị con đường phiêu lưu qua các chương và bài học
+ * - Các điểm dừng Nhiệm vụ (Quest nodes) nối liền bằng đường mòn SVG
+ * - Trạng thái khoá/mở khoá dựa trên GameState
+ * - Chạm vào nhiệm vụ mở khoá -> Nhân vật bước đi dọc đường và vào chơi.
+ */
+import KidPageLayout from '../../../layouts/kid-page-layout.astro';
+import Hud from '../../../components/game/hud.astro';
+import { getAllWorlds, findRegion } from '../../../lib/game/world/world-registry';
+import type { Region, World } from '../../../lib/game/world/world-types';
+
+export function getStaticPaths() {
+  const worlds = getAllWorlds();
+  const paths = [];
+  for (const world of worlds) {
+    for (const region of world.regions) {
+      paths.push({
+        params: { lop: world.grade, vung: region.id },
+        props: { world, region },
+      });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  world: World;
+  region: Region;
+}
+
+const { lop, vung } = Astro.params;
+const world = Astro.props.world;
+const region = Astro.props.region ?? findRegion(lop ?? 'lop-2', vung as any)!;
+const chapter1 = region.chapters[0];
+const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
+---
+
+<KidPageLayout
+  title={`${region.name} — ${world.name}`}
+  showToolbar={false}
+>
+  <link rel="stylesheet" href="/game/characters/character-poses.css" />
+  <link rel="stylesheet" href="/styles/game.css" />
+
+  <Hud title={region.name} backUrl={`/the-gioi/${world.grade}/`} backLabel={`Về Bản đồ ${world.name}`} />
+
+  <main class="world-container">
+    <div class="region-map-card">
+      <div class="region-banner-header" style={`background: linear-gradient(135deg, ${region.theme.primaryColor}, ${region.theme.secondaryColor});`}>
+        <div class="region-banner-info">
+          <span class="region-icon-badge">{region.theme.icon}</span>
+          <div>
+            <h1 class="region-title">{region.name}: {chapter1?.name ?? 'Chương 1'}</h1>
+            <p class="region-subtitle">{chapter1?.description ?? region.tagline}</p>
+          </div>
+        </div>
+        <div class="region-guide-chip">
+          <span>🦉 Bác Cú dẫn đường</span>
+        </div>
+      </div>
+
+      <!-- Khung cảnh bản đồ vùng -->
+      <div class="region-canvas" id="region-canvas">
+        <!-- Đường mòn SVG uốn lượn nối các điểm nhiệm vụ -->
+        <svg class="region-path-svg" viewBox="0 0 800 500" preserveAspectRatio="none">
+          <path
+            id="quest-trail"
+            d="M 160 400 Q 280 320 380 280 T 620 160"
+            fill="none"
+            stroke="#fef08a"
+            stroke-width="16"
+            stroke-linecap="round"
+            stroke-dasharray="20 12"
+          />
+          <path
+            d="M 160 400 Q 280 320 380 280 T 620 160"
+            fill="none"
+            stroke="#eab308"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+        </svg>
+
+        <!-- Các điểm nút Nhiệm Vụ -->
+        {quests.map((q, idx) => (
+          <div
+            class="quest-node"
+            id={`node-${q.id.replace(/\//g, '-')}`}
+            data-quest-id={q.id}
+            data-quest-title={q.title}
+            data-is-boss={q.isBoss ? 'true' : 'false'}
+            style={`top: ${q.mapCoordinates.y}%; left: ${q.mapCoordinates.x}%;`}
+          >
+            <div class="quest-node-button" id={`btn-${q.id.replace(/\//g, '-')}`}>
+              <div class="quest-halo"></div>
+              <div class="quest-icon-inner">
+                {q.isBoss ? '👑' : idx === 0 ? '🍬' : '🧺'}
+              </div>
+              <div class="quest-stars-badge" id={`stars-${q.id.replace(/\//g, '-')}`}>
+                ⭐⭐⭐
+              </div>
+            </div>
+
+            <div class="quest-label-card">
+              <span class="quest-num-tag">Nhiệm vụ {idx + 1}</span>
+              <strong class="quest-title-text">{q.title}</strong>
+              <small class="quest-status-text" id={`status-${q.id.replace(/\//g, '-')}`}>Kiểm tra...</small>
+            </div>
+          </div>
+        ))}
+
+        <!-- Nhân vật Miu di chuyển trên bản đồ vùng -->
+        <div class="region-miu-walker" id="region-miu-walker">
+          <div class="region-miu-figure" id="region-miu-figure"></div>
+          <span class="region-miu-bubble" id="region-miu-bubble">Chọn bài nào! 🐾</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</KidPageLayout>
+
+<style>
+  .region-map-card {
+    position: relative;
+    width: 100%;
+    max-width: 980px;
+    background: #ffffff;
+    border: 4px solid #0f172a;
+    border-radius: 32px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .region-banner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.75rem;
+    color: #ffffff;
+    border-bottom: 3px solid #0f172a;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .region-banner-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .region-icon-badge {
+    font-size: 2.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 0.35rem 0.65rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .region-title {
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  .region-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    margin-top: 0.2rem;
+    margin-bottom: 0;
+  }
+
+  .region-guide-chip {
+    padding: 0.4rem 0.9rem;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 999px;
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Canvas bản đồ vùng */
+  .region-canvas {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    background:
+      radial-gradient(circle at 20% 30%, #bae6fd 0%, transparent 40%),
+      linear-gradient(180deg, #dcfce7 0%, #fef3c7 70%, #ffedd5 100%);
+    overflow: hidden;
+  }
+
+  .region-path-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Nút nhiệm vụ */
+  .quest-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 5;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .quest-node-button {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 4px solid #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  }
+
+  .quest-node:hover .quest-node-button {
+    transform: scale(1.12);
+    box-shadow: 0 12px 28px rgba(2, 132, 199, 0.3);
+  }
+
+  .quest-icon-inner {
+    font-size: 2.2rem;
+  }
+
+  .quest-halo {
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    background: rgba(2, 132, 199, 0.2);
+    animation: halo-pulse 2s infinite ease-in-out;
+  }
+
+  .quest-stars-badge {
+    position: absolute;
+    bottom: -10px;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 999px;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.7rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .quest-label-card {
+    margin-top: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    min-width: 130px;
+  }
+
+  .quest-num-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+
+  .quest-title-text {
+    font-size: 0.85rem;
+    color: #0f172a;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .quest-status-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #16a34a;
+  }
+
+  /* Trạng thái khoá */
+  .quest-node.locked {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .quest-node.locked .quest-node-button {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+  }
+
+  .quest-node.locked .quest-halo {
+    display: none;
+  }
+
+  .quest-node.locked:hover .quest-node-button {
+    transform: none;
+  }
+
+  .quest-node.locked .quest-status-text {
+    color: #64748b;
+  }
+
+  /* Nhân vật di chuyển */
+  .region-miu-walker {
+    position: absolute;
+    top: 78%;
+    left: 20%;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .region-miu-figure {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+  }
+
+  .region-miu-bubble {
+    padding: 0.25rem 0.6rem;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #0369a1;
+    white-space: nowrap;
+  }
+
+  @keyframes halo-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.25); opacity: 0.1; }
+  }
+</style>
+
+<script>
+  import {
+    renderCatSvgHtml,
+    type CatFurColorId,
+    type CatAccessoryId,
+  } from '../../../components/game/characters/cat-character';
+  import { getBrowserGameStore } from '../../../lib/game/state/game-store';
+  import { isQuestUnlocked } from '../../../lib/game/world/unlock-rules';
+  import { WORLD_LOP_2 } from '../../../worlds/lop-2/world';
+  import { playSfx, speak } from '../../../lib/game/media/audio';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const store = getBrowserGameStore(today, 'Miu');
+  const state = store.getState();
+
+  const miuWalker = document.getElementById('region-miu-walker');
+  const miuFigure = document.getElementById('region-miu-figure');
+  const miuBubble = document.getElementById('region-miu-bubble');
+
+  if (miuFigure) {
+    miuFigure.innerHTML = renderCatSvgHtml({
+      pose: 'dung',
+      furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
+      accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
+      size: 80,
+      label: `Bé ${state.avatar.name}`,
+    });
+  }
+
+  const nodes = document.querySelectorAll('.quest-node');
+  const chapter1Quests = WORLD_LOP_2.regions[0].chapters[0].lessons[0].quests;
+
+  nodes.forEach((node) => {
+    const qId = node.getAttribute('data-quest-id');
+    const questDef = chapter1Quests.find((q) => q.id === qId);
+    if (!questDef) return;
+
+    const unlocked = isQuestUnlocked(questDef, state, WORLD_LOP_2);
+    const questProg = state.quests[questDef.id];
+    const starsEl = document.getElementById(`stars-${questDef.id.replace(/\//g, '-')}`);
+    const statusEl = document.getElementById(`status-${questDef.id.replace(/\//g, '-')}`);
+
+    if (unlocked) {
+      node.classList.remove('locked');
+      if (statusEl) {
+        statusEl.textContent = questProg ? 'Đã hoàn thành' : 'Sẵn sàng';
+        statusEl.style.color = '#16a34a';
+      }
+      if (starsEl) {
+        const starCount = questProg?.stars || 0;
+        starsEl.textContent = starCount > 0 ? '⭐'.repeat(starCount) + '☆'.repeat(3 - starCount) : 'Mới ✨';
+      }
+
+      node.addEventListener('click', () => {
+        // Hoạt ảnh nhân vật bước tới điểm này
+        const coords = questDef.mapCoordinates;
+        if (miuWalker) {
+          miuWalker.style.top = `${coords.y}%`;
+          miuWalker.style.left = `${coords.x}%`;
+        }
+        if (miuBubble) {
+          miuBubble.textContent = 'Lên đường! 🚀';
+        }
+        playSfx('click');
+        speak(`Bắt đầu thử thách: ${questDef.title}!`);
+
+        setTimeout(() => {
+          window.location.href = `/the-gioi/choi/?nv=${encodeURIComponent(questDef.id)}`;
+        }, 600);
+      });
+    } else {
+      node.classList.add('locked');
+      if (statusEl) {
+        statusEl.textContent = '🔒 Đang khoá';
+        statusEl.style.color = '#64748b';
+      }
+      if (starsEl) {
+        starsEl.textContent = '🔒';
+      }
+      node.addEventListener('click', () => {
+        playSfx('fail');
+        speak('Bé cần hoàn thành nhiệm vụ trước để mở khoá nhé!');
+      });
+    }
+  });
+</script>
