@@ -13,13 +13,10 @@ test.describe('trang chủ', () => {
     await expect(page.locator('a[href="/the-gioi/"]')).toContainText('Thế giới học tập');
   });
 
-  test('sinh nhật Miu và em Bo hiện lời chúc', async ({ page }) => {
+  test('sinh nhật bạn mèo hiện lời chúc', async ({ page }) => {
     await page.clock.setFixedTime(setToday('2026-12-15'));
     await page.goto('/');
     await expect(page.locator('[data-birthday]')).toContainText('Chúc mừng sinh nhật Miu');
-    await page.clock.setFixedTime(setToday('2027-03-19'));
-    await page.goto('/');
-    await expect(page.locator('[data-birthday]')).toContainText('sinh nhật em Bo');
   });
 
   test('không hiện bài nháp ở danh sách', async ({ page }) => {

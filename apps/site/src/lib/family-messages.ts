@@ -1,11 +1,11 @@
 import { CHILD_PROFILE, isBirthdayOn } from 'lesson-core';
 import type { TodayPickMode } from './today-lesson-picker';
+import { uniformReminderFor } from './uniform-schedule';
 
-/** Lời chào, lời khen, lời chúc sinh nhật gọi đúng tên bé và người thân. */
-const { nickname: miu, sibling, father, mother } = CHILD_PROFILE;
-const bo = sibling.nickname;
+/** Tên mặc định của bạn mèo nếu chưa được đặt tên */
+const defaultName: string = CHILD_PROFILE.nickname || 'Miu';
 
-export const SITE_TITLE = `Góc học tập của ${miu}`;
+export const SITE_TITLE = `Góc học tập của ${defaultName}`;
 
 /** Buổi trong ngày theo giờ Việt Nam (0–23). */
 export function partOfDay(hour: number): string {
@@ -15,28 +15,34 @@ export function partOfDay(hour: number): string {
   return 'buổi tối';
 }
 
-export function greetingFor(mode: TodayPickMode | 'the-gioi', hour: number): string {
-  const hello = `Chào ${miu} ${partOfDay(hour)} vui vẻ!`;
+export function greetingFor(
+  mode: TodayPickMode | 'the-gioi',
+  hour: number,
+  catName: string = defaultName,
+): string {
+  const hello = `Chào ${catName} ${partOfDay(hour)} vui vẻ!`;
   if (mode === 'the-gioi') {
     return `${hello} Cùng mèo con khám phá Thế giới học tập nhé! 🚀`;
   }
   switch (mode) {
     case 'hom-nay':
-      return `${hello} Bài hôm nay đây, ${miu} chép thật đẹp nhé!`;
+      return `${hello} Bài hôm nay đây, ${catName} chép thật đẹp nhé!`;
     case 'gan-nhat':
-      return `${hello} Hôm nay chưa có bài mới, ${miu} ôn lại bài gần nhất nhé!`;
+      return `${hello} Hôm nay chưa có bài mới, ${catName} ôn lại bài gần nhất nhé!`;
     case 'sap-toi':
-      return `${hello} Bài mới sắp tới rồi, ${miu} xem trước nhé!`;
+      return `${hello} Bài mới sắp tới rồi, ${catName} xem trước nhé!`;
     case 'trong':
-      return `${hello} Chưa có bài nào, ${miu} chờ bố ${father} mẹ ${mother} thêm bài nhé!`;
+      return `${hello} Chưa có bài nào, ${catName} chờ bố mẹ thêm bài nhé!`;
   }
 }
 
-import { uniformReminderFor } from './uniform-schedule';
-
 /** Lời chào mèo con khi vào Thế giới học tập (kèm nhắc nhở đồng phục theo ngày). */
-export function greetingForWorld(hour: number, dayOfWeek?: number): string {
-  const hello = `Chào ${miu} ${partOfDay(hour)} vui vẻ!`;
+export function greetingForWorld(
+  hour: number,
+  dayOfWeek?: number,
+  catName: string = defaultName,
+): string {
+  const hello = `Chào ${catName} ${partOfDay(hour)} vui vẻ!`;
   if (dayOfWeek === undefined) {
     return `${hello} Cùng mèo con khám phá Thế giới học tập nhé! 🚀`;
   }
@@ -45,23 +51,20 @@ export function greetingForWorld(hour: number, dayOfWeek?: number): string {
 }
 
 /** Lời chúc sinh nhật trong ngày (nếu có). */
-export function birthdayMessage(isoDate: string): string | null {
+export function birthdayMessage(isoDate: string, catName: string = defaultName): string | null {
   if (isBirthdayOn(isoDate, CHILD_PROFILE.birthday)) {
-    return `🎂 Chúc mừng sinh nhật ${miu}! Bố ${father}, mẹ ${mother} và em ${bo} yêu ${miu} nhiều lắm!`;
-  }
-  if (isBirthdayOn(isoDate, sibling.birthday)) {
-    return `🎈 Hôm nay là sinh nhật em ${bo}! Chị ${miu} nhớ chúc mừng em nhé!`;
+    return `🎂 Chúc mừng sinh nhật ${catName}! Bố mẹ yêu ${catName} nhiều lắm!`;
   }
   return null;
 }
 
 /** Lời khen hiện khi bé mở lời giải. */
 export const PRAISES = [
-  `${miu} giỏi quá! Bố ${father} và mẹ ${mother} tự hào về ${miu} lắm!`,
-  `Em ${bo} đang cổ vũ chị ${miu} đó! Cố lên nào!`,
-  `${miu} chép bài thật đẹp! Mèo con thưởng cho ${miu} một ngôi sao ⭐`,
-  `Tuyệt vời! ${miu} làm xong rồi thì khoe bố mẹ nhé!`,
-  `${miu} chăm chỉ quá! Mèo con thích học cùng ${miu} lắm!`,
+  'Bé giỏi quá! Bố mẹ rất tự hào về bé!',
+  'Mèo con đang cổ vũ bạn đó! Cố lên nào!',
+  'Chép bài thật đẹp! Mèo con thưởng cho bạn một ngôi sao ⭐',
+  'Tuyệt vời! Làm xong rồi thì khoe bố mẹ nhé!',
+  'Chăm chỉ quá! Mèo con rất thích học cùng bạn!',
 ];
 
-export const FAMILY_FOOTER = `Làm tặng ${miu} với tình yêu của bố ${father}, mẹ ${mother} và em ${bo} 💖`;
+export const FAMILY_FOOTER = 'Làm tặng bé với tình yêu của bố mẹ 💖';

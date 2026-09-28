@@ -77,6 +77,10 @@ export function toZaloSpeed(rate: number): number {
 }
 
 export function zaloAudioUrl(speaker: number, speed: number, text: string): string {
-  const params = new URLSearchParams({ giong: String(speaker), 'toc-do': speed.toFixed(1), 'noi-dung': text });
+  const params = new URLSearchParams({
+    giong: String(speaker),
+    'toc-do': speed.toFixed(1),
+    'noi-dung': text,
+  });
   return `/api/doc?${params.toString()}`;
 }

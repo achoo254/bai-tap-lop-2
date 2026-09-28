@@ -25,84 +25,105 @@ const furColors = Object.values(CAT_FUR_COLORS);
 </div>
 
 <dialog class="companion-panel" data-companion-panel aria-labelledby="companion-panel-title">
-  <div class="panel-head">
-    <h2 id="companion-panel-title">🐾 Bạn mèo của bé</h2>
-    <button type="button" class="panel-close" data-companion-close aria-label="Đóng cài đặt">✕</button>
+  <div class="panel-sticky-top">
+    <div class="panel-head">
+      <h2 id="companion-panel-title">🐾 Bạn mèo của bé</h2>
+      <button type="button" class="panel-close" data-companion-close aria-label="Đóng cài đặt">✕</button>
+    </div>
+    <div class="panel-preview" data-companion-preview aria-hidden="true"></div>
+    <div class="panel-tabs" role="tablist">
+      <button type="button" class="panel-tab active" data-companion-tab="appearance" role="tab" aria-selected="true">
+        🎨 Màu & Tên
+      </button>
+      <button type="button" class="panel-tab" data-companion-tab="accessories" role="tab" aria-selected="false">
+        🎀 Phụ kiện
+      </button>
+      <button type="button" class="panel-tab" data-companion-tab="settings" role="tab" aria-selected="false">
+        ⚙️ Âm thanh & Chữ
+      </button>
+    </div>
   </div>
-  <div class="panel-preview" data-companion-preview aria-hidden="true"></div>
 
-  <section class="panel-section">
-    <h3>🏷️ Tên bạn mèo</h3>
-    <input class="panel-input" type="text" maxlength="20" data-setting="name" aria-label="Tên bạn mèo" />
-  </section>
+  <div class="panel-body">
+    <div class="panel-tab-content" data-tab-pane="appearance">
+      <section class="panel-section">
+        <h3>🏷️ Tên bạn mèo</h3>
+        <input class="panel-input" type="text" maxlength="20" data-setting="name" aria-label="Tên bạn mèo" />
+      </section>
 
-  <section class="panel-section">
-    <h3>🎨 Màu lông</h3>
-    <div class="fur-grid" role="radiogroup" aria-label="Màu lông">
+      <section class="panel-section">
+        <h3>🎨 Màu lông</h3>
+        <div class="fur-grid" role="radiogroup" aria-label="Màu lông">
+          {
+            furColors.map((color) => (
+              <button type="button" class="fur-chip" data-fur-id={color.id} role="radio" aria-checked="false">
+                <span class="fur-swatch" style={`background:${color.fur};border-color:${color.furDark}`} />
+                {color.name}
+              </button>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+
+    <div class="panel-tab-content" data-tab-pane="accessories" hidden>
+      <section class="panel-section">
+        <h3>🎀 Phụ kiện (mỗi loại 1 món)</h3>
+        <AccessoryCategoryPicker />
+      </section>
+    </div>
+
+    <div class="panel-tab-content" data-tab-pane="settings" hidden>
+      <section class="panel-section">
+        <h3>🔊 Âm thanh</h3>
+        <label class="switch-row"><span>Bật âm thanh</span><input type="checkbox" data-setting="all-sound" /></label>
+        <label class="switch-row"><span>🎵 Nhạc nền</span><input type="checkbox" data-setting="music" /></label>
+        <label class="slider-row">
+          <span>Âm lượng nhạc <output data-value-for="music-volume"></output></span>
+          <input type="range" min="0" max="100" step="5" data-setting="music-volume" />
+        </label>
+        <label class="switch-row"><span>💬 Mèo tự nói chuyện</span><input type="checkbox" data-setting="chatter" /></label>
+      </section>
+
+      <section class="panel-section">
+        <h3>🗣️ Giọng đọc</h3>
+        <label class="switch-row"><span>Bật giọng đọc</span><input type="checkbox" data-setting="voice" /></label>
+        <label class="select-row">
+          <span>Người đọc</span>
+          <select data-setting="voice-name"></select>
+        </label>
+        <label class="select-row">
+          <span>Phong cách</span>
+          <select data-setting="tone"></select>
+        </label>
+        <label class="slider-row">
+          <span>Tốc độ <output data-value-for="rate"></output></span>
+          <input type="range" min="60" max="140" step="5" data-setting="rate" />
+        </label>
+        <label class="slider-row">
+          <span>Cao độ <output data-value-for="pitch"></output></span>
+          <input type="range" min="60" max="150" step="5" data-setting="pitch" />
+          <small class="setting-hint">Giọng Zalo cần mạng và chỉ chỉnh được tốc độ; cao độ áp dụng cho giọng có sẵn của máy.</small>
+        </label>
+        <div class="panel-actions">
+          <button type="button" class="panel-btn" data-action="try-voice">▶️ Nghe thử</button>
+          <button type="button" class="panel-btn panel-btn--ghost" data-action="reset-voice">↺ Giọng mặc định</button>
+        </div>
+      </section>
+
       {
-        furColors.map((color) => (
-          <button type="button" class="fur-chip" data-fur-id={color.id} role="radio" aria-checked="false">
-            <span class="fur-swatch" style={`background:${color.fur};border-color:${color.furDark}`} />
-            {color.name}
-          </button>
-        ))
+        handwritingAvailable && (
+          <section class="panel-section">
+            <h3>✍️ Chữ đọc bài</h3>
+            <label class="switch-row">
+              <span>Chữ viết tay mẫu tiểu học</span>
+              <input type="checkbox" data-setting="handwriting" />
+            </label>
+          </section>
+        )
       }
     </div>
-  </section>
-
-  <section class="panel-section">
-    <h3>🎀 Phụ kiện (mỗi loại 1 món)</h3>
-    <AccessoryCategoryPicker />
-  </section>
-
-  <section class="panel-section">
-    <h3>🔊 Âm thanh</h3>
-    <label class="switch-row"><span>Bật âm thanh</span><input type="checkbox" data-setting="all-sound" /></label>
-    <label class="switch-row"><span>🎵 Nhạc nền</span><input type="checkbox" data-setting="music" /></label>
-    <label class="slider-row">
-      <span>Âm lượng nhạc <output data-value-for="music-volume"></output></span>
-      <input type="range" min="0" max="100" step="5" data-setting="music-volume" />
-    </label>
-    <label class="switch-row"><span>💬 Mèo tự nói chuyện</span><input type="checkbox" data-setting="chatter" /></label>
-  </section>
-
-  <section class="panel-section">
-    <h3>🗣️ Giọng đọc</h3>
-    <label class="switch-row"><span>Bật giọng đọc</span><input type="checkbox" data-setting="voice" /></label>
-    <label class="select-row">
-      <span>Người đọc</span>
-      <select data-setting="voice-name"></select>
-    </label>
-    <label class="select-row">
-      <span>Phong cách</span>
-      <select data-setting="tone"></select>
-    </label>
-    <label class="slider-row">
-      <span>Tốc độ <output data-value-for="rate"></output></span>
-      <input type="range" min="60" max="140" step="5" data-setting="rate" />
-    </label>
-    <label class="slider-row">
-      <span>Cao độ <output data-value-for="pitch"></output></span>
-      <input type="range" min="60" max="150" step="5" data-setting="pitch" />
-      <small class="setting-hint">Giọng Zalo cần mạng và chỉ chỉnh được tốc độ; cao độ áp dụng cho giọng có sẵn của máy.</small>
-    </label>
-    <div class="panel-actions">
-      <button type="button" class="panel-btn" data-action="try-voice">▶️ Nghe thử</button>
-      <button type="button" class="panel-btn panel-btn--ghost" data-action="reset-voice">↺ Giọng mặc định</button>
-    </div>
-  </section>
-
-  {
-    handwritingAvailable && (
-      <section class="panel-section">
-        <h3>✍️ Chữ đọc bài</h3>
-        <label class="switch-row">
-          <span>Chữ viết tay mẫu tiểu học</span>
-          <input type="checkbox" data-setting="handwriting" />
-        </label>
-      </section>
-    )
-  }
+  </div>
 
   <p class="panel-note">Mọi lựa chọn được lưu trên máy này, tải lại trang vẫn giữ nguyên.</p>
 </dialog>
@@ -204,14 +225,21 @@ const furColors = Object.values(CAT_FUR_COLORS);
     background: rgba(15, 23, 42, 0.45);
   }
 
-  .panel-head {
+  .panel-sticky-top {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
+    background: #fffdf7;
+    padding-top: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px dashed #cbd5e1;
+  }
+
+  .panel-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 0 10px;
+    padding-bottom: 8px;
     background: #fffdf7;
   }
 
@@ -234,10 +262,54 @@ const furColors = Object.values(CAT_FUR_COLORS);
   .panel-preview {
     display: grid;
     place-items: center;
-    height: 150px;
+    height: 130px;
     margin-bottom: 8px;
     border-radius: 20px;
     background: linear-gradient(180deg, #fef3c7, #e0f2fe);
+  }
+
+  .panel-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel-tab {
+    flex: 1;
+    min-height: 44px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    font-size: 0.92rem;
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+
+  .panel-tab:hover {
+    background: #f1f5f9;
+  }
+
+  .panel-tab.active {
+    background: #fef08a;
+    border-color: #0f172a;
+    color: #0f172a;
+    box-shadow: 0 3px 0 #0f172a;
+    transform: translateY(-1px);
+  }
+
+  .panel-tab-content[hidden] {
+    display: none;
   }
 
   .panel-section {

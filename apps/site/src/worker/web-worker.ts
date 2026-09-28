@@ -10,7 +10,11 @@ interface Env extends TtsEnv {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: { waitUntil(promise: Promise<unknown>): void }): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: { waitUntil(promise: Promise<unknown>): void },
+  ): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/doc') return handleTtsRequest(request, env, ctx);
     return env.ASSETS.fetch(request);

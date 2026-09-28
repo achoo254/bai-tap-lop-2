@@ -4,9 +4,8 @@ import MascotKitten from '../components/mascot-kitten.astro';
 import { greetingForWorld } from '../lib/family-messages';
 import { UNIFORM_SCHEDULE, WEEK_DAYS_ORDER, getUniformForDay } from '../lib/uniform-schedule';
 import { TIMETABLE_DATA, SCHOOL_WEEK_DAYS, getScheduleForDay } from '../lib/timetable-schedule';
-import { dayOfWeekInVietnam, hourInVietnam, todayInVietnam } from '../lib/today-lesson-picker';
+import { dayOfWeekInVietnam, hourInVietnam } from '../lib/today-lesson-picker';
 
-const todayIso = todayInVietnam();
 const currentHour = hourInVietnam();
 const currentDayOfWeek = dayOfWeekInVietnam();
 const todayUniform = getUniformForDay(currentDayOfWeek);
@@ -89,7 +88,7 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
       <div class="world-hero-title-group">
         <div class="world-hero-icon">🌌</div>
         <div>
-          <h2 class="world-hero-title">Thế giới học tập của Miu</h2>
+          <h2 class="world-hero-title">Thế giới học tập của <span data-cat-name>Miu</span></h2>
           <p class="world-hero-desc">Khám phá các vùng môn học, làm nhiệm vụ vượt thử thách và mở rương kho báu!</p>
         </div>
       </div>
@@ -144,8 +143,8 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
         <div class="card-title-group">
           <span class="card-icon">👗</span>
           <div>
-            <h3 class="card-title">Lịch mặc đồng phục của Miu</h3>
-            <p class="card-subtitle">Cô giáo và bố mẹ dặn Miu chuẩn bị trang phục</p>
+            <h3 class="card-title">Lịch mặc đồng phục của <span data-cat-name>Miu</span></h3>
+            <p class="card-subtitle">Cô giáo và bố mẹ dặn <span data-cat-name>Miu</span> chuẩn bị trang phục</p>
           </div>
         </div>
         <span class="card-badge-today" id="uniform-today-badge">Hôm nay</span>
@@ -191,7 +190,7 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
 
       <div class="daily-tip-footer">
         <span class="tip-icon">💡</span>
-        <span>Bố mẹ dặn Miu: Hãy soạn trang phục và balo từ tối hôm trước để sáng mai đi học thật thảnh thơi nhé!</span>
+        <span>Bố mẹ dặn <span data-cat-name>Miu</span>: Hãy soạn trang phục và balo từ tối hôm trước để sáng mai đi học thật thảnh thơi nhé!</span>
       </div>
     </section>
 
@@ -1067,11 +1066,6 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
   import { introduceScreen } from '../lib/game/media/screen-intro';
   import type { UniformDay } from '../lib/uniform-schedule';
   import type { DaySchedule } from '../lib/timetable-schedule';
-  import {
-    renderCatSvgHtml,
-    type CatFurColorId,
-    type CatAccessoryId,
-  } from '../components/game/characters/cat-character';
 
 
   const today = todayInVietnam();
@@ -1121,7 +1115,6 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
 
   // 4. Đồng bộ Thanh Chiến Tích & Mèo Chào từ Game Store (localStorage the-gioi:v1)
   const store = getBrowserGameStore(today, 'Miu');
-  const greetingCat = document.querySelector<HTMLElement>('[data-greeting-cat]');
 
   function updateStats(state: ReturnType<typeof store.getState>) {
     const avatarNameEl = document.getElementById('home-avatar-name');
@@ -1132,7 +1125,21 @@ const todaySchedule = getScheduleForDay(currentDayOfWeek) ?? getScheduleForDay(1
     const streakEl = document.getElementById('home-streak-val');
     const starsEl = document.getElementById('home-stars-val');
 
-    if (avatarNameEl) avatarNameEl.textContent = state.avatar.name || 'Miu';
+    const catName = state.avatar.name?.trim() || 'Miu';
+    if (avatarNameEl) avatarNameEl.textContent = catName;
+    document.querySelectorAll<HTMLElement>('[data-cat-name]').forEach((el) => {
+      el.textContent = catName;
+    });
+
+    if (greetingEl) {
+      greetingEl.textContent = greetingForWorld(currentHour, currentDayOfWeek, catName);
+    }
+    const birthday = birthdayMessage(today, catName);
+    if (banner && birthday) {
+      banner.textContent = birthday;
+      banner.hidden = false;
+    }
+
     const { level, ratio, toNext } = levelProgress(state.xp);
     if (levelBadgeEl) levelBadgeEl.textContent = `Cấp ${level}`;
     if (xpValEl) xpValEl.textContent = `${toNext > 0 ? toNext + ' XP nữa' : 'Tối đa'}`;

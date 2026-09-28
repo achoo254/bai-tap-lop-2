@@ -39,13 +39,18 @@ export function parseTtsRequest(url: URL): TtsRequest | string {
   if (!Number.isFinite(speedRaw)) return 'Tốc độ không hợp lệ';
 
   // Làm tròn tốc độ để các yêu cầu gần giống nhau dùng chung bản lưu
-  const speed = Math.round(Math.min(SPEED_RANGE.max, Math.max(SPEED_RANGE.min, speedRaw)) * 10) / 10;
+  const speed =
+    Math.round(Math.min(SPEED_RANGE.max, Math.max(SPEED_RANGE.min, speedRaw)) * 10) / 10;
   return { speaker, speed, text };
 }
 
 /** Khoá lưu cache: cùng câu, cùng giọng, cùng tốc độ → cùng file. */
 export function cacheKeyFor(origin: string, req: TtsRequest): string {
-  const params = new URLSearchParams({ giong: String(req.speaker), 'toc-do': req.speed.toFixed(1), 'noi-dung': req.text });
+  const params = new URLSearchParams({
+    giong: String(req.speaker),
+    'toc-do': req.speed.toFixed(1),
+    'noi-dung': req.text,
+  });
   return `${origin}/api/doc?${params.toString()}`;
 }
 
@@ -56,19 +61,37 @@ export function isSameSiteRequest(request: Request): boolean {
 }
 
 const plain = (status: number, message: string) =>
-  new Response(message, { status, headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' } });
+  new Response(message, {
+    status,
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
+  });
 
-async function synthesize(req: TtsRequest, apiKey: string, fetcher: typeof fetch): Promise<Response> {
-  const body = new URLSearchParams({ input: req.text, speaker_id: String(req.speaker), speed: String(req.speed) });
+async function synthesize(
+  req: TtsRequest,
+  apiKey: string,
+  fetcher: typeof fetch,
+): Promise<Response> {
+  const body = new URLSearchParams({
+    input: req.text,
+    speaker_id: String(req.speaker),
+    speed: String(req.speed),
+  });
   const res = await fetcher(ZALO_TTS_ENDPOINT, {
     method: 'POST',
     headers: { apikey: apiKey, 'content-type': 'application/x-www-form-urlencoded' },
     body,
   });
-  const json = (await res.json()) as { error_code?: number; error_message?: string; data?: { url?: string } };
+  const json = (await res.json()) as {
+    error_code?: number;
+    error_message?: string;
+    data?: { url?: string };
+  };
   const audioUrl = json.data?.url;
   if (json.error_code !== 0 || !audioUrl) {
-    return plain(502, `Zalo TTS lỗi ${json.error_code ?? res.status}: ${json.error_message ?? ''}`.trim());
+    return plain(
+      502,
+      `Zalo TTS lỗi ${json.error_code ?? res.status}: ${json.error_message ?? ''}`.trim(),
+    );
   }
 
   // File âm thanh có thể cần vài trăm ms mới sẵn sàng

@@ -79,7 +79,10 @@ export function getSpeechRateScale(): number {
 }
 
 export function setSpeechRateScale(scale: number): void {
-  write(SPEECH_RATE_KEY, String(Math.min(SPEECH_RATE_RANGE.max, Math.max(SPEECH_RATE_RANGE.min, scale))));
+  write(
+    SPEECH_RATE_KEY,
+    String(Math.min(SPEECH_RATE_RANGE.max, Math.max(SPEECH_RATE_RANGE.min, scale))),
+  );
 }
 
 export function getSpeechPitchScale(): number {
@@ -87,5 +90,8 @@ export function getSpeechPitchScale(): number {
 }
 
 export function setSpeechPitchScale(scale: number): void {
-  write(SPEECH_PITCH_KEY, String(Math.min(SPEECH_PITCH_RANGE.max, Math.max(SPEECH_PITCH_RANGE.min, scale))));
+  write(
+    SPEECH_PITCH_KEY,
+    String(Math.min(SPEECH_PITCH_RANGE.max, Math.max(SPEECH_PITCH_RANGE.min, scale))),
+  );
 }

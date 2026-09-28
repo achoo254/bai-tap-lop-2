@@ -23,7 +23,7 @@ interface Props {
 }
 
 const {
-  title = 'Thế giới của Miu',
+  title = 'Thế giới của bé',
   backUrl = '/the-gioi/',
   backLabel = 'Cổng thế giới',
   showHearts = false,
@@ -40,7 +40,7 @@ const {
           🐱
         </div>
         <div class="hud-avatar-info">
-          <span class="hud-avatar-name" id="hud-avatar-name">Miu</span>
+          <span class="hud-avatar-name" id="hud-avatar-name" data-cat-name>Miu</span>
           <span class="hud-level-badge" id="hud-level-badge">Cấp 1</span>
         </div>
       </a>
@@ -110,7 +110,11 @@ const {
     const coinsEl = document.getElementById('hud-coins-val');
     const streakEl = document.getElementById('hud-streak-val');
 
-    if (avatarNameEl) avatarNameEl.textContent = state.avatar.name || 'Miu';
+    const catName = state.avatar.name?.trim() || 'Miu';
+    if (avatarNameEl) avatarNameEl.textContent = catName;
+    document.querySelectorAll<HTMLElement>('[data-cat-name]').forEach((el) => {
+      el.textContent = catName;
+    });
 
     const { level, ratio, toNext } = levelProgress(state.xp);
     if (levelBadgeEl) levelBadgeEl.textContent = `Cấp ${level}`;

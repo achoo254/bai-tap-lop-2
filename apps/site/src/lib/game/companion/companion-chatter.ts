@@ -76,7 +76,8 @@ export function startCompanionChatter(
   let chatterTimer: number | undefined;
 
   const lessonSubject = document.querySelector<HTMLElement>('[data-subject]')?.dataset.subject;
-  const context = (contextOverride as CompanionContext | undefined) ??
+  const context =
+    (contextOverride as CompanionContext | undefined) ??
     detectCompanionContext(window.location.pathname, lessonSubject);
 
   function draw(): void {

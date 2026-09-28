@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { findZaloVoice, splitForSpeech, toZaloSpeed, zaloAudioUrl } from '../../src/lib/game/media/zalo-voice';
+import {
+  findZaloVoice,
+  splitForSpeech,
+  toZaloSpeed,
+  zaloAudioUrl,
+} from '../../src/lib/game/media/zalo-voice';
 
 describe('giọng Zalo phía trình duyệt', () => {
   it('nhận ra tên giọng Zalo, bỏ qua giọng của máy', () => {
@@ -32,6 +37,8 @@ describe('giọng Zalo phía trình duyệt', () => {
   });
 
   it('tạo đường dẫn tới Worker', () => {
-    expect(zaloAudioUrl(3, 1, 'Bé ơi')).toBe('/api/doc?giong=3&toc-do=1.0&noi-dung=B%C3%A9+%C6%A1i');
+    expect(zaloAudioUrl(3, 1, 'Bé ơi')).toBe(
+      '/api/doc?giong=3&toc-do=1.0&noi-dung=B%C3%A9+%C6%A1i',
+    );
   });
 });

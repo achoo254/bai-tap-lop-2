@@ -8,20 +8,19 @@ export interface DayMonth {
 }
 
 export const CHILD_PROFILE = {
-  /** Tên gọi ở nhà, hiện trên web. */
+  /** Tên gọi ở nhà mặc định của bạn mèo. */
   nickname: 'Miu',
-  /** Bé là con gái: xưng "chị" với em. */
+  /** Bé là con gái. */
   isGirl: true,
   birthday: { day: 15, month: 12 } satisfies DayMonth,
   sibling: {
-    nickname: 'Bo',
-    /** Cách bé gọi em. */
+    nickname: 'em',
     relation: 'em',
     isBoy: true,
     birthday: { day: 19, month: 3 } satisfies DayMonth,
   },
-  father: 'Đạt',
-  mother: 'Thủy',
+  father: 'bố',
+  mother: 'mẹ',
 } as const;
 
 /** "YYYY-MM-DD" có trùng ngày/tháng sinh không. */
@@ -32,9 +31,9 @@ export function isBirthdayOn(isoDate: string, birthday: DayMonth): boolean {
 
 /** Gợi ý cho AI dùng tên người thân quen thuộc trong bài toán có lời văn. */
 export function familyNamesHint(): string {
-  const { nickname, sibling, father, mother } = CHILD_PROFILE;
+  const { nickname } = CHILD_PROFILE;
   return (
     `Trong bài toán có lời văn và câu ví dụ, có thể dùng tên người thân quen thuộc của bé: ` +
-    `bé ${nickname} (bạn gái học lớp 2), em trai ${sibling.nickname}, bố ${father}, mẹ ${mother}.`
+    `bé ${nickname} (học lớp 2), bố mẹ.`
   );
 }

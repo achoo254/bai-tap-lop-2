@@ -48,11 +48,7 @@
       "license": "Bản quyền riêng của dự án",
       "licenseUrl": "file:///Users/hoandat/inet-gitlab/bai-tap-lop-2/LICENSE",
       "website": "https://lop2.hoandat.com",
-      "files": [
-        "characters/cat-character.ts",
-        "characters/npc-guide.ts",
-        "characters/boss-timo.ts"
-      ]
+      "files": ["characters/cat-character.ts", "characters/npc-guide.ts", "characters/boss-timo.ts"]
     },
     {
       "id": "project-voiceover",

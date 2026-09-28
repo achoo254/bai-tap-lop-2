@@ -3,22 +3,22 @@
  * apps/site/src/pages/the-gioi/tao-nhan-vat.astro
  *
  * Màn tạo & tùy biến nhân vật cho bé (Character Creator):
- * - Đặt tên cho mèo con (mặc định Miu, gợi ý Bo, Bơ...)
- * - Chọn màu lông đa dạng (10 màu từ cat-character.ts)
- * - Chọn phụ kiện xinh xắn (nơ, mũ, balo, kính...)
- * - Xem trước nhân vật chuyển động trực quan theo thời gian thực
+ * - Hình nhân vật hiển thị bên phải, luôn giữ vị trí khi scroll (sticky) để bé dễ quan sát.
+ * - Các tùy chỉnh hiển thị dạng Tab (Tên & Màu lông / Phụ kiện) thao tác nhanh gọn.
+ * - Tên bạn mèo tự động đồng bộ sang tất cả các trang.
  * - Bấm "Lên đường! 🚀" để lưu tiến trình và bước vào Thế giới Lớp 2.
  */
 import KidPageLayout from '../../layouts/kid-page-layout.astro';
 import Hud from '../../components/game/hud.astro';
 import AccessoryCategoryPicker from '../../components/game/accessory-category-picker.astro';
-import { CAT_FUR_COLORS } from '../../components/game/characters/cat-character';
+import { CAT_FUR_COLORS, CAT_ACCESSORIES } from '../../components/game/characters/cat-character';
 
 const furColors = Object.values(CAT_FUR_COLORS);
+const totalAccessories = Object.keys(CAT_ACCESSORIES).length;
 ---
 
 <KidPageLayout
-  title="Tạo nhân vật của bé — Thế giới học tập của Miu"
+  title="Tạo nhân vật bạn mèo — Thế giới học tập"
   showToolbar={false}
 >
   <Hud
@@ -26,25 +26,112 @@ const furColors = Object.values(CAT_FUR_COLORS);
     backUrl="/the-gioi/"
     backLabel="Về Cổng thế giới"
     backgroundMusic
-    intro="Mình cùng trang trí cho Miu nào! Chọn màu lông, rồi mỗi loại chọn một món phụ kiện thật xinh nhé!"
+    intro="Mình cùng tạo hình bạn mèo nào! Hãy chọn màu lông, phụ kiện thật xinh và đặt cho bạn một cái tên đáng yêu nhé!"
   />
 
   <main class="creator-main-container">
     <div class="creator-card">
       <div class="creator-header">
-        <h1 class="creator-title">✨ Bạn đồng hành của bé ✨</h1>
-        <p class="creator-subtitle">Hãy chọn cho bạn mèo nhỏ cái tên đáng yêu và bộ cánh thật ngầu nhé!</p>
+        <h1 class="creator-title">✨ Bạn mèo của bé ✨</h1>
+        <p class="creator-subtitle">Hãy chọn cho bạn mèo nhỏ cái tên đáng yêu và phong cách thật ngầu nhé!</p>
       </div>
 
       <div class="creator-content-grid">
-        <!-- Cột trái: Khung xem trước Miu trực tiếp -->
+        <!-- CỘT TRÁI: Bảng điều khiển phân loại dạng Tab -->
+        <div class="creator-options-pane">
+          <!-- Thanh Tab chính -->
+          <div class="creator-tabs-bar" role="tablist" aria-label="Tùy biến nhân vật">
+            <button
+              type="button"
+              class="creator-tab-btn active"
+              data-creator-tab="basic"
+              role="tab"
+              aria-selected="true"
+            >
+              <span class="tab-icon">🎨</span>
+              <span class="tab-label">Tên & Màu lông</span>
+            </button>
+            <button
+              type="button"
+              class="creator-tab-btn"
+              data-creator-tab="accessories"
+              role="tab"
+              aria-selected="false"
+            >
+              <span class="tab-icon">🎀</span>
+              <span class="tab-label">Phụ kiện ({totalAccessories} món)</span>
+            </button>
+          </div>
+
+          <!-- TAB PANEL 1: Tên & Màu lông -->
+          <div class="creator-tab-panel active" data-creator-panel="basic">
+            <!-- 1. Đặt tên -->
+            <div class="option-group">
+              <label class="group-label" for="char-name-input">🏷️ 1. Tên bạn mèo:</label>
+              <div class="name-input-wrapper">
+                <input
+                  type="text"
+                  id="char-name-input"
+                  class="char-input"
+                  maxlength="20"
+                  value="Miu"
+                  placeholder="Nhập tên bạn mèo..."
+                />
+                <div class="preset-name-pills">
+                  <button type="button" class="name-pill active" data-name="Miu">Miu</button>
+                  <button type="button" class="name-pill" data-name="Bơ">Bơ</button>
+                  <button type="button" class="name-pill" data-name="Kem">Kem</button>
+                  <button type="button" class="name-pill" data-name="Mun">Mun</button>
+                  <button type="button" class="name-pill" data-name="Sóc">Sóc</button>
+                  <button type="button" class="name-pill" data-name="Bông">Bông</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Chọn màu lông -->
+            <div class="option-group">
+              <label class="group-label">🎨 2. Chọn màu lông ({furColors.length} màu):</label>
+              <div class="fur-color-grid" id="fur-color-grid">
+                {furColors.map((color, index) => (
+                  <button
+                    type="button"
+                    class={`fur-chip ${index === 0 ? 'active' : ''}`}
+                    data-fur-id={color.id}
+                    data-fur-color={color.fur}
+                    title={color.name}
+                  >
+                    <span class="fur-swatch" style={`background-color: ${color.fur}; border-color: ${color.furDark};`}></span>
+                    <span class="fur-name">{color.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB PANEL 2: Phụ kiện -->
+          <div class="creator-tab-panel" data-creator-panel="accessories">
+            <div class="option-group">
+              <label class="group-label">🎀 Chọn phụ kiện cho bạn mèo:</label>
+              <AccessoryCategoryPicker />
+            </div>
+          </div>
+
+          <!-- Nút chốt Lưu & Lên đường -->
+          <div class="creator-launch-bar">
+            <button type="button" class="confirm-launch-btn" id="btn-launch-game">
+              🚀 Lên đường vào Thế giới Lớp 2!
+            </button>
+          </div>
+        </div>
+
+        <!-- CỘT PHẢI: Khung xem trước trực quan LUÔN GIỮ VỊ TRÍ KHI SCROLL (Sticky) -->
         <div class="creator-preview-pane">
           <div class="creator-bubble" id="creator-bubble">
             Mến chào bé! Hãy tạo hình cho mình nhé! 🐾
           </div>
 
           <div class="creator-cat-stage" id="creator-cat-stage">
-            <!-- SVG sẽ được render bằng script -->
+            <!-- SVG bạn mèo được render bằng script -->
           </div>
 
           <div class="creator-pose-triggers">
@@ -53,60 +140,6 @@ const furColors = Object.values(CAT_FUR_COLORS);
             <button type="button" class="mini-pose-btn" data-pose="suy-nghi">🤔 Suy nghĩ</button>
             <button type="button" class="mini-pose-btn" data-pose="dung">✨ Đứng</button>
           </div>
-        </div>
-
-        <!-- Cột phải: Các bảng lựa chọn -->
-        <div class="creator-options-pane">
-          <!-- 1. Đặt tên -->
-          <div class="option-group">
-            <label class="group-label" for="char-name-input">🏷️ 1. Tên bạn mèo:</label>
-            <div class="name-input-wrapper">
-              <input
-                type="text"
-                id="char-name-input"
-                class="char-input"
-                maxlength="20"
-                value="Miu"
-                placeholder="Nhập tên..."
-              />
-              <div class="preset-name-pills">
-                <button type="button" class="name-pill active" data-name="Miu">Miu</button>
-                <button type="button" class="name-pill" data-name="Bo">Bo</button>
-                <button type="button" class="name-pill" data-name="Bơ">Bơ</button>
-                <button type="button" class="name-pill" data-name="Sóc">Sóc</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. Chọn màu lông -->
-          <div class="option-group">
-            <label class="group-label">🎨 2. Chọn màu lông:</label>
-            <div class="fur-color-grid" id="fur-color-grid">
-              {furColors.map((color, index) => (
-                <button
-                  type="button"
-                  class={`fur-chip ${index === 0 ? 'active' : ''}`}
-                  data-fur-id={color.id}
-                  data-fur-color={color.fur}
-                  title={color.name}
-                >
-                  <span class="fur-swatch" style={`background-color: ${color.fur}; border-color: ${color.furDark};`}></span>
-                  <span class="fur-name">{color.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <!-- 3. Chọn phụ kiện -->
-          <div class="option-group">
-            <label class="group-label">🎀 3. Phụ kiện (mỗi loại chọn 1 món):</label>
-            <AccessoryCategoryPicker />
-          </div>
-
-          <!-- Nút chốt Lưu & Lên đường -->
-          <button type="button" class="confirm-launch-btn" id="btn-launch-game">
-            🚀 Lên đường vào Thế giới Lớp 2!
-          </button>
         </div>
       </div>
     </div>
@@ -124,7 +157,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
 
   .creator-card {
     width: 100%;
-    max-width: 980px;
+    max-width: 1040px;
     background: #ffffff;
     border: 4px solid #0f172a;
     border-radius: 32px;
@@ -152,21 +185,27 @@ const furColors = Object.values(CAT_FUR_COLORS);
     margin-top: 0.35rem;
   }
 
+  /* Bố cục 2 cột: Tuỳ chọn bên trái (1fr) - Xem trước bên phải (320px) sticky */
   .creator-content-grid {
     display: grid;
-    grid-template-columns: 340px 1fr;
+    grid-template-columns: 1fr 340px;
     gap: 2rem;
     align-items: start;
+    min-width: 0;
   }
 
-  @media (max-width: 840px) {
+  @media (max-width: 880px) {
     .creator-content-grid {
       grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column-reverse;
     }
   }
 
-  /* Cột xem trước nhân vật */
+  /* Cột xem trước nhân vật (HIỂN THỊ BÊN PHẢI & STICKY KHI SCROLL) */
   .creator-preview-pane {
+    position: sticky;
+    top: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -175,6 +214,18 @@ const furColors = Object.values(CAT_FUR_COLORS);
     border: 3px solid #cbd5e1;
     border-radius: 24px;
     gap: 1.25rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    z-index: 10;
+  }
+
+  @media (max-width: 880px) {
+    .creator-preview-pane {
+      position: sticky;
+      top: 0.5rem;
+      width: 100%;
+      padding: 1rem;
+      gap: 0.75rem;
+    }
   }
 
   .creator-bubble {
@@ -187,11 +238,14 @@ const furColors = Object.values(CAT_FUR_COLORS);
     text-align: center;
     font-size: 0.95rem;
     box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+    position: relative;
+    max-width: 100%;
+    word-break: break-word;
   }
 
   .creator-cat-stage {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,7 +259,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
   }
 
   .mini-pose-btn {
-    padding: 0.4rem 0.75rem;
+    padding: 0.45rem 0.8rem;
     font-size: 0.85rem;
     font-weight: 800;
     background: #ffffff;
@@ -223,17 +277,76 @@ const furColors = Object.values(CAT_FUR_COLORS);
     color: #0369a1;
   }
 
-  /* Cột tùy chọn */
+  /* Cột tùy chọn bên trái */
   .creator-options-pane {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    min-width: 0;
+  }
+
+  /* Thanh tab phân loại chính */
+  .creator-tabs-bar {
+    display: flex;
+    gap: 0.6rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.6rem;
+  }
+
+  .creator-tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #475569;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+
+  .creator-tab-btn:hover {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+  }
+
+  .creator-tab-btn.active {
+    background: #0284c7;
+    border-color: #0369a1;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+  }
+
+  .tab-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  /* Panels nội dung của từng Tab */
+  .creator-tab-panel {
+    display: none;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .creator-tab-panel.active {
+    display: flex;
   }
 
   .option-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
   }
 
   .group-label {
@@ -244,13 +357,12 @@ const furColors = Object.values(CAT_FUR_COLORS);
 
   .name-input-wrapper {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
     gap: 0.75rem;
   }
 
   .char-input {
-    flex: 1 1 200px;
+    width: 100%;
     min-height: 52px;
     padding: 0.6rem 1rem;
     font-size: 1.25rem;
@@ -270,13 +382,14 @@ const furColors = Object.values(CAT_FUR_COLORS);
 
   .preset-name-pills {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.4rem;
   }
 
   .name-pill {
-    min-height: 48px;
+    min-height: 42px;
     padding: 0.4rem 0.85rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 800;
     background: #f1f5f9;
     border: 2px solid #cbd5e1;
@@ -296,7 +409,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
   .fur-color-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .fur-chip {
@@ -304,7 +417,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
     align-items: center;
     gap: 0.5rem;
     padding: 0.45rem 0.65rem;
-    min-height: 52px;
+    min-height: 50px;
     background: #ffffff;
     border: 2px solid #e2e8f0;
     border-radius: 14px;
@@ -320,24 +433,29 @@ const furColors = Object.values(CAT_FUR_COLORS);
   }
 
   .fur-swatch {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid;
     flex-shrink: 0;
   }
 
   .fur-name {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 800;
     color: #1e293b;
+    line-height: 1.25;
   }
 
   /* Nút xuất phát */
+  .creator-launch-bar {
+    margin-top: 0.5rem;
+  }
+
   .confirm-launch-btn {
     width: 100%;
-    min-height: 64px;
-    font-size: 1.35rem;
+    min-height: 60px;
+    font-size: 1.3rem;
     font-weight: 900;
     color: #ffffff;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -345,7 +463,6 @@ const furColors = Object.values(CAT_FUR_COLORS);
     border-radius: 20px;
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
-    margin-top: 0.5rem;
     transition: transform 0.15s, box-shadow 0.15s;
     touch-action: manipulation;
   }
@@ -357,6 +474,17 @@ const furColors = Object.values(CAT_FUR_COLORS);
 
   .confirm-launch-btn:active {
     transform: translateY(0);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
@@ -371,8 +499,9 @@ const furColors = Object.values(CAT_FUR_COLORS);
   import { bindAccessoryPicker } from '../../lib/game/avatar/accessory-picker';
   import { getBrowserGameStore } from '../../lib/game/state/game-store';
   import { speak, playSfx } from '../../lib/game/media/audio';
+  import { todayInVietnam } from '../../lib/today-lesson-picker';
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInVietnam();
   const store = getBrowserGameStore(today, 'Miu');
   const initialState = store.getState();
 
@@ -391,14 +520,33 @@ const furColors = Object.values(CAT_FUR_COLORS);
       pose: currentPose,
       furColor: currentFur,
       accessories: currentAccessories,
-      size: 180,
+      size: 190,
       label: `Bạn mèo ${currentName}`,
     });
   }
 
   renderPreview();
 
-  // Đổi tư thế
+  // Tab chuyển đổi: Tên & Màu lông vs Phụ kiện
+  const tabButtons = document.querySelectorAll<HTMLButtonElement>('[data-creator-tab]');
+  const tabPanels = document.querySelectorAll<HTMLElement>('[data-creator-panel]');
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.creatorTab;
+      tabButtons.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', String(active));
+      });
+      tabPanels.forEach((p) => {
+        p.classList.toggle('active', p.dataset.creatorPanel === target);
+      });
+      playSfx('click');
+    });
+  });
+
+  // Đổi tư thế xem trước
   const poseButtons = document.querySelectorAll('.mini-pose-btn');
   poseButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -409,10 +557,10 @@ const furColors = Object.values(CAT_FUR_COLORS);
     });
   });
 
-  // Tên
+  // Nhập tên bạn mèo
   nameInput?.addEventListener('input', () => {
     currentName = nameInput.value.trim() || 'Miu';
-    if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được gặp bạn! 🐾`;
+    if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được học cùng bạn! 🐾`;
   });
 
   const namePills = document.querySelectorAll('.name-pill');
@@ -423,7 +571,8 @@ const furColors = Object.values(CAT_FUR_COLORS);
       const val = pill.getAttribute('data-name') || 'Miu';
       currentName = val;
       if (nameInput) nameInput.value = val;
-      if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được gặp bạn! 🐾`;
+      if (bubble) bubble.textContent = `Tên mình là ${currentName} nè! Rất vui được học cùng bạn! 🐾`;
+      playSfx('click');
     });
   });
 
@@ -437,6 +586,15 @@ const furColors = Object.values(CAT_FUR_COLORS);
       renderPreview();
       playSfx('click');
     });
+  });
+
+  // Đồng bộ trạng thái ban đầu từ store
+  if (nameInput) nameInput.value = currentName;
+  namePills.forEach((p) => {
+    p.classList.toggle('active', p.getAttribute('data-name') === currentName);
+  });
+  furChips.forEach((c) => {
+    c.classList.toggle('active', c.getAttribute('data-fur-id') === currentFur);
   });
 
   // Chọn phụ kiện: mỗi loại 1 món
@@ -468,7 +626,7 @@ const furColors = Object.values(CAT_FUR_COLORS);
     store.flush();
 
     playSfx('levelUp');
-    speak(`Hoan hô! Bạn ${currentName} đã sẵn sàng bước vào Thế giới Lớp 2!`, { tone: 'cheer' });
+    speak(`Hoan hô! Bạn mèo ${currentName} đã sẵn sàng bước vào Thế giới Lớp 2!`, { tone: 'cheer' });
 
     setTimeout(() => {
       window.location.href = '/the-gioi/lop-2/';

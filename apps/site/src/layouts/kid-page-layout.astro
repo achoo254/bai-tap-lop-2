@@ -60,7 +60,7 @@ const handwritingAvailable = hasHandwritingFont();
           <span class="brand-cat" data-brand-cat aria-hidden="true">
             <MascotKitten pose="vui" />
           </span>
-          <span>{SITE_TITLE}</span>
+          <span data-brand-title>{SITE_TITLE}</span>
         </a>
         <div class="top-bar__right">
           <PwaInstallButton />
@@ -82,35 +82,95 @@ const handwritingAvailable = hasHandwritingFont();
 
 <script>
   /**
-   * Đồng bộ mèo ở thanh đầu trang với avatar cá nhân hoá từ game store.
-   * Khi store cập nhật (đổi màu/phụ kiện trong bảng cài đặt của đồng hành),
-   * subscriber này sẽ tự vẽ lại ngay lập tức — tất cả mèo trên trang đều
-   * hiển thị nhất quán theo cá nhân hóa của bé.
+   * Đồng bộ toàn diện tất cả mèo trên trang theo avatar cá nhân hoá từ game store:
+   * 1. Mèo trên thanh thương hiệu (brand logo ở góc trên bên trái).
+   * 2. Mọi biểu tượng mèo MascotKitten ([data-mascot-cat]) như mèo vẫy chào trang chủ, mèo gợi ý bài tập...
+   * 3. Vòng tròn đại diện nhân vật (.stats-avatar-circle) trên thanh chiến tích.
+   * Khi store cập nhật từ bảng cài đặt, tất cả mèo lập tức đổi diện mạo tức thì.
    */
   import {
     renderCatSvgHtml,
     type CatFurColorId,
     type CatAccessoryId,
+    type CatPose,
   } from '../components/game/characters/cat-character';
   import { getBrowserGameStore } from '../lib/game/state/game-store';
   import { todayInVietnam } from '../lib/today-lesson-picker';
 
-  const brandCat = document.querySelector<HTMLElement>('[data-brand-cat]');
-  if (brandCat) {
-    const store = getBrowserGameStore(todayInVietnam(), 'Miu');
+  const store = getBrowserGameStore(todayInVietnam(), 'Miu');
 
-    function drawBrandCat(): void {
-      const { avatar } = store.getState();
-      brandCat!.innerHTML = renderCatSvgHtml({
+  function syncAllCats(): void {
+    const { avatar } = store.getState();
+    const catName = avatar.name?.trim() || 'Miu';
+    const furColor = (avatar.furColor as CatFurColorId) || 'vang-cam';
+    const accessories = (avatar.accessories as CatAccessoryId[]) ?? [];
+
+    // Cập nhật tên bạn mèo tại mọi vị trí có data-cat-name
+    document.querySelectorAll<HTMLElement>('[data-cat-name]').forEach((el) => {
+      el.textContent = catName;
+    });
+
+    // Cập nhật tiêu đề thương hiệu trên thanh điều hướng
+    const brandTitle = document.querySelector<HTMLElement>('[data-brand-title]');
+    if (brandTitle) {
+      brandTitle.textContent = `Góc học tập của ${catName}`;
+    }
+
+    // 1. Mèo thương hiệu ở góc trên bên trái
+    const brandCat = document.querySelector<HTMLElement>('[data-brand-cat]');
+    if (brandCat) {
+      brandCat.innerHTML = renderCatSvgHtml({
         pose: 'vui',
-        furColor: (avatar.furColor as CatFurColorId) || 'vang-cam',
-        accessories: (avatar.accessories as CatAccessoryId[]) ?? [],
-        size: 40,
-        label: '',
+        furColor,
+        accessories,
+        size: 56,
+        label: `Bạn mèo ${catName}`,
       });
     }
 
-    drawBrandCat();
-    store.subscribe(() => drawBrandCat());
+    // 2. Mọi mascot mèo trên trang có data-mascot-cat
+    const mascotCats = document.querySelectorAll<SVGElement>('[data-mascot-cat]');
+    mascotCats.forEach((el) => {
+      // Bỏ qua nếu là phần tử con của brandCat đã được vẽ ở bước 1
+      if (brandCat && brandCat.contains(el)) return;
+
+      const pose = (el.dataset.pose as CatPose) || 'chao';
+      const label = el.getAttribute('aria-label') || el.dataset.label || `Bạn mèo ${avatar.name || 'Miu'}`;
+      const className = el.getAttribute('class') || 'mascot';
+
+      const temp = document.createElement('div');
+      temp.innerHTML = renderCatSvgHtml({
+        pose,
+        furColor,
+        accessories,
+        className,
+        label,
+        size: 140,
+      });
+
+      const newSvg = temp.firstElementChild;
+      if (newSvg) {
+        newSvg.setAttribute('data-mascot-cat', '');
+        newSvg.setAttribute('data-pose', pose);
+        newSvg.setAttribute('data-label', label);
+        el.replaceWith(newSvg);
+      }
+    });
+
+    // 3. Vòng tròn avatar trên thanh chiến tích trang chủ
+    const statsAvatar = document.querySelector<HTMLElement>('.stats-avatar-circle');
+    if (statsAvatar) {
+      statsAvatar.innerHTML = renderCatSvgHtml({
+        pose: 'vui',
+        furColor,
+        accessories,
+        size: 40,
+        label: catName,
+      });
+    }
   }
+
+  // Chạy ngay khi nạp trang và đăng ký lắng nghe thay đổi từ store
+  syncAllCats();
+  store.subscribe(syncAllCats);
 </script>

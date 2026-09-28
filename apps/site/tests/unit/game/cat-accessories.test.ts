@@ -15,11 +15,9 @@ describe('phụ kiện mèo theo loại', () => {
   });
 
   it('mỗi loại chỉ giữ 1 món, món chọn sau cùng thắng', () => {
-    expect(normalizeAccessories(['no-hong', 'mu-phot', 'no-do', 'kinh-tri-thuc', 'vuong-mien-sao'])).toEqual([
-      'no-do',
-      'kinh-tri-thuc',
-      'vuong-mien-sao',
-    ]);
+    expect(
+      normalizeAccessories(['no-hong', 'mu-phot', 'no-do', 'kinh-tri-thuc', 'vuong-mien-sao']),
+    ).toEqual(['no-do', 'kinh-tri-thuc', 'vuong-mien-sao']);
   });
 
   it('bỏ qua mã phụ kiện lạ trong dữ liệu cũ', () => {

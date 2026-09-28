@@ -442,7 +442,8 @@ export function speak(text: string, optionsOrLanguage?: SpeechLanguage | SpeakOp
   const toneConfig = VOICE_TONES[toneId] ?? VOICE_TONES.story;
 
   // Giọng Zalo (có giọng miền Nam): phát file âm thanh từ Worker, lỗi thì quay về giọng của máy
-  const zaloVoice = language === 'vi' ? findZaloVoice(options.voiceName ?? getPreferredVoice('vi')) : undefined;
+  const zaloVoice =
+    language === 'vi' ? findZaloVoice(options.voiceName ?? getPreferredVoice('vi')) : undefined;
   if (zaloVoice) {
     stopAudio();
     const speed = toZaloSpeed((options.rate ?? toneConfig.rate) * getSpeechRateScale());
@@ -597,7 +598,8 @@ export type SfxType =
 export type SfxName = SfxType;
 
 export function playSfx(type: SfxType): void {
-  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(SFX_EVENT, { detail: type }));
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new CustomEvent(SFX_EVENT, { detail: type }));
   unlockAudio();
   switch (type) {
     case 'correct':

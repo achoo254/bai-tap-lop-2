@@ -30,7 +30,8 @@ describe('lời nói nhân vật đồng hành', () => {
   });
 
   it('mỗi màn có ít nhất 2 câu để nói', () => {
-    for (const lines of Object.values(CONTEXT_LINES)) expect(lines.length).toBeGreaterThanOrEqual(2);
+    for (const lines of Object.values(CONTEXT_LINES))
+      expect(lines.length).toBeGreaterThanOrEqual(2);
   });
 
   it('câu riêng của màn chiếm nhiều hơn câu chung', () => {
@@ -45,7 +46,9 @@ describe('lời nói nhân vật đồng hành', () => {
   });
 
   it('thay tên nhân vật bé đặt vào câu nói', () => {
-    expect(personalize({ pose: 'vui', text: 'Chào {ten}! {ten} giỏi quá' }, 'Bơ').text).toBe('Chào Bơ! Bơ giỏi quá');
+    expect(personalize({ pose: 'vui', text: 'Chào {ten}! {ten} giỏi quá' }, 'Bơ').text).toBe(
+      'Chào Bơ! Bơ giỏi quá',
+    );
   });
 
   it('không lặp lại câu vừa nói', () => {

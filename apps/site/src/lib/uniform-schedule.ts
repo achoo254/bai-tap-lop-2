@@ -99,7 +99,7 @@ export const UNIFORM_SCHEDULE: Record<number, UniformDay> = {
     dayName: 'Chủ Nhật',
     shortName: 'CN',
     title: 'Trang phục tự do',
-    description: 'Trang phục thoải mái ở nhà hoặc dạo phố cùng bố Đạt, mẹ và em Bo.',
+    description: 'Trang phục thoải mái ở nhà hoặc dạo phố cùng bố mẹ.',
     badge: 'Gia đình yêu thương',
     icon: '🌈',
     color: '#6d28d9',

@@ -8,7 +8,10 @@
  * - Mèo tự nói chuyện, kiểu chữ đọc bài
  * Mọi lựa chọn lưu trên thiết bị (localStorage) nên tải lại trang không mất.
  */
-import { normalizeAccessories, type CatAccessoryId } from '../../../components/game/characters/cat-character';
+import {
+  normalizeAccessories,
+  type CatAccessoryId,
+} from '../../../components/game/characters/cat-character';
 import { bindAccessoryPicker } from '../avatar/accessory-picker';
 import type { GameStore } from '../state/game-store';
 import {
@@ -88,6 +91,27 @@ export function bindCompanionSettingsPanel(
     (next: CatAccessoryId[]) => saveAvatar({ accessories: next }),
   );
 
+  // --- Chuyển Tab trong bảng cài đặt ---
+  const tabBtns = panel.querySelectorAll<HTMLButtonElement>('[data-companion-tab]');
+  const tabPanes = panel.querySelectorAll<HTMLElement>('[data-tab-pane]');
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.companionTab;
+      tabBtns.forEach((b) => {
+        const isActive = b === btn;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-selected', String(isActive));
+      });
+      tabPanes.forEach((pane) => {
+        pane.hidden = pane.dataset.tabPane !== target;
+      });
+      if (target === 'accessories') {
+        picker.sync();
+      }
+    });
+  });
+
   // --- Âm thanh ---
   const allSound = field<HTMLInputElement>(panel, 'all-sound');
   const music = field<HTMLInputElement>(panel, 'music');
@@ -143,12 +167,11 @@ export function bindCompanionSettingsPanel(
   }
 
   if (tone) {
-    tone.replaceChildren(
-      ...Object.values(VOICE_TONES).map((t) => new Option(t.name, t.id)),
-    );
+    tone.replaceChildren(...Object.values(VOICE_TONES).map((t) => new Option(t.name, t.id)));
   }
 
-  const tryVoice = () => speak(`Xin chào ${store.getState().avatar.name}! Giọng mình nghe thế này nè.`);
+  const tryVoice = () =>
+    speak(`Xin chào ${store.getState().avatar.name}! Giọng mình nghe thế này nè.`);
 
   allSound?.addEventListener('change', () => setMuted(!allSound.checked));
   music?.addEventListener('change', () => setMusicEnabled(music.checked));

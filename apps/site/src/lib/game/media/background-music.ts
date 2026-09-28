@@ -21,7 +21,10 @@ export interface BackgroundTrack {
 /** Nguồn gốc & giấy phép ghi tại public/game/licenses.json và trang Ghi nguồn. */
 /** `?v=` đổi mỗi khi thay nội dung file (thư mục /game được trình duyệt lưu cache lâu dài). */
 const TRACK_VERSION = 2;
-const track = (id: string): BackgroundTrack => ({ id, url: `/game/audio/nhac-nen/${id}.mp3?v=${TRACK_VERSION}` });
+const track = (id: string): BackgroundTrack => ({
+  id,
+  url: `/game/audio/nhac-nen/${id}.mp3?v=${TRACK_VERSION}`,
+});
 
 /** Bài sôi động xen kẽ bài nhẹ nhàng. */
 export const BACKGROUND_TRACKS: BackgroundTrack[] = [
@@ -60,7 +63,10 @@ function setupGain(element: HTMLAudioElement): void {
   try {
     audioContext = new AudioContext();
     gainNode = audioContext.createGain();
-    audioContext.createMediaElementSource(element).connect(gainNode).connect(audioContext.destination);
+    audioContext
+      .createMediaElementSource(element)
+      .connect(gainNode)
+      .connect(audioContext.destination);
   } catch {
     audioContext = null;
     gainNode = null;
@@ -98,7 +104,8 @@ function savePosition(): void {
 
 function loadTrack(index: number, startAt = 0): void {
   if (!audio) return;
-  trackIndex = ((index % BACKGROUND_TRACKS.length) + BACKGROUND_TRACKS.length) % BACKGROUND_TRACKS.length;
+  trackIndex =
+    ((index % BACKGROUND_TRACKS.length) + BACKGROUND_TRACKS.length) % BACKGROUND_TRACKS.length;
   audio.src = BACKGROUND_TRACKS[trackIndex].url;
   if (startAt > 0) {
     audio.addEventListener(

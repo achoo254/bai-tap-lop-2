@@ -1,7 +1,12 @@
 ---
 /**
- * Bộ chọn phụ kiện chia theo loại (mỗi loại 1 món), dùng ở trang Tạo nhân vật
- * và bảng cài đặt của nhân vật đồng hành. Hành vi gắn bằng `bindAccessoryPicker`.
+ * apps/site/src/components/game/accessory-category-picker.astro
+ *
+ * Bộ chọn phụ kiện phân loại thông minh & tối ưu UX cho danh sách phong phú (~150 món):
+ * - Thanh tab danh mục cuộn ngang mượt mà, kèm icon và huy hiệu (badge) báo món đang đeo.
+ * - Ô tìm kiếm nhanh lọc tức thì theo tên phụ kiện.
+ * - Thanh tóm tắt đồ đang đeo với nút gỡ nhanh (✕) từng món và nút "Tháo tất cả".
+ * - Lưới phụ kiện dạng thẻ rõ ràng, chạm bấm tiện lợi trên iPad và điện thoại.
  */
 import { CAT_ACCESSORIES, CAT_ACCESSORY_CATEGORIES } from './characters/cat-character';
 
@@ -11,65 +16,415 @@ const groups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
 }));
 ---
 
-<div class="acc-picker">
-  {
-    groups.map((group) => (
-      <div class="acc-category" data-acc-category={group.id} role="radiogroup" aria-label={group.name}>
-        <span class="acc-category-name">
-          {group.icon} {group.name}
+<div class="acc-picker" data-acc-picker-root>
+  <!-- 1. Thanh tìm kiếm và tóm tắt phụ kiện đang đeo -->
+  <div class="acc-toolbar">
+    <div class="acc-search-box">
+      <span class="acc-search-icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        class="acc-search-input"
+        placeholder="Tìm phụ kiện... (ví dụ: vàng, siêu nhân, nơ, kính...)"
+        data-acc-search
+        aria-label="Tìm kiếm phụ kiện"
+      />
+      <button type="button" class="acc-search-clear" data-acc-clear hidden aria-label="Xóa tìm kiếm">✕</button>
+    </div>
+
+    <!-- Tóm tắt đồ đang đeo -->
+    <div class="acc-equipped-bar" data-acc-equipped-bar hidden>
+      <div class="acc-equipped-header">
+        <span class="acc-equipped-title">
+          ✨ Đang trang bị (<span data-acc-equipped-count>0</span> món):
         </span>
-        <div class="acc-grid">
-          <button type="button" class="acc-chip acc-chip--none" data-acc-id="" role="radio" aria-checked="false">
-            Không đeo
-          </button>
-          {group.items.map((acc) => (
-            <button type="button" class="acc-chip" data-acc-id={acc.id} role="radio" aria-checked="false">
-              {acc.name}
-            </button>
-          ))}
-        </div>
+        <button type="button" class="acc-clear-all-btn" data-acc-clear-all>
+          🗑️ Tháo tất cả
+        </button>
       </div>
-    ))
-  }
+      <div class="acc-equipped-chips" data-acc-equipped-chips></div>
+    </div>
+  </div>
+
+  <!-- 2. Thanh tab danh mục cuộn ngang -->
+  <div class="acc-tabs-nav" role="tablist" aria-label="Loại phụ kiện">
+    <button
+      type="button"
+      class="acc-tab-btn active"
+      data-acc-tab="all"
+      role="tab"
+      aria-selected="true"
+    >
+      <span class="acc-tab-icon">🌟</span>
+      <span class="acc-tab-label">Tất cả</span>
+    </button>
+    {
+      groups.map((group) => (
+        <button
+          type="button"
+          class="acc-tab-btn"
+          data-acc-tab={group.id}
+          role="tab"
+          aria-selected="false"
+        >
+          <span class="acc-tab-icon">{group.icon}</span>
+          <span class="acc-tab-label">{group.name}</span>
+          <span class="acc-tab-badge" data-tab-badge={group.id} hidden aria-label="Có phụ kiện đang đeo">✓</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- 3. Danh sách các nhóm phụ kiện -->
+  <div class="acc-groups-container">
+    {
+      groups.map((group) => (
+        <section class="acc-category" data-acc-category={group.id} role="radiogroup" aria-label={group.name}>
+          <div class="acc-category-head">
+            <span class="acc-category-title">
+              <span class="category-icon">{group.icon}</span> {group.name}
+            </span>
+            <span class="acc-category-count">({group.items.length} món)</span>
+          </div>
+
+          <div class="acc-grid">
+            <!-- Nút không đeo loại này -->
+            <button
+              type="button"
+              class="acc-chip acc-chip--none"
+              data-acc-id=""
+              role="radio"
+              aria-checked="false"
+            >
+              <span class="chip-icon">🚫</span>
+              <span class="chip-name">Không đeo</span>
+            </button>
+
+            <!-- Các món phụ kiện -->
+            {group.items.map((acc) => (
+              <button
+                type="button"
+                class="acc-chip"
+                data-acc-id={acc.id}
+                data-acc-name={acc.name.toLowerCase()}
+                role="radio"
+                aria-checked="false"
+                title={acc.name}
+              >
+                <span class="chip-icon">{group.icon}</span>
+                <span class="chip-name">{acc.name}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
 </div>
 
 <style>
+  .acc-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  /* Toolbar: Tìm kiếm & Tóm tắt */
+  .acc-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .acc-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .acc-search-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 1.1rem;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .acc-search-input {
+    width: 100%;
+    min-height: 46px;
+    padding: 8px 36px 8px 38px;
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    background: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+
+  .acc-search-input:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  }
+
+  .acc-search-clear {
+    position: absolute;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #e2e8f0;
+    color: #475569;
+    font-weight: 900;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  /* Thanh tóm tắt đồ đang đeo */
+  .acc-equipped-bar {
+    padding: 0.65rem 0.85rem;
+    background: #fdf2f8;
+    border: 2px solid #f472b6;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .acc-equipped-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .acc-equipped-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #be185d;
+  }
+
+  .acc-clear-all-btn {
+    padding: 2px 8px;
+    min-height: 28px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1.5px solid #f87171;
+    border-radius: 8px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+
+  .acc-clear-all-btn:hover {
+    background: #fecaca;
+  }
+
+  .acc-equipped-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  :global(.acc-equipped-pill) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #ffffff;
+    border: 1.5px solid #ec4899;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #be185d;
+    box-shadow: 0 1px 3px rgba(236, 72, 153, 0.15);
+  }
+
+  :global(.acc-pill-remove) {
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    background: #fce7f3;
+    border: none;
+    border-radius: 50%;
+    color: #be185d;
+    font-size: 0.75rem;
+    font-weight: 900;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+
+  :global(.acc-pill-remove:hover) {
+    background: #f43f5e;
+    color: #ffffff;
+  }
+
+  /* Thanh tab danh mục cuộn ngang */
+  .acc-tabs-nav {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .acc-tabs-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .acc-tabs-nav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  .acc-tab-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 40px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #475569;
+    cursor: pointer;
+    touch-action: manipulation;
+    scroll-snap-align: start;
+    transition: all 0.15s ease;
+  }
+
+  .acc-tab-btn:hover {
+    border-color: #0284c7;
+    background: #f0f9ff;
+    color: #0369a1;
+  }
+
+  .acc-tab-btn.active {
+    background: #0284c7;
+    border-color: #0369a1;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+  }
+
+  .acc-tab-icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .acc-tab-badge {
+    display: inline-grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 900;
+  }
+
+  .acc-tab-btn.active .acc-tab-badge {
+    background: #ffffff;
+    color: #0284c7;
+  }
+
+  /* Khung nội dung nhóm phụ kiện */
+  .acc-groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .acc-category {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1.5px dashed #e2e8f0;
   }
 
-  .acc-category-name {
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: #475569;
+  .acc-category:last-child {
+    border-bottom: none;
   }
 
-  .acc-grid {
+  .acc-category.is-hidden {
+    display: none !important;
+  }
+
+  .acc-category-head {
     display: flex;
-    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .acc-category-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .acc-category-count {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  /* Lưới phụ kiện */
+  .acc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 0.5rem;
   }
 
   .acc-chip {
-    padding: 0.5rem 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
     min-height: 48px;
     background: #ffffff;
     border: 2px solid #e2e8f0;
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: #334155;
+    text-align: left;
     touch-action: manipulation;
-    transition: all 0.15s;
+    transition: all 0.15s ease;
+  }
+
+  .acc-chip:hover {
+    border-color: #38bdf8;
+    background: #f0f9ff;
+  }
+
+  .acc-chip.is-search-hidden {
+    display: none !important;
   }
 
   .acc-chip--none {
     color: #64748b;
     border-style: dashed;
+    background: #f8fafc;
   }
 
   .acc-chip.active {
@@ -77,5 +432,31 @@ const groups = CAT_ACCESSORY_CATEGORIES.map((category) => ({
     border-color: #ec4899;
     color: #be185d;
     box-shadow: 0 0 0 2px #ec4899;
+  }
+
+  .chip-icon {
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .chip-name {
+    flex: 1;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>

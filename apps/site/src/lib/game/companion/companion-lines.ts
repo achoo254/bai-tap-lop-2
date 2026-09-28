@@ -45,7 +45,7 @@ export const CONTEXT_LINES: Record<CompanionContext, CompanionLine[]> = {
     L('nhay', 'Bấm vào Thế giới học tập, mình cùng phiêu lưu đi!'),
     L('dung', 'Thời khoá biểu hôm nay có những môn gì ta?'),
     L('vui', 'Học một chút, chơi một chút, vui ơi là vui!'),
-    L('chao', 'Bố mẹ và em Bo thương {ten} lắm đó!'),
+    L('chao', 'Bố mẹ thương {ten} lắm đó!'),
     L('suy-nghi', 'Hôm qua mình học tới đâu rồi nhỉ?'),
   ],
   'danh-sach-bai': [
@@ -116,10 +116,7 @@ export const CONTEXT_LINES: Record<CompanionContext, CompanionLine[]> = {
     L('vui', 'Nghe nhiều là nói giỏi đó!'),
     L('suy-nghi', 'Vùng này sắp mở rồi, chờ chút nha.'),
   ],
-  'vung-khac': [
-    L('suy-nghi', 'Vùng này có gì hay ta?'),
-    L('vui', 'Khám phá thôi {ten}!'),
-  ],
+  'vung-khac': [L('suy-nghi', 'Vùng này có gì hay ta?'), L('vui', 'Khám phá thôi {ten}!')],
   'nhiem-vu': [
     L('suy-nghi', 'Bình tĩnh suy nghĩ nha {ten}, mình tin bạn!'),
     L('dung', 'Bí quá thì bấm bóng đèn để xem gợi ý nhé.'),
@@ -177,11 +174,46 @@ export const GENERAL_LINES: CompanionLine[] = [
 ];
 
 const TIME_LINES: { from: number; to: number; lines: CompanionLine[] }[] = [
-  { from: 5, to: 11, lines: [L('chao', 'Chào buổi sáng {ten}! Ăn sáng chưa nè?'), L('vui', 'Buổi sáng học bài là mau thuộc nhất!')] },
-  { from: 11, to: 14, lines: [L('suy-nghi', 'Trưa rồi, ăn cơm rồi nghỉ trưa chút nha.'), L('dung', 'Buổi trưa ngủ một chút cho khoẻ nhé!')] },
-  { from: 14, to: 18, lines: [L('chao', 'Chào buổi chiều {ten}! Đi học về rồi hả?'), L('vui', 'Chiều nay mình ôn bài cùng nhau nha!')] },
-  { from: 18, to: 21, lines: [L('dung', 'Buổi tối học bài xong rồi đi ngủ sớm nha.'), L('suy-nghi', 'Soạn sách vở cho ngày mai chưa {ten}?')] },
-  { from: 21, to: 24, lines: [L('buon', 'Khuya rồi, {ten} đi ngủ thôi...'), L('suy-nghi', 'Mai mình học tiếp nha, ngủ ngon!')] },
+  {
+    from: 5,
+    to: 11,
+    lines: [
+      L('chao', 'Chào buổi sáng {ten}! Ăn sáng chưa nè?'),
+      L('vui', 'Buổi sáng học bài là mau thuộc nhất!'),
+    ],
+  },
+  {
+    from: 11,
+    to: 14,
+    lines: [
+      L('suy-nghi', 'Trưa rồi, ăn cơm rồi nghỉ trưa chút nha.'),
+      L('dung', 'Buổi trưa ngủ một chút cho khoẻ nhé!'),
+    ],
+  },
+  {
+    from: 14,
+    to: 18,
+    lines: [
+      L('chao', 'Chào buổi chiều {ten}! Đi học về rồi hả?'),
+      L('vui', 'Chiều nay mình ôn bài cùng nhau nha!'),
+    ],
+  },
+  {
+    from: 18,
+    to: 21,
+    lines: [
+      L('dung', 'Buổi tối học bài xong rồi đi ngủ sớm nha.'),
+      L('suy-nghi', 'Soạn sách vở cho ngày mai chưa {ten}?'),
+    ],
+  },
+  {
+    from: 21,
+    to: 24,
+    lines: [
+      L('buon', 'Khuya rồi, {ten} đi ngủ thôi...'),
+      L('suy-nghi', 'Mai mình học tiếp nha, ngủ ngon!'),
+    ],
+  },
   { from: 0, to: 5, lines: [L('buon', 'Khuya lắm rồi đó {ten}, đi ngủ nha!')] },
 ];
 
@@ -198,10 +230,7 @@ export const REACTION_LINES: Record<CompanionReaction, CompanionLine[]> = {
     L('te', 'Ui, trượt rồi! Đứng dậy làm tiếp nha!'),
     L('suy-nghi', 'Xem gợi ý thử xem {ten}!'),
   ],
-  reward: [
-    L('nhay', 'Được thưởng rồi! Vui quá đi!'),
-    L('vui', '{ten} xứng đáng lắm luôn!'),
-  ],
+  reward: [L('nhay', 'Được thưởng rồi! Vui quá đi!'), L('vui', '{ten} xứng đáng lắm luôn!')],
   levelUp: [
     L('nhay', 'Lên cấp rồi! {ten} siêu quá!'),
     L('vui', 'Ting ting! Cấp mới, sức mạnh mới!'),
@@ -214,7 +243,10 @@ export const REACTION_LINES: Record<CompanionReaction, CompanionLine[]> = {
 };
 
 /** Suy ra màn đang xem từ đường dẫn (và môn của bài học nếu có). */
-export function detectCompanionContext(pathname: string, lessonSubject?: string | null): CompanionContext {
+export function detectCompanionContext(
+  pathname: string,
+  lessonSubject?: string | null,
+): CompanionContext {
   const path = pathname.endsWith('/') ? pathname : `${pathname}/`;
   if (path === '/') return 'trang-chu';
   if (path.startsWith('/cac-bai/')) return 'danh-sach-bai';
@@ -247,7 +279,12 @@ export function timeOfDayLines(hour: number): CompanionLine[] {
 
 /** Toàn bộ câu có thể nói ở màn này: câu riêng của màn nhiều nhất, xen câu theo giờ và câu chung. */
 export function linesForContext(context: CompanionContext, hour: number): CompanionLine[] {
-  return [...CONTEXT_LINES[context], ...CONTEXT_LINES[context], ...timeOfDayLines(hour), ...GENERAL_LINES];
+  return [
+    ...CONTEXT_LINES[context],
+    ...CONTEXT_LINES[context],
+    ...timeOfDayLines(hour),
+    ...GENERAL_LINES,
+  ];
 }
 
 export function personalize(line: CompanionLine, name: string): CompanionLine {
@@ -255,7 +292,11 @@ export function personalize(line: CompanionLine, name: string): CompanionLine {
 }
 
 /** Chọn ngẫu nhiên một câu, tránh lặp lại câu vừa nói. */
-export function pickLine(lines: CompanionLine[], previousText?: string, random = Math.random): CompanionLine {
+export function pickLine(
+  lines: CompanionLine[],
+  previousText?: string,
+  random = Math.random,
+): CompanionLine {
   const candidates = lines.length > 1 ? lines.filter((l) => l.text !== previousText) : lines;
   return candidates[Math.floor(random() * candidates.length)] ?? lines[0];
 }
