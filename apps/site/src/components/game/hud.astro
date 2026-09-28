@@ -8,6 +8,9 @@
  * - Nút bật/tắt âm thanh 🔊/🔇
  * - Nút điều hướng quay lại bản đồ 🗺️
  */
+import '../../styles/game.css';
+import '../../components/game/characters/character-poses.css';
+
 interface Props {
   title?: string;
   backUrl?: string;
@@ -23,40 +26,41 @@ const {
 } = Astro.props;
 ---
 
-<header class="game-hud" id="game-hud">
-  <div class="hud-left">
-    <a href="/the-gioi/tao-nhan-vat/" class="hud-avatar-chip" title="Chỉnh sửa nhân vật của bé">
-      <div class="hud-avatar-circle" id="hud-avatar-icon">
-        🐱
-      </div>
-      <div class="hud-avatar-info">
-        <span class="hud-avatar-name" id="hud-avatar-name">Miu</span>
-        <span class="hud-level-badge" id="hud-level-badge">Cấp 1</span>
-      </div>
-    </a>
+<div class="game-hud-wrapper">
+  <header class="game-hud" id="game-hud">
+    <div class="hud-left">
+      <a href="/the-gioi/tao-nhan-vat/" class="hud-avatar-chip" title="Chỉnh sửa nhân vật của bé">
+        <div class="hud-avatar-circle" id="hud-avatar-icon">
+          🐱
+        </div>
+        <div class="hud-avatar-info">
+          <span class="hud-avatar-name" id="hud-avatar-name">Miu</span>
+          <span class="hud-level-badge" id="hud-level-badge">Cấp 1</span>
+        </div>
+      </a>
 
-    <div class="hud-xp-container" title="Điểm kinh nghiệm để lên cấp tiếp theo">
-      <div class="hud-xp-label">
-        <span>XP</span>
-        <span id="hud-xp-text">0 / 100</span>
-      </div>
-      <div class="hud-xp-bar-bg">
-        <div class="hud-xp-bar-fill" id="hud-xp-fill" style="width: 0%;"></div>
+      <div class="hud-xp-container" title="Điểm kinh nghiệm để lên cấp tiếp theo">
+        <div class="hud-xp-label">
+          <span>XP</span>
+          <span id="hud-xp-text">0 / 100</span>
+        </div>
+        <div class="hud-xp-bar-bg">
+          <div class="hud-xp-bar-fill" id="hud-xp-fill" style="width: 0%;"></div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="hud-center">
-    {showHearts ? (
-      <div class="quest-hearts" id="hud-hearts" title="Lượt thử còn lại">
-        <span>❤️</span><span>❤️</span><span>❤️</span>
-      </div>
-    ) : (
-      <span class="hud-title-badge" style="font-weight: 900; font-size: 1.1rem; color: #0f172a;">
-        {title}
-      </span>
-    )}
-  </div>
+    <div class="hud-center">
+      {showHearts ? (
+        <div class="quest-hearts" id="hud-hearts" title="Lượt thử còn lại">
+          <span>❤️</span><span>❤️</span><span>❤️</span>
+        </div>
+      ) : (
+        <span class="hud-title-badge">
+          {title}
+        </span>
+      )}
+    </div>
 
   <div class="hud-right">
     <div class="hud-stat-pill coins" title="Số xu vàng đã thu thập">
@@ -74,12 +78,13 @@ const {
     </button>
 
     {backUrl && (
-      <a href={backUrl} class="hud-btn" title={backLabel}>
+      <a href={backUrl} class="hud-btn" title={backLabel} aria-label={backLabel}>
         🗺️
       </a>
     )}
   </div>
 </header>
+</div>
 
 <script>
   import { getBrowserGameStore } from '../../lib/game/state/game-store';

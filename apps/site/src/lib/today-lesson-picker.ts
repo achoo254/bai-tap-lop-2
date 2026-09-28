@@ -51,3 +51,10 @@ export function hourInVietnam(now: Date = new Date()): number {
     }).format(now),
   );
 }
+
+/** Thứ trong tuần (0: Chủ Nhật, 1: Thứ 2, ..., 6: Thứ 7) theo giờ Việt Nam. */
+export function dayOfWeekInVietnam(now: Date = new Date()): number {
+  const iso = todayInVietnam(now);
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+}

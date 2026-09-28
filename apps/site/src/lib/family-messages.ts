@@ -32,9 +32,16 @@ export function greetingFor(mode: TodayPickMode | 'the-gioi', hour: number): str
   }
 }
 
-/** Lời chào mèo con khi vào Thế giới học tập. */
-export function greetingForWorld(hour: number): string {
-  return greetingFor('the-gioi', hour);
+import { uniformReminderFor } from './uniform-schedule';
+
+/** Lời chào mèo con khi vào Thế giới học tập (kèm nhắc nhở đồng phục theo ngày). */
+export function greetingForWorld(hour: number, dayOfWeek?: number): string {
+  const hello = `Chào ${miu} ${partOfDay(hour)} vui vẻ!`;
+  if (dayOfWeek === undefined) {
+    return `${hello} Cùng mèo con khám phá Thế giới học tập nhé! 🚀`;
+  }
+  const reminder = uniformReminderFor(hour, dayOfWeek);
+  return `${hello} ${reminder.text} Cùng bước vào Thế giới học tập nào! 🚀`;
 }
 
 /** Lời chúc sinh nhật trong ngày (nếu có). */
