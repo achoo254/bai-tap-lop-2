@@ -84,7 +84,9 @@ img {
   box-shadow: var(--shadow-comic-small);
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .comic-button:active {
@@ -321,7 +323,13 @@ img {
 .draft-banner {
   margin-bottom: var(--space-5);
   padding: var(--space-3) var(--space-5);
-  background: repeating-linear-gradient(-45deg, var(--color-sun), var(--color-sun) 16px, #ffe690 16px, #ffe690 32px);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-sun),
+    var(--color-sun) 16px,
+    #ffe690 16px,
+    #ffe690 32px
+  );
   border: var(--border-comic);
   border-radius: var(--radius-md);
   font-weight: 700;
@@ -452,4 +460,37 @@ img {
   margin: 0 0 var(--space-2);
   font-weight: 700;
   color: #c2185b;
+}
+
+/* Banner Luyện TIMO trên trang chủ */
+.timo-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  color: var(--color-ink);
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--color-sky), var(--color-grape));
+  border: var(--border-comic-thick);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-comic);
+  transition: transform 0.1s ease;
+}
+.timo-banner:active {
+  transform: translate(3px, 3px);
+}
+.timo-banner__emoji {
+  flex: none;
+  font-size: 64px;
+  line-height: 1;
+}
+.timo-banner__title {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+}
+.timo-banner__subtitle {
+  display: block;
+  font-size: 22px;
 }

@@ -31,6 +31,14 @@ const datedLessons = published.map((lesson) => ({ id: lesson.id, ngay: lesson.fr
     <a class="comic-button comic-button--sky" href="/cac-bai/">Xem tất cả bài</a>
   </p>
 
+  <a class="timo-banner" href="/luyen-timo/">
+    <span class="timo-banner__emoji" aria-hidden="true">🏝️</span>
+    <span>
+      <span class="timo-banner__title">Luyện thi TIMO</span>
+      <span class="timo-banner__subtitle">Chơi trò chơi toán cùng mèo con</span>
+    </span>
+  </a>
+
   <script type="application/json" id="du-lieu-bai" set:html={JSON.stringify(datedLessons)} />
 </KidPageLayout>
 

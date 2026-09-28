@@ -1,0 +1,103 @@
+---
+/**
+ * Mini-game "Kẹo chẵn lẻ" — bản thử đầu tiên của mục Luyện TIMO.
+ * Dạng bài lấy từ chủ đề Số chẵn/số lẻ trong bộ đề ôn TIMO Khối 2 (vòng loại); câu hỏi do máy tự sinh.
+ */
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import MascotKitten from '../../components/mascot-kitten.astro';
+import { CHILD_PROFILE } from 'lesson-core';
+import '../../styles/timo-game.css';
+
+const miu = CHILD_PROFILE.nickname;
+---
+
+<KidPageLayout title="Kẹo chẵn lẻ" showToolbar={false} noindex>
+  <div class="timo-game" data-timo-game>
+    <section data-screen="start" class="game-screen game-start">
+      <div class="mascot-row">
+        <MascotKitten pose="chao" label="Mèo con vẫy chào" />
+        <p class="speech-bubble">Chào {miu}! Cùng mèo con chơi <strong>Kẹo chẵn lẻ</strong> nhé! 🍬</p>
+      </div>
+      <h1 class="game-title">🍬 Kẹo chẵn lẻ</h1>
+      <p class="game-best">Kỷ lục của {miu}: <strong data-best>0</strong> ⭐</p>
+      <div class="game-actions">
+        <button type="button" class="comic-button comic-button--sun game-big-button" data-action="play">
+          ▶ Chơi
+        </button>
+        <button type="button" class="comic-button comic-button--sky game-big-button" data-action="tip">
+          💡 Mẹo của mèo
+        </button>
+      </div>
+      <p class="game-note" data-no-voice hidden>
+        Máy này chưa có giọng đọc tiếng Việt, nên bố mẹ đọc đề giúp {miu} nhé. (iPad: Cài đặt → Trợ năng →
+        Nội dung được đọc → Giọng nói → Tiếng Việt.)
+      </p>
+    </section>
+
+    <section data-screen="tip" class="game-screen" hidden>
+      <h2 class="game-title">💡 Mẹo của mèo</h2>
+      <div class="tip-row">
+        <div class="play-stage candy-stage" data-tip-even></div>
+        <p class="tip-label tip-label--even" data-tip-label="chan" hidden>6 viên: xếp đôi vừa hết → <b>CHẴN</b></p>
+      </div>
+      <div class="tip-row">
+        <div class="play-stage candy-stage" data-tip-odd></div>
+        <p class="tip-label tip-label--odd" data-tip-label="le" hidden>7 viên: thừa 1 viên → <b>LẺ</b></p>
+      </div>
+      <p class="tip-rule">Số có chữ số cuối là <b>0, 2, 4, 6, 8</b> là số chẵn.</p>
+      <div class="game-actions">
+        <button type="button" class="comic-button comic-button--sun game-big-button" data-action="play">
+          ▶ Chơi thôi!
+        </button>
+      </div>
+    </section>
+
+    <section data-screen="play" class="game-screen" hidden>
+      <div class="game-hud">
+        <div class="progress" data-progress aria-label="Tiến độ"></div>
+        <p class="star-count" aria-label="Số sao">⭐ <span data-stars>0</span></p>
+      </div>
+      <div class="prompt">
+        <button type="button" class="comic-button comic-button--sky speak-button" data-speak aria-label="Đọc lại đề">
+          🔊
+        </button>
+        <div>
+          <p class="prompt__text" data-prompt></p>
+          <p class="prompt__en" data-prompt-en lang="en"></p>
+        </div>
+      </div>
+      <div class="play-stage" data-stage></div>
+      <p class="picked-counter" data-picked hidden></p>
+      <div class="answer-grid" data-choices></div>
+      <p class="game-feedback" data-feedback aria-live="polite"></p>
+      <div class="game-actions">
+        <button type="button" class="comic-button comic-button--sun game-big-button" data-next hidden>
+          Tiếp theo ▶
+        </button>
+      </div>
+    </section>
+
+    <section data-screen="end" class="game-screen game-end" hidden>
+      <div class="mascot-row">
+        <MascotKitten pose="vui" label="Mèo con cười vui" />
+        <p class="speech-bubble" data-end-message></p>
+      </div>
+      <p class="end-stars" data-end-stars></p>
+      <div class="game-actions">
+        <button type="button" class="comic-button comic-button--sun game-big-button" data-action="play">
+          🔁 Chơi lại
+        </button>
+        <a class="comic-button comic-button--sky game-big-button" href="/luyen-timo/">🏝️ Trò chơi khác</a>
+      </div>
+    </section>
+
+    <div class="confetti-host" data-confetti aria-hidden="true"></div>
+  </div>
+</KidPageLayout>
+
+<script>
+  import { startEvenOddGame } from '../../lib/timo/even-odd-game';
+
+  const root = document.querySelector<HTMLElement>('[data-timo-game]');
+  if (root) startEvenOddGame(root);
+</script>

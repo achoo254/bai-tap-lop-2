@@ -1,0 +1,50 @@
+---
+/** Đảo Luyện TIMO: danh sách trò chơi toán theo khung chương trình TIMO Khối 2. */
+import KidPageLayout from '../../layouts/kid-page-layout.astro';
+import MascotKitten from '../../components/mascot-kitten.astro';
+import { CHILD_PROFILE } from 'lesson-core';
+import { TIMO_GAMES, timoGameHref } from '../../lib/timo/timo-game-catalog';
+import '../../styles/timo-game.css';
+
+const miu = CHILD_PROFILE.nickname;
+---
+
+<KidPageLayout title="Luyện TIMO" showToolbar={false} noindex>
+  <div class="mascot-row">
+    <MascotKitten pose="chao" label="Mèo con vẫy chào" />
+    <p class="speech-bubble">{miu} chọn một trò chơi toán để luyện thi TIMO nhé! 🏝️</p>
+  </div>
+
+  <ul class="lesson-grid timo-game-list">
+    {
+      TIMO_GAMES.map((game) => (
+        <li>
+          <a class="lesson-card timo-game-card" href={timoGameHref(game)}>
+            <span class="timo-game-card__emoji" aria-hidden="true">
+              {game.emoji}
+            </span>
+            <span class="subject-badge" data-subject="toan">
+              {game.topic}
+            </span>
+            <span class="lesson-card__title">{game.title}</span>
+            <span class="lesson-card__date">{game.description}</span>
+            <span class="timo-game-card__stars" data-best-stars={game.bestStarsKey} data-max={game.maxStars} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="empty-state">Mèo con đang làm thêm trò chơi mới cho {miu}! 🐾</p>
+</KidPageLayout>
+
+<script>
+  import { readBestStars, TIMO_GAMES } from '../../lib/timo/timo-game-catalog';
+
+  // Hiện kỷ lục sao của từng trò chơi (lưu trên máy của bé).
+  for (const game of TIMO_GAMES) {
+    const slot = document.querySelector<HTMLElement>(`[data-best-stars="${game.bestStarsKey}"]`);
+    const best = readBestStars(game);
+    if (slot) slot.textContent = best > 0 ? `Kỷ lục: ${'⭐'.repeat(best)}` : 'Chưa chơi lần nào';
+  }
+</script>
