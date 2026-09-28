@@ -146,14 +146,6 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
               );
             })
           }
-
-          <!-- Miu nhân vật trên bản đồ sự kiện -->
-          <div class="miu-sailor-marker" id="miu-sailor" style="left: 22%; top: 75%;">
-            <div class="miu-figure-box" id="miu-event-figure">
-              <!-- Miu SVG -->
-            </div>
-            <div class="miu-tag" id="miu-event-tag">Miu</div>
-          </div>
         </div>
       </section>
 
@@ -229,11 +221,6 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
 </KidPageLayout>
 
 <script>
-  import {
-    renderCatSvgHtml,
-    type CatFurColorId,
-    type CatAccessoryId,
-  } from '../../../../components/game/characters/cat-character';
   import { getBrowserGameStore } from '../../../../lib/game/state/game-store';
 
   const today = new Date().toISOString().slice(0, 10);
@@ -256,22 +243,7 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     let completedCount = 0;
     let totalStars = 0;
 
-    // Render Miu nhân vật
-    const miuFigure = document.getElementById('miu-event-figure');
-    const miuTag = document.getElementById('miu-event-tag');
-    if (miuFigure && state.avatar) {
-      miuFigure.innerHTML = renderCatSvgHtml({
-        pose: 'dung',
-        furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
-        accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
-        size: 72,
-      });
-      if (miuTag) miuTag.textContent = state.avatar.name || 'Miu';
-    }
-
     const islandNodes = document.querySelectorAll('.island-node');
-    let activeLeft = '';
-    let activeTop = '';
 
     for (const node of islandNodes) {
       const nodeEl = node as HTMLElement;
@@ -313,10 +285,6 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
           const statusSpan = nodeEl.querySelector('.status-indicator');
           if (statusSpan) statusSpan.textContent = '👉 Vào chơi';
         }
-        if (!activeLeft) {
-          activeLeft = nodeEl.style.left;
-          activeTop = nodeEl.style.top;
-        }
       } else {
         nodeEl.classList.remove('unlocked', 'completed');
         nodeEl.classList.add('locked');
@@ -331,13 +299,6 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
           if (statusSpan) statusSpan.textContent = '🔒 Khóa';
         }
       }
-    }
-
-    // Cập nhật vị trí Miu đứng tại ải đang mở gần nhất
-    const miuSailor = document.getElementById('miu-sailor');
-    if (miuSailor && activeLeft && activeTop) {
-      miuSailor.style.left = activeLeft;
-      miuSailor.style.top = activeTop;
     }
 
     // Cập nhật số liệu thống kê
@@ -650,33 +611,6 @@ const fullEventId = `${metadata.grade}/${metadata.id}`;
     50% {
       transform: translateY(-5px);
     }
-  }
-
-  /* Miu Marker */
-  .miu-sailor-marker {
-    position: absolute;
-    transform: translate(-50%, -100%);
-    z-index: 10;
-    pointer-events: none;
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .miu-figure-box {
-    display: flex;
-    justify-content: center;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
-  }
-
-  .miu-tag {
-    background: #f59e0b;
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 900;
-    padding: 0.15rem 0.5rem;
-    border-radius: 9999px;
-    border: 2px solid #ffffff;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
   /* Sidebar */
