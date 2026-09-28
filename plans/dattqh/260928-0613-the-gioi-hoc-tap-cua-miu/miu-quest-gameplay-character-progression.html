@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Miu Learning World — Quest Gameplay & Character Progression</title>
+    <style>
+      :root {
+        --bg: #f4f6fa;
+        --card: #fff;
+        --text: #172033;
+        --muted: #647084;
+        --accent: #4f46e5;
+        --border: #e1e6ef;
+        --soft: #f7f8fc;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.65;
+      }
+      main {
+        max-width: 960px;
+        margin: auto;
+        padding: 24px 16px 60px;
+      }
+      .hero {
+        background: linear-gradient(135deg, #eef2ff, #fff);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.2;
+        margin: 0 0 10px;
+      }
+      h2 {
+        font-size: 21px;
+        margin: 28px 0 12px;
+      }
+      p,
+      li {
+        font-size: 15px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        margin: 15px 0;
+      }
+      .flow {
+        background: var(--soft);
+        border: 1px dashed #cdd4df;
+        border-radius: 12px;
+        padding: 14px;
+        white-space: pre-wrap;
+        overflow: auto;
+        font-weight: 650;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .principle {
+        border-left: 4px solid var(--accent);
+      }
+      strong {
+        font-weight: 750;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>Miu Learning World</h1>
+        <p><strong>Nâng cấp Quest thành Gameplay & Character Progression</strong></p>
+        <p class="muted">
+          Product context dành cho AI thiết kế UX/UI, gameplay, learning experience và hệ thống phát
+          triển nhân vật.
+        </p>
+      </section>
+
+      <div class="card">
+        <h2>1. Vấn đề cần giải quyết</h2>
+        <p>
+          Phần “Nhiệm vụ phiêu lưu” hiện tại đang giống một bài học/worksheet được đặt trong giao
+          diện game. Cần thay đổi tư duy thiết kế.
+        </p>
+        <div class="flow">
+          Không phải: Đọc nội dung → Trả lời câu hỏi → Nhận kết quả Mà phải là: Chơi → Khám phá →
+          Tương tác → Sử dụng kiến thức → Vượt thử thách → Nhận thưởng → Nhân vật phát triển
+        </div>
+        <p>
+          <strong>Mục tiêu:</strong> Học sinh phải có cảm giác “Mình đang chơi một cuộc phiêu lưu,
+          và để tiến lên trong game mình phải sử dụng kiến thức đã học.”
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>2. Quest phải có Gameplay Loop</h2>
+        <div class="flow">
+          START QUEST ↓ Story / Situation ↓ Explore ↓ Interact ↓ Encounter / Challenge ↓ Use
+          Learning Skill ↓ Make Decision ↓ Immediate Feedback ↓ Reward ↓ Character Progression ↓
+          Unlock / Continue Adventure
+        </div>
+        <p>
+          Ví dụ với Tiếng Việt – Đọc hiểu: Miu bước vào khu rừng → gặp NPC → nhận nhiệm vụ → khám
+          phá → tìm manh mối từ câu chuyện → vượt thử thách → mở khóa cánh cửa → Final Challenge →
+          nhận XP/vật phẩm → tiếp tục phiêu lưu.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>3. Character phải thực sự có vai trò</h2>
+        <p>
+          Miu không nên chỉ là avatar đứng trên màn hình. Miu phải là người trực tiếp tham gia vào
+          câu chuyện.
+        </p>
+        <ul>
+          <li>Level</li>
+          <li>XP</li>
+          <li>Inventory</li>
+          <li>Equipment</li>
+          <li>Achievement</li>
+          <li>Skill</li>
+          <li>Quest Log</li>
+          <li>Collection</li>
+          <li>Vật phẩm được thu thập trong quá trình học</li>
+        </ul>
+        <p>Các chỉ số chỉ nên tồn tại khi chúng có ý nghĩa đối với trải nghiệm học tập.</p>
+      </div>
+
+      <div class="card">
+        <h2>4. Learning Skill trở thành Character Skill</h2>
+        <p>
+          Không chỉ ghi nhận “Miu đã hoàn thành bài Đọc hiểu”. Hãy biến kết quả học thành năng lực
+          của nhân vật.
+        </p>
+        <div class="flow">
+          Miu Level 8 Skills 📖 Reading Lv.4 🧠 Logic Lv.3 ✍️ Writing Lv.2 🔢 Math Lv.5 🇬🇧 English
+          Lv.2
+        </div>
+        <p>Khi học sinh làm tốt hoạt động đọc hiểu:</p>
+        <div class="flow">Reading XP +120 Reading Skill → Level 4 → Level 5</div>
+        <p>
+          Skill đã phát triển có thể được sử dụng trong các Quest sau. Học sinh phải cảm thấy “Mình
+          đang mạnh lên”, không chỉ “Mình đã làm xong bài”.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>5. Knowledge phải tạo ra năng lực trong game</h2>
+        <p>
+          Kiến thức đã học phải có khả năng quay lại và được sử dụng trong những tình huống khác.
+        </p>
+        <p>
+          Ví dụ: Miu học Reading Skill. Ở Quest sau, NPC đưa cho Miu một lá thư bị thiếu thông tin.
+          Miu phải sử dụng kỹ năng đọc để tìm manh mối hoặc mở khóa lựa chọn phù hợp.
+        </p>
+        <p>
+          <strong>Thông điệp trải nghiệm:</strong> “Kiến thức mình học trước đó giúp mình tiến bộ
+          trong game.”
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>6. Thêm World Exploration</h2>
+        <p>
+          Quest không nên chỉ tồn tại trong một màn hình. Nó nên là một địa điểm trong thế giới.
+        </p>
+        <div class="flow">
+          🌎 THẾ GIỚI CỦA MIU 🏠 Nhà của Miu │ ├── 📚 Thư viện ├── 🌳 Khu rừng │ └── Quest: Khu rừng
+          bí mật ├── 🏫 Trường học ├── 🏰 Lâu đài └── 🎪 Event
+        </div>
+        <p>
+          Học sinh có cảm giác “Mình đang đi đến một nơi để làm nhiệm vụ”, thay vì “Mình mở một bài
+          học”.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>7. NPC và hội thoại</h2>
+        <p>NPC đóng vai trò dẫn chuyện và giao nhiệm vụ.</p>
+        <div class="flow">
+          🧙 Ông Gác Rừng “Miu! Ta đang cần tìm chiếc chìa khóa đã bị thất lạc trong khu rừng. Ta
+          nhớ rằng manh mối cuối cùng nằm trong câu chuyện mà cháu vừa đọc.”
+        </div>
+        <p>
+          Học sinh đang giải quyết một vấn đề trong thế giới game, không chỉ đọc nội dung bài học.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>8. Biến câu hỏi thành Interaction</h2>
+        <ul>
+          <li><strong>Tìm kiếm:</strong> click các đồ vật để tìm manh mối.</li>
+          <li><strong>Kéo thả:</strong> đưa thông tin/đồ vật vào đúng vị trí.</li>
+          <li><strong>Ghép cặp:</strong> ghép nhân vật với hành động.</li>
+          <li><strong>Sắp xếp:</strong> sắp xếp sự kiện theo trình tự.</li>
+          <li><strong>Lựa chọn:</strong> chọn hành động nhân vật nên làm.</li>
+          <li><strong>Khám phá:</strong> tìm hidden clues.</li>
+          <li><strong>Puzzle:</strong> ghép thông tin để mở khóa.</li>
+          <li><strong>Dialogue Choice:</strong> chọn câu trả lời khi nói chuyện với NPC.</li>
+          <li><strong>Boss Challenge:</strong> tổng hợp kiến thức ở cuối Quest.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>9. Không biến mọi thứ thành Quiz</h2>
+        <div class="flow">
+          Không nên: Question → Multiple Choice → Correct → Next Question Nên: World → Story →
+          Exploration → Interaction → Challenge → Learning → Decision → Reward
+        </div>
+        <p>Quiz chỉ là một loại gameplay mechanic, không phải toàn bộ gameplay.</p>
+      </div>
+
+      <div class="card">
+        <h2>10. Decision & Consequence</h2>
+        <p>Cho học sinh cảm giác mình đang điều khiển nhân vật.</p>
+        <div class="flow">
+          Miu gặp một cây cầu bị hỏng. A. Tìm gỗ để sửa cầu B. Đi vòng qua khu rừng C. Tìm NPC giúp
+          đỡ
+        </div>
+        <p>
+          Các lựa chọn có thể dẫn tới interaction khác nhau. Không nhất thiết lúc nào cũng phải hiển
+          thị đúng/sai ngay lập tức.
+        </p>
+        <p><strong>Agency:</strong> “Đây là lựa chọn của mình.”</p>
+      </div>
+
+      <div class="card">
+        <h2>11. Reward phải có giá trị trong thế giới</h2>
+        <div class="flow">
+          +120 XP +20 Coins 🎒 Magic Backpack 🗝️ Forest Key 🏆 Reading Badge ❤️ Energy ✨ Reading
+          Skill XP
+        </div>
+        <p>Một số reward phải được sử dụng ở Quest sau.</p>
+        <div class="flow">
+          Forest Key → mở Forest Gate Magic Compass → tìm Hidden Location Reading Badge → mở Reading
+          Challenge
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>12. Character Progression</h2>
+        <p>Sau mỗi Quest, học sinh phải nhìn thấy nhân vật đã phát triển như thế nào.</p>
+        <div class="flow">
+          QUEST COMPLETE! 🎉 Khu rừng bí mật đã được khám phá! Miu nhận được: ⭐ +150 XP 🪙 +30
+          Coins 📖 Reading Skill +20 🗝️ Forest Key Progress Reading ████████░░ Lv.4 Adventure
+          ██████░░░░ Lv.6
+        </div>
+        <p><strong>Học sinh phải nhìn thấy sự tiến bộ của chính nhân vật.</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>13. Quest cần có Adventure Arc</h2>
+        <div class="flow">
+          Phase 1 — Hook → Tạo tình huống Phase 2 — Explore → Khám phá và tìm manh mối Phase 3 —
+          Learn → Sử dụng kiến thức Phase 4 — Challenge → Thử thách khó hơn Phase 5 — Decision → Lựa
+          chọn cách giải quyết Phase 6 — Finale → Final Challenge tổng hợp kiến thức Phase 7 —
+          Reward → XP + vật phẩm + Skill Progression Phase 8 — Unlock → Mở khóa khu vực hoặc Quest
+          mới
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>14. Tạo cảm giác Live Game</h2>
+        <p>Learning World nên có cảm giác là một thế giới đang sống.</p>
+        <ul>
+          <li>NPC xuất hiện ở những thời điểm khác nhau.</li>
+          <li>Daily Quest.</li>
+          <li>Weekly Challenge.</li>
+          <li>Seasonal Event.</li>
+          <li>Special Event.</li>
+          <li>Hidden Quest.</li>
+          <li>Achievement.</li>
+          <li>Collection.</li>
+          <li>Character Customization.</li>
+          <li>Unlockable Locations.</li>
+        </ul>
+        <p>
+          Ví dụ: “🎪 TIMO Event đã xuất hiện tại quảng trường!” trong khi Base Learning vẫn tiếp tục
+          tồn tại.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>15. Quy tắc bắt buộc khi AI thiết kế Quest</h2>
+        <p>Mỗi Quest mới phải trả lời được 7 câu hỏi:</p>
+        <ol>
+          <li><strong>Học sinh đang đóng vai ai?</strong></li>
+          <li><strong>Học sinh đang ở đâu trong thế giới?</strong></li>
+          <li><strong>Mục tiêu của nhân vật là gì?</strong></li>
+          <li><strong>Học sinh thực sự tương tác/chơi gì?</strong></li>
+          <li><strong>Kiến thức nào được sử dụng để vượt qua thử thách?</strong></li>
+          <li><strong>Nhân vật nhận được gì sau khi hoàn thành?</strong></li>
+          <li><strong>Điều gì được mở khóa hoặc thay đổi sau Quest?</strong></li>
+        </ol>
+        <p>
+          Nếu Quest chỉ có “Đọc → trả lời câu hỏi → đúng/sai → tiếp tục” thì
+          <strong>chưa đạt yêu cầu gameplay</strong>.
+        </p>
+      </div>
+
+      <div class="card principle">
+        <h2>16. Design Principle</h2>
+        <div class="flow">
+          ƯU TIÊN: Story > Exploration > Interaction > Learning > Challenge > Reward > Progression
+          THAY VÌ: Content > Question > Answer > Score
+        </div>
+        <p><strong>Miu không phải đang “làm bài”.</strong></p>
+        <p>
+          <strong
+            >Miu đang phiêu lưu trong thế giới của mình, và Toán – Tiếng Việt – Tiếng Anh chính là
+            những kỹ năng giúp Miu vượt qua thế giới đó.</strong
+          >
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>17. Yêu cầu khi redesign Quest</h2>
+        <ul>
+          <li>Giữ nguyên mục tiêu kiến thức và chuẩn đầu ra.</li>
+          <li>Không làm mất nội dung học để đổi lấy tính game.</li>
+          <li>Thiết kế lại flow để học sinh có hành động và tương tác.</li>
+          <li>Đưa nhân vật Miu vào trung tâm câu chuyện.</li>
+          <li>Cho phép khám phá, lựa chọn và nhận phản hồi.</li>
+          <li>Biến kiến thức thành công cụ giải quyết vấn đề.</li>
+          <li>Thêm XP, Skill Progression và reward có ý nghĩa.</li>
+          <li>Tạo liên kết giữa Quest hiện tại và Quest sau.</li>
+          <li>Ưu tiên gameplay thực sự thay vì animation trang trí.</li>
+          <li>Giữ kiến trúc mở để Event như TIMO có thể cắm vào Base World.</li>
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Miu Learning World — Homepage & Character Creator Redesign</title>
+    <style>
+      :root {
+        --bg: #f4f6fa;
+        --card: #fff;
+        --text: #172033;
+        --muted: #667085;
+        --accent: #4f46e5;
+        --border: #e1e6ef;
+        --soft: #f7f8fc;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.65;
+      }
+      main {
+        max-width: 960px;
+        margin: auto;
+        padding: 24px 16px 60px;
+      }
+      .hero {
+        background: linear-gradient(135deg, #eef2ff, #fff);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      h1 {
+        font-size: 30px;
+        line-height: 1.2;
+        margin: 0 0 10px;
+      }
+      h2 {
+        font-size: 21px;
+        margin: 28px 0 12px;
+      }
+      p,
+      li {
+        font-size: 15px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        margin: 15px 0;
+      }
+      .flow {
+        background: var(--soft);
+        border: 1px dashed #cdd4df;
+        border-radius: 12px;
+        padding: 14px;
+        white-space: pre-wrap;
+        overflow: auto;
+        font-weight: 650;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .principle {
+        border-left: 4px solid var(--accent);
+      }
+      strong {
+        font-weight: 750;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>Miu Learning World</h1>
+        <p><strong>Redesign Homepage & Character Creator theo hướng Game World</strong></p>
+        <p class="muted">
+          Tài liệu context dành cho AI thiết kế UX/UI, gameplay, world building và character
+          progression.
+        </p>
+      </section>
+
+      <div class="card">
+        <h2>1. Tư duy sản phẩm cốt lõi</h2>
+        <p>Đây không phải là một website học tập có thêm avatar.</p>
+        <p>
+          Đây là một <strong>game world dành cho việc học</strong>, trong đó việc học là một phần
+          của gameplay và nhân vật là trung tâm của trải nghiệm.
+        </p>
+        <div class="flow">
+          Curriculum = World Subject = Region Lesson = Quest Exercise = Gameplay Skill = Character
+          Progression Assessment = Challenge TIMO = Special Event Reward = Item / XP / Badge
+          Learning Progress = Character Progression + World Unlock
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>2. Homepage phải trở thành Home Base của Miu</h2>
+        <p>
+          Homepage không nên giống dashboard học tập truyền thống với các card Toán / Tiếng Việt /
+          Tiếng Anh.
+        </p>
+        <p>Học sinh phải có cảm giác:</p>
+        <div class="flow">“Đây là thế giới của mình. Hôm nay mình muốn đi đâu?”</div>
+        <p>thay vì:</p>
+        <div class="flow">“Hôm nay mình phải làm bài nào?”</div>
+      </div>
+
+      <div class="card">
+        <h2>3. Hero của Homepage</h2>
+        <div class="flow">
+          🌎 THẾ GIỚI CỦA MIU ☁️ ☀️ 🏔️ 🐱 MIU Level 8 · 1,240 XP “Hôm nay chúng ta đi đâu?” 🗺️ BẢN
+          ĐỒ THẾ GIỚI
+        </div>
+        <p>Nhân vật phải là trung tâm thị giác. World và các hoạt động xoay quanh nhân vật.</p>
+      </div>
+
+      <div class="card">
+        <h2>4. World Map thay cho danh sách môn học</h2>
+        <p>
+          Toán, Tiếng Việt và Tiếng Anh không nên chỉ là 3 menu/card ngang hàng. Hãy thể hiện chúng
+          như các khu vực trong cùng một thế giới.
+        </p>
+        <div class="flow">
+          🌎 MIU WORLD 🏠 📚 🏫 Nhà Thư viện Trường │ ┌──────────┼──────────┐ │ │ │ 🔢 Toán 📖 Văn
+          🇬🇧 English
+        </div>
+        <p>
+          Mỗi location có thể chứa NPC, Quest, Mini Game, Hidden Quest, Collection và điều kiện mở
+          khóa.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>5. Learning Progress phải làm thay đổi World</h2>
+        <p>
+          Character Progression không chỉ tăng một con số XP. Khi Miu phát triển, thế giới cũng nên
+          mở rộng.
+        </p>
+        <div class="flow">
+          Học / Chơi ↓ Skill tăng ↓ Character Level tăng ↓ Location mới mở ↓ Quest mới xuất hiện ↓
+          Item mới mở khóa ↓ Khám phá tiếp
+        </div>
+        <p><strong>Learning Progress = World Progression.</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>6. Daily Quest</h2>
+        <p>Homepage cần có một khu vực “Nhiệm vụ hôm nay” để tạo lý do quay lại mỗi ngày.</p>
+        <div class="flow">
+          🎯 NHIỆM VỤ HÔM NAY ① 📖 Giải mã lá thư bí mật Tiếng Việt · Đọc hiểu +100 XP ② 🔢 Thu thập
+          20 viên pha lê Toán · Phép cộng +120 XP ③ 🇬🇧 Find the Lost Backpack English +100 XP
+        </div>
+        <p>
+          Không gọi đơn thuần là “Bài 1, Bài 2, Bài 3”. Hãy biến chúng thành nhiệm vụ trong thế
+          giới.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>7. Character Status</h2>
+        <p>Thông tin về nhân vật phải là một phần quan trọng của Homepage.</p>
+        <div class="flow">
+          🐱 MIU Lv.8 Explorer ████████░░ 1,240 / 1,500 XP 🔥 7 ngày liên tiếp 🪙 420 Coins ⭐
+          Skills 🔢 Toán Lv.5 📖 Tiếng Việt Lv.4 🇬🇧 English Lv.3 🧠 Logic Lv.4
+        </div>
+        <p>
+          Level không chỉ là số trang trí. Nó phải phản ánh nhân vật đang phát triển như thế nào.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>8. Character Journey</h2>
+        <p>Character Identity nên phát triển cùng Level.</p>
+        <div class="flow">
+          Lv.1 🌱 Người mới bắt đầu ↓ Lv.5 🎒 Nhà thám hiểm nhỏ ↓ Lv.10 🔎 Thám tử học đường ↓ Lv.20
+          🧙 Nhà thông thái ↓ Lv.30 🏆 Bậc thầy Learning World
+        </div>
+        <p>Level tăng đồng thời tạo cảm giác nhân vật trưởng thành.</p>
+      </div>
+
+      <div class="card">
+        <h2>9. Event trên Homepage</h2>
+        <p>TIMO và các hoạt động đặc biệt phải xuất hiện như Event, không phải môn học mới.</p>
+        <div class="flow">
+          🎪 ĐANG CÓ SỰ KIỆN 🏆 TIMO ADVENTURE Một cánh cổng bí ẩn vừa xuất hiện trong rừng. 🔥
+          Challenge Level 3 🎁 Exclusive Badge [ KHÁM PHÁ EVENT ]
+        </div>
+        <p>Event phải có Banner, Location, Story, Quest, Challenge, Reward, Badge và Schedule.</p>
+      </div>
+
+      <div class="card">
+        <h2>10. Homepage nên có cấu trúc</h2>
+        <div class="flow">
+          🌎 MIU LEARNING WORLD 🐱 CHARACTER Lv.8 Explorer XP / Coins / Streak 🗺️ WORLD MAP Các
+          location đang mở 🎯 QUESTS HÔM NAY 📖 Khu rừng bí mật 🔢 Thu thập pha lê 🇬🇧 Lost Backpack
+          🎪 EVENTS 🏆 TIMO Challenge ⭐ CHARACTER PROGRESS Toán Lv.5 Văn Lv.4 English Lv.3 🎒
+          COLLECTION 🦋 12/50 🏆 8/30 💎 24/100
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>11. Character Creator hiện tại cần chuyển từ Form thành Character Creation</h2>
+        <p>
+          Không chỉ có nhiều option tùy chỉnh. Trải nghiệm phải giống bước tạo nhân vật trong một
+          game.
+        </p>
+        <div class="flow">
+          Choose Character → Name → Personality → Appearance → Outfit → Accessories → Preview →
+          Animation → Confirm → Enter Learning World
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>12. Character Preview phải là trung tâm</h2>
+        <div class="flow">
+          ┌───────────────────────┐ │ │ │ 🐱 │ │ Miu │ │ │ │ ✨ Idle Animation │ │ │ │ [Vẫy] [Nhảy]
+          [Nghĩ] │ │ │ └───────────────────────┘ Lv.1 New Explorer
+        </div>
+        <p>Khi chọn mũ, áo, balo hoặc phụ kiện, nhân vật phải thay đổi ngay trên preview.</p>
+      </div>
+
+      <div class="card">
+        <h2>13. Character Identity</h2>
+        <p>Nên bổ sung Personality để tạo cảm giác “đây là nhân vật của mình”.</p>
+        <div class="flow">
+          Miu là... 🔎 Nhà thám hiểm 🧠 Nhà thông thái ⚔️ Chiến binh 🎨 Nghệ sĩ 🚀 Nhà du hành
+        </div>
+        <p>
+          Personality ban đầu chủ yếu phục vụ identity/story, sau này có thể mở rộng thành gameplay.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>14. Character Customization</h2>
+        <p>Không hiển thị một danh sách option dài ngay từ đầu. Chia thành các nhóm:</p>
+        <div class="flow">
+          ① Identity Tên / Personality ② Appearance Màu lông / Mắt / Biểu cảm ③ Outfit Áo / Mũ /
+          Giày ④ Accessories Kính / Tai nghe / Balo / Cánh ⑤ Special Aura / Trail / Pet / Effect
+        </div>
+        <p>Mọi thay đổi phải được phản ánh ngay trên nhân vật.</p>
+      </div>
+
+      <div class="card">
+        <h2>15. Idle Animation và Expression</h2>
+        <p>Nhân vật cần có cảm giác đang sống.</p>
+        <ul>
+          <li>Chớp mắt.</li>
+          <li>Đuôi chuyển động.</li>
+          <li>Nhìn xung quanh.</li>
+          <li>Vẫy tay.</li>
+          <li>Nhảy.</li>
+          <li>Ngáp.</li>
+          <li>Phản ứng khi chọn item.</li>
+        </ul>
+        <p>Animation phải phục vụ identity, không chỉ để trang trí.</p>
+      </div>
+
+      <div class="card">
+        <h2>16. Customization phải trở thành Gameplay</h2>
+        <p>Không phải item nào cũng mở sẵn.</p>
+        <div class="flow">
+          🎩 Detective Hat 🔒 Unlock at Level 5 🚀 Space Suit 🔒 Complete Space Adventure 🏆 TIMO
+          Crown 🔒 Complete TIMO Event 🪽 Magic Wings 🔒 Collect 10 badges
+        </div>
+        <p>Học sinh phải có lý do để muốn khám phá và hoàn thành Quest.</p>
+      </div>
+
+      <div class="card">
+        <h2>17. Inventory</h2>
+        <p>Sau khi tạo nhân vật, các item đã sở hữu phải được quản lý trong Inventory.</p>
+        <div class="flow">
+          🎒 INVENTORY Outfits ├── 👕 Áo học sinh ├── 🚀 Áo phi hành gia └── 🧙 Áo phù thủy
+          Accessories ├── 🎧 Gamer Headset ├── 🎩 Detective Hat └── 🪽 Magic Wings Badges ├── 🌱
+          First Quest ├── 📖 Reading Explorer └── 🏆 TIMO Challenger
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>18. Collection System</h2>
+        <p>Thêm Collection để tạo gameplay khám phá không phụ thuộc trực tiếp vào điểm học.</p>
+        <div class="flow">
+          📖 BOOK COLLECTION 🦋 CREATURE COLLECTION 💎 GEM COLLECTION 🏆 BADGE COLLECTION 🎒 ITEM
+          COLLECTION 🗺️ LOCATION COLLECTION
+        </div>
+        <p>Ví dụ: tìm một con bướm hiếm trong Quest → Collection +1.</p>
+      </div>
+
+      <div class="card">
+        <h2>19. Core Gameplay Loop của Homepage + Character</h2>
+        <div class="flow">
+          Character ↓ World ↓ Explore ↓ Quest ↓ Play ↓ Learn ↓ Challenge ↓ Reward ↓ Character
+          Progression ↓ World Unlock ↓ Explore tiếp
+        </div>
+      </div>
+
+      <div class="card principle">
+        <h2>20. Design Principle</h2>
+        <p><strong>Miu không phải đang vào website để làm bài.</strong></p>
+        <p><strong>Miu đang trở về thế giới của mình để tiếp tục cuộc phiêu lưu.</strong></p>
+        <p>
+          Việc học Toán, Tiếng Việt và Tiếng Anh là những kỹ năng giúp Miu khám phá thế giới, vượt
+          qua thử thách và phát triển nhân vật.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>21. Prompt yêu cầu AI redesign</h2>
+        <p>Hãy redesign Homepage và Character Creator theo toàn bộ context trong tài liệu này.</p>
+        <ul>
+          <li>Không biến Homepage thành dashboard học tập truyền thống.</li>
+          <li>Không biến Character Creator thành form cấu hình avatar.</li>
+          <li>Đưa Character vào trung tâm.</li>
+          <li>Đưa World Map và Exploration vào trung tâm.</li>
+          <li>Biến Subject thành Location/Region.</li>
+          <li>Biến Lesson thành Quest.</li>
+          <li>Biến Learning Skill thành Character Skill.</li>
+          <li>Biến Reward thành Item/Badge/XP.</li>
+          <li>Biến Progress thành World Unlock.</li>
+          <li>Biến TIMO thành Event.</li>
+          <li>Cho phép mở rộng Event và Content mà không phá vỡ Base World.</li>
+          <li>Ưu tiên gameplay thực sự thay vì chỉ animation trang trí.</li>
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>
