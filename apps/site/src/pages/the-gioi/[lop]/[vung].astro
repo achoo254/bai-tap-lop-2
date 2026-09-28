@@ -333,6 +333,10 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
     transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
+  .region-miu-walker.wandering {
+    transition: top 1.6s ease-in-out, left 1.6s ease-in-out;
+  }
+
   .region-miu-figure {
     width: 80px;
     height: 80px;
@@ -359,6 +363,7 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
 <script>
   import {
     renderCatSvgHtml,
+    type CatPose,
     type CatFurColorId,
     type CatAccessoryId,
   } from '../../../components/game/characters/cat-character';
@@ -375,15 +380,87 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
   const miuFigure = document.getElementById('region-miu-figure');
   const miuBubble = document.getElementById('region-miu-bubble');
 
-  if (miuFigure) {
+  /** Vẽ lại Miu với tư thế mới, giữ màu lông và phụ kiện bé đã chọn. */
+  function renderMiu(pose: CatPose) {
+    if (!miuFigure) return;
     miuFigure.innerHTML = renderCatSvgHtml({
-      pose: 'dung',
+      pose,
       furColor: (state.avatar.furColor as CatFurColorId) || 'vang-cam',
       accessories: (state.avatar.accessories as CatAccessoryId[]) || ['no-hong'],
       size: 80,
       label: `Bé ${state.avatar.name}`,
     });
   }
+  renderMiu('dung');
+
+  // Miu đi lang thang trên bản đồ, mỗi lần dừng lại đổi một cảm xúc ngẫu nhiên
+  const MOODS: { pose: CatPose; text: string }[] = [
+    { pose: 'dung', text: 'Chọn bài nào! 🐾' },
+    { pose: 'chao', text: 'Chào bé nha! 👋' },
+    { pose: 'vui', text: 'Học vui quá đi! 🎉' },
+    { pose: 'nhay', text: 'Hí hửng quá! ✨' },
+    { pose: 'suy-nghi', text: 'Bài nào đây nhỉ? 🤔' },
+    { pose: 'buon', text: 'Chờ bé mãi à… 🥺' },
+    { pose: 'te', text: 'Ui da, vấp rồi! 😵' },
+  ];
+  const WANDER_MOVE_MS = 1600;
+  const WANDER_REST_MS = 3200;
+  const questSpots = Array.from(document.querySelectorAll<HTMLElement>('.quest-node')).map((n) => ({
+    x: parseFloat(n.style.left),
+    y: parseFloat(n.style.top),
+  }));
+  let wanderTimer: number | undefined;
+  let lastMood = 0;
+
+  const randomIn = (min: number, max: number) => min + Math.random() * (max - min);
+
+  /** Chọn chỗ trống ngẫu nhiên, tránh đứng đè lên thẻ nhiệm vụ. */
+  function pickFreeSpot() {
+    let spot = { x: 20, y: 78 };
+    for (let i = 0; i < 20; i++) {
+      spot = { x: randomIn(10, 90), y: randomIn(30, 92) };
+      if (questSpots.every((q) => Math.abs(q.x - spot.x) > 16 || Math.abs(q.y - spot.y) > 22)) break;
+    }
+    return spot;
+  }
+
+  function showRandomMood() {
+    let next = Math.floor(Math.random() * MOODS.length);
+    if (next === lastMood) next = (next + 1) % MOODS.length;
+    lastMood = next;
+    renderMiu(MOODS[next].pose);
+    if (miuBubble) miuBubble.textContent = MOODS[next].text;
+  }
+
+  function wanderStep() {
+    if (!miuWalker) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      // Không di chuyển khi bé/bố mẹ tắt hiệu ứng chuyển động, chỉ đổi cảm xúc
+      showRandomMood();
+    } else {
+      const spot = pickFreeSpot();
+      miuWalker.classList.add('wandering');
+      miuWalker.style.top = `${spot.y}%`;
+      miuWalker.style.left = `${spot.x}%`;
+      renderMiu('di');
+      if (miuBubble) miuBubble.textContent = '🐾 🐾 🐾';
+      wanderTimer = window.setTimeout(() => {
+        miuWalker.classList.remove('wandering');
+        showRandomMood();
+        wanderTimer = window.setTimeout(wanderStep, WANDER_REST_MS);
+      }, WANDER_MOVE_MS);
+      return;
+    }
+    wanderTimer = window.setTimeout(wanderStep, WANDER_REST_MS);
+  }
+
+  function stopWandering() {
+    window.clearTimeout(wanderTimer);
+    miuWalker?.classList.remove('wandering');
+  }
+
+  wanderTimer = window.setTimeout(wanderStep, WANDER_REST_MS);
 
   const nodes = document.querySelectorAll('.quest-node');
 
@@ -410,7 +487,9 @@ const quests = chapter1 ? chapter1.lessons.flatMap((l) => l.quests) : [];
       }
 
       node.addEventListener('click', () => {
-        // Hoạt ảnh nhân vật bước tới điểm này
+        // Dừng đi lang thang, cho nhân vật bước tới điểm này
+        stopWandering();
+        renderMiu('vui');
         const coords = questDef.mapCoordinates;
         if (miuWalker) {
           miuWalker.style.top = `${coords.y}%`;
