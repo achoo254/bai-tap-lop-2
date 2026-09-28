@@ -108,6 +108,9 @@ importers:
       lesson-core:
         specifier: workspace:*
         version: link:../../packages/lesson-core
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.10
