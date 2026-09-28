@@ -51,15 +51,29 @@ import Hud from '../../components/game/hud.astro';
 
       <!-- Thanh công cụ trợ giúp dưới đáy -->
       <div class="quest-controls-row">
-        <button type="button" class="quest-action-btn speak-btn" id="btn-speak-question">
-          <span>🔊</span>
-          <span>Đọc lại</span>
-        </button>
+        <div class="quest-controls-group">
+          <button type="button" class="quest-action-btn speak-btn" id="btn-speak-question">
+            <span>🔊</span>
+            <span>Đọc lại</span>
+          </button>
 
-        <button type="button" class="quest-action-btn hint-btn" id="btn-hint-trigger">
-          <span>💡</span>
-          <span id="hint-btn-label">Gợi ý (Bậc 1)</span>
-        </button>
+          <button type="button" class="quest-action-btn hint-btn" id="btn-hint-trigger">
+            <span>💡</span>
+            <span id="hint-btn-label">Gợi ý (Bậc 1)</span>
+          </button>
+        </div>
+
+        <!-- Chuyển câu: trả lời đúng không tự sang câu mới để bé kịp chép đáp án vào vở -->
+        <div class="quest-controls-group">
+          <button type="button" class="quest-action-btn nav-btn" id="btn-prev-question" disabled>
+            <span>◀</span>
+            <span>Câu trước</span>
+          </button>
+          <button type="button" class="quest-action-btn nav-btn nav-btn--next" id="btn-next-question" disabled>
+            <span id="next-btn-label">Câu tiếp</span>
+            <span>➜</span>
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -353,7 +367,11 @@ import Hud from '../../components/game/hud.astro';
   let currentQuestionIndex = 0;
   let currentHintTier: HintTier = 1;
   let hintsUsedForCurrentQuestion = 0;
-  let answerRecords: AnswerRecord[] = [];
+  /** Kết quả lần làm đúng đầu tiên của từng câu (quay lại làm lại không tính thêm). */
+  const answerRecords = new Map<number, AnswerRecord>();
+  const prevBtn = document.getElementById('btn-prev-question') as HTMLButtonElement | null;
+  const nextBtn = document.getElementById('btn-next-question') as HTMLButtonElement | null;
+  const nextLabel = document.getElementById('next-btn-label');
   let heartsLeft = 3;
 
   const stageEl = document.getElementById('minigame-stage');
@@ -382,27 +400,26 @@ import Hud from '../../components/game/hud.astro';
     if (hintLabel) hintLabel.textContent = 'Gợi ý (Bậc 1)';
 
     const challenge = challenges[currentQuestionIndex];
+    const questionIndex = currentQuestionIndex;
 
     const api: QuestApi = {
       submit(answer) {
         const isCorrect = String(answer) === String(challenge.expectedAnswer);
+        const alreadySolved = answerRecords.has(questionIndex);
         if (isCorrect) {
-          answerRecords.push({
-            skill: skillId,
-            correctFirstTry: hintsUsedForCurrentQuestion === 0,
-            hintsUsed: hintsUsedForCurrentQuestion,
-          });
-
-          setTimeout(() => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < challenges.length) {
-              mountCurrentQuestion();
-            } else {
-              finishQuest();
-            }
-          }, 800);
-
+          if (!alreadySolved) {
+            answerRecords.set(questionIndex, {
+              skill: skillId,
+              correctFirstTry: hintsUsedForCurrentQuestion === 0,
+              hintsUsed: hintsUsedForCurrentQuestion,
+            });
+          }
+          updateNavButtons();
+          nextBtn?.classList.add('ready');
           return { correct: true };
+        } else if (alreadySolved) {
+          // Câu đã làm đúng, bé đang xem lại: không trừ tim
+          return { correct: false };
         } else {
           heartsLeft = Math.max(0, heartsLeft - 1);
           renderHearts();
@@ -426,7 +443,37 @@ import Hud from '../../components/game/hud.astro';
     };
 
     minigame.mount(stageEl, challenge, api);
+    if (answerRecords.has(questionIndex)) minigame.showSolved?.();
+    updateNavButtons();
   }
+
+  function updateNavButtons() {
+    const isLast = currentQuestionIndex === challenges.length - 1;
+    if (prevBtn) prevBtn.disabled = currentQuestionIndex === 0;
+    if (nextBtn) {
+      nextBtn.disabled = !answerRecords.has(currentQuestionIndex);
+      nextBtn.classList.toggle('ready', !nextBtn.disabled);
+    }
+    if (nextLabel) nextLabel.textContent = isLast ? 'Hoàn thành 🎉' : 'Câu tiếp';
+  }
+
+  prevBtn?.addEventListener('click', () => {
+    if (currentQuestionIndex === 0) return;
+    currentQuestionIndex--;
+    playSfx('click');
+    mountCurrentQuestion();
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    if (!answerRecords.has(currentQuestionIndex)) return;
+    playSfx('click');
+    if (currentQuestionIndex < challenges.length - 1) {
+      currentQuestionIndex++;
+      mountCurrentQuestion();
+    } else {
+      finishQuest();
+    }
+  });
 
   // Đọc lại câu hỏi
   document.getElementById('btn-speak-question')?.addEventListener('click', () => {
@@ -457,7 +504,7 @@ import Hud from '../../components/game/hud.astro';
     const result = {
       questId,
       isBoss,
-      answers: answerRecords,
+      answers: [...answerRecords.values()],
     };
 
     let { state: updatedState, reward } = applyQuestResult(currentState, result, today);

@@ -146,6 +146,7 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
         btn.type = 'button';
         btn.className = 'demo-choice-btn lesson-font';
         btn.textContent = c.label;
+        btn.dataset.answer = String(c.value);
         btn.style.cssText = `
           flex: 1 1 180px;
           min-height: 64px;
@@ -171,6 +172,7 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
         btn.type = 'button';
         btn.className = 'demo-choice-btn lesson-font';
         btn.textContent = String(optVal);
+        btn.dataset.answer = String(optVal);
         btn.style.cssText = `
           min-width: 68px;
           min-height: 64px;
@@ -201,15 +203,26 @@ export class DemoMiniGame implements MiniGame<DemoChallenge> {
     }
   }
 
+  /** Tô xanh nút đáp án đúng. */
+  private markCorrect(btn: HTMLElement): void {
+    btn.style.background = '#dcfce7';
+    btn.style.borderColor = '#16a34a';
+    btn.style.color = '#15803d';
+    btn.style.transform = 'scale(1.08)';
+  }
+
+  showSolved(): void {
+    const expected = String(this.currentChallenge?.expectedAnswer ?? '');
+    const btn = this.container?.querySelector<HTMLElement>(`[data-answer="${expected}"]`);
+    if (btn) this.markCorrect(btn);
+  }
+
   private handleAnswer(answer: unknown, btnElement: HTMLElement): void {
     if (!this.api || !this.currentChallenge) return;
 
     const res = this.api.submit(answer);
     if (res.correct) {
-      btnElement.style.background = '#dcfce7';
-      btnElement.style.borderColor = '#16a34a';
-      btnElement.style.color = '#15803d';
-      btnElement.style.transform = 'scale(1.08)';
+      this.markCorrect(btnElement);
       void this.playOutcome(true);
     } else {
       btnElement.style.background = '#fee2e2';

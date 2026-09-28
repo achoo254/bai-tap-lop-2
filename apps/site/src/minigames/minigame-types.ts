@@ -39,6 +39,8 @@ export interface MiniGame<C extends Challenge = Challenge> {
   showHint(tier: HintTier): void;
   /** Chạy hoạt ảnh hệ quả tương tác trong cảnh (cửa mở, kẹo nhảy vào giỏ...). */
   playOutcome(correct: boolean): Promise<void>;
+  /** Bé quay lại câu đã làm đúng: tô sáng đáp án đúng (và mẫu viết vở nếu có) để bé chép lại. */
+  showSolved?(): void;
   /** Dọn dẹp DOM và sự kiện khi thoát hoặc chuyển câu. */
   unmount(): void;
 }

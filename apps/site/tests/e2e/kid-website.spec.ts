@@ -176,3 +176,33 @@ test.describe('PWA', () => {
     await context.setOffline(false);
   });
 });
+
+test.describe('nhiệm vụ đọc hiểu', () => {
+  test('trả lời đúng không tự chuyển câu, có nút câu tiếp và quay lại', async ({ page }) => {
+    // Nút "Câu tiếp" nhấp nháy khi sẵn sàng; tắt hoạt ảnh để trình duyệt tự động bấm được
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/the-gioi/choi/?nv=lop-2%2Ftieng-viet%2Fch1%2Fq1-doc-hieu');
+    const step = page.locator('#quest-step-text');
+    const next = page.locator('#btn-next-question');
+    const prev = page.locator('#btn-prev-question');
+    await expect(next).toBeDisabled();
+    await expect(prev).toBeDisabled();
+
+    await page.locator('#opt-btn-a').click();
+    await page.waitForTimeout(1200);
+    // Vẫn ở câu 1 để bé kịp chép mẫu viết vở
+    await expect(step).toContainText('Câu 1');
+    await expect(page.getByText('Mẫu viết vào vở hướng dẫn học')).toBeVisible();
+    await expect(next).toBeEnabled();
+
+    await next.click();
+    await expect(step).toContainText('Câu 2');
+    await expect(next).toBeDisabled();
+
+    await prev.click();
+    await expect(step).toContainText('Câu 1');
+    // Câu đã làm đúng: hiện lại mẫu viết vở, được đi tiếp ngay
+    await expect(page.getByText('Mẫu viết vào vở hướng dẫn học')).toBeVisible();
+    await expect(next).toBeEnabled();
+  });
+});

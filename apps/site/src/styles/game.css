@@ -332,6 +332,8 @@
 
 .quest-controls-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.25rem;
@@ -374,6 +376,52 @@
 .quest-action-btn.speak-btn:hover {
   background: #bae6fd;
   transform: translateY(-2px);
+}
+
+.quest-controls-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Nút chuyển câu trước / câu tiếp */
+.quest-action-btn.nav-btn {
+  background: #ffffff;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.quest-action-btn.nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.quest-action-btn.nav-btn--next.ready {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 4px 0 #0f172a;
+  animation: next-ready-pulse 1.6s ease-in-out infinite;
+}
+
+.quest-action-btn.nav-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+@keyframes next-ready-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quest-action-btn.nav-btn--next.ready {
+    animation: none;
+  }
 }
 
 /* --- Màn Thưởng Rực Rỡ (Reward Screen) --- */

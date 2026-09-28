@@ -40,6 +40,7 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
   private storyCardElement: HTMLElement | null = null;
   private isStoryExpanded = true;
   private isAnswerRevealed = false;
+  private showAnswerButton: HTMLButtonElement | null = null;
 
   mount(stage: HTMLElement, challenge: DocHieuChallenge, api: QuestApi): void {
     this.container = stage;
@@ -343,13 +344,8 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
       font-weight: 700;
       cursor: pointer;
     `;
-    showAnswerBtn.addEventListener('click', () => {
-      this.isAnswerRevealed = !this.isAnswerRevealed;
-      answerBox.style.display = this.isAnswerRevealed ? 'block' : 'none';
-      showAnswerBtn.innerHTML = this.isAnswerRevealed
-        ? `<span>🙈</span> <span>Ẩn đáp án viết vở</span>`
-        : `<span>✍️</span> <span>Xem đáp án viết vào vở</span>`;
-    });
+    this.showAnswerButton = showAnswerBtn;
+    showAnswerBtn.addEventListener('click', () => this.setAnswerRevealed(!this.isAnswerRevealed));
     questionCard.appendChild(showAnswerBtn);
 
     root.appendChild(questionCard);
@@ -365,17 +361,9 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
 
     const res = this.api.submit(selectedId);
     if (res.correct) {
-      btn.style.borderColor = '#10b981';
-      btn.style.background = '#ecfdf5';
-      btn.style.color = '#065f46';
-      btn.style.transform = 'scale(1.02)';
+      this.markCorrect(btn);
       this.api.sfx('correct');
-      this.api.speak('Chính xác rồi! Bé giỏi quá!', 'vi');
-
-      // Tự động mở hộp đáp án viết vở
-      if (this.answerBoxElement) {
-        this.answerBoxElement.style.display = 'block';
-      }
+      this.api.speak('Chính xác rồi! Bé viết đáp án vào vở rồi bấm Câu tiếp nhé!', 'vi');
     } else {
       btn.style.borderColor = '#ef4444';
       btn.style.background = '#fef2f2';
@@ -386,6 +374,32 @@ export class DocHieuMiniGame implements MiniGame<DocHieuChallenge> {
       this.api.sfx('wrong');
       this.api.speak('Chưa đúng rồi, bé hãy đọc lại gợi ý nhé!', 'vi');
     }
+  }
+
+  /** Tô xanh đáp án đúng và mở hộp mẫu viết vở. */
+  private markCorrect(btn: HTMLElement): void {
+    btn.style.borderColor = '#10b981';
+    btn.style.background = '#ecfdf5';
+    btn.style.color = '#065f46';
+    btn.style.transform = 'scale(1.02)';
+    this.setAnswerRevealed(true);
+  }
+
+  /** Mở/đóng hộp mẫu viết vở và đổi chữ trên nút tương ứng. */
+  private setAnswerRevealed(revealed: boolean): void {
+    this.isAnswerRevealed = revealed;
+    if (this.answerBoxElement) this.answerBoxElement.style.display = revealed ? 'block' : 'none';
+    if (this.showAnswerButton) {
+      this.showAnswerButton.innerHTML = revealed
+        ? `<span>🙈</span> <span>Ẩn đáp án viết vở</span>`
+        : `<span>✍️</span> <span>Xem đáp án viết vào vở</span>`;
+    }
+  }
+
+  showSolved(): void {
+    const expected = String(this.currentChallenge?.expectedAnswer ?? '');
+    const btn = this.container?.querySelector<HTMLElement>(`#opt-btn-${expected}`);
+    if (btn) this.markCorrect(btn);
   }
 
   showHint(tier: HintTier): void {
