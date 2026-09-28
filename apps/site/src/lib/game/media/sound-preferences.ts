@@ -14,7 +14,7 @@ const MUSIC_ENABLED_KEY = 'the-gioi:nhac-nen-bat';
 const MUSIC_VOLUME_KEY = 'the-gioi:am-luong-nhac';
 const VOICE_ENABLED_KEY = 'the-gioi:giong-doc-bat';
 
-export const DEFAULT_MUSIC_VOLUME = 0.28;
+export const DEFAULT_MUSIC_VOLUME = 0.55;
 
 function read(key: string): string | null {
   try {

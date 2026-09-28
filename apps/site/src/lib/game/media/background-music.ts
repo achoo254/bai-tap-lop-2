@@ -1,13 +1,14 @@
 /**
  * apps/site/src/lib/game/media/background-music.ts
  *
- * Nhạc nền nhẹ nhàng, không lời (CC0) cho các màn ngoài bài học: trang chủ, cổng thế giới,
+ * Nhạc nền không lời vui nhộn (CC0) cho các màn ngoài bài học: trang chủ, cổng thế giới,
  * bản đồ, tạo nhân vật. Vào bài học thì trang đó không gọi nhạc nên nhạc tự dừng.
  *
  * - Phát nối tiếp giữa các trang: nhớ bài đang phát và vị trí trong sessionStorage.
  * - Hết bài thì chuyển bài kế tiếp trong danh sách.
  * - Nhỏ lại khi có giọng đọc, tắt theo nút 🔊/🔇 chung.
  * - Trình duyệt chặn tự phát thì chờ lần chạm đầu tiên của bé.
+ * - iPad/iPhone bỏ qua audio.volume: chỉnh âm lượng qua Web Audio (GainNode).
  */
 import { isMuted, MUTED_EVENT, SPEECH_EVENT } from './audio';
 import { getMusicVolume, isMusicEnabled, PREFS_EVENT } from './sound-preferences';
@@ -18,10 +19,18 @@ export interface BackgroundTrack {
 }
 
 /** Nguồn gốc & giấy phép ghi tại public/game/licenses.json và trang Ghi nguồn. */
+/** `?v=` đổi mỗi khi thay nội dung file (thư mục /game được trình duyệt lưu cache lâu dài). */
+const TRACK_VERSION = 2;
+const track = (id: string): BackgroundTrack => ({ id, url: `/game/audio/nhac-nen/${id}.mp3?v=${TRACK_VERSION}` });
+
+/** Bài sôi động xen kẽ bài nhẹ nhàng. */
 export const BACKGROUND_TRACKS: BackgroundTrack[] = [
-  { id: 'buoi-sang-vui-ve', url: '/game/audio/nhac-nen/buoi-sang-vui-ve.mp3' },
-  { id: 'dao-xanh-thu-gian', url: '/game/audio/nhac-nen/dao-xanh-thu-gian.mp3' },
-  { id: 'gau-con-cau-ca', url: '/game/audio/nhac-nen/gau-con-cau-ca.mp3' },
+  track('vo-tay-vui-nhon'),
+  track('buoi-sang-vui-ve'),
+  track('cac-ban-nho-dieu-hanh'),
+  track('dao-xanh-thu-gian'),
+  track('nhay-nhot-tung-bung'),
+  track('gau-con-cau-ca'),
 ];
 
 /** Khi có giọng đọc, nhạc nhỏ còn khoảng 1/3 âm lượng bé chọn. */
@@ -37,9 +46,31 @@ let audio: HTMLAudioElement | null = null;
 let trackIndex = 0;
 let started = false;
 let speaking = false;
+/** Chỉ dùng trên máy bỏ qua audio.volume (Safari iOS/iPadOS). */
+let audioContext: AudioContext | null = null;
+let gainNode: GainNode | null = null;
+
+function volumeIsIgnored(): boolean {
+  const probe = new Audio();
+  probe.volume = 0.5;
+  return probe.volume !== 0.5;
+}
+
+function setupGain(element: HTMLAudioElement): void {
+  try {
+    audioContext = new AudioContext();
+    gainNode = audioContext.createGain();
+    audioContext.createMediaElementSource(element).connect(gainNode).connect(audioContext.destination);
+  } catch {
+    audioContext = null;
+    gainNode = null;
+  }
+}
 
 function applyVolume(): void {
-  if (audio) audio.volume = getMusicVolume() * (speaking ? DUCK_RATIO : 1);
+  const volume = getMusicVolume() * (speaking ? DUCK_RATIO : 1);
+  if (gainNode) gainNode.gain.value = volume;
+  else if (audio) audio.volume = volume;
 }
 
 const canPlay = () => !isMuted() && isMusicEnabled();
@@ -83,10 +114,17 @@ function loadTrack(index: number, startAt = 0): void {
 /** Thử phát; bị chặn tự phát thì phát ở lần chạm/bấm phím đầu tiên. */
 function tryPlay(): void {
   if (!audio || !canPlay()) return;
+  const resume = () => {
+    if (!audio || !canPlay()) return;
+    void audioContext?.resume();
+    void audio.play().catch(() => undefined);
+  };
+  // Web Audio chỉ chạy sau lượt chạm: chờ chạm để mở tiếng dù play() không báo lỗi
+  if (audioContext && audioContext.state !== 'running') {
+    void audioContext.resume().catch(() => undefined);
+    window.addEventListener('pointerdown', resume, { once: true });
+  }
   audio.play().catch(() => {
-    const resume = () => {
-      if (audio && canPlay()) void audio.play().catch(() => undefined);
-    };
     window.addEventListener('pointerdown', resume, { once: true });
     window.addEventListener('keydown', resume, { once: true });
   });
@@ -99,6 +137,7 @@ export function startBackgroundMusic(): void {
 
   audio = new Audio();
   audio.preload = 'auto';
+  if (volumeIsIgnored()) setupGain(audio);
   applyVolume();
 
   const saved = readSaved();

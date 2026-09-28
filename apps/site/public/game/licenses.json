@@ -72,15 +72,18 @@
     },
     {
       "id": "nhac-nen-cc0",
-      "name": "Nhạc nền không lời cho các màn ngoài bài học (OpenGameArt)",
-      "author": "Cakeflaps (Good Morning); Brandon Morris, bản cắt vòng lặp của AntumDeluge (Feel Good Island Loop); Memoraphile (Beary Fishy Menu Screen)",
+      "name": "Nhạc nền không lời vui nhộn cho các màn ngoài bài học (OpenGameArt)",
+      "author": "Cakeflaps (Good Morning); Brandon Morris, bản cắt vòng lặp của AntumDeluge (Feel Good Island Loop); Memoraphile (Beary Fishy Menu Screen); OwlishMedia (Happy Clappy Loop); Cleyton Kauffman (Children's March Theme); MintoDog (Joyfully)",
       "license": "CC0 1.0 Universal (Public Domain)",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "website": "https://opengameart.org/content/good-morning ; https://opengameart.org/content/feel-good-island-loop ; https://opengameart.org/content/gone-fishin",
+      "website": "https://opengameart.org/content/good-morning ; https://opengameart.org/content/feel-good-island-loop ; https://opengameart.org/content/gone-fishin ; https://opengameart.org/content/happy-clappy-loop ; https://opengameart.org/content/childrens-march-theme ; https://opengameart.org/content/joyfully",
       "files": [
         "audio/nhac-nen/buoi-sang-vui-ve.mp3",
         "audio/nhac-nen/dao-xanh-thu-gian.mp3",
-        "audio/nhac-nen/gau-con-cau-ca.mp3"
+        "audio/nhac-nen/gau-con-cau-ca.mp3",
+        "audio/nhac-nen/vo-tay-vui-nhon.mp3",
+        "audio/nhac-nen/cac-ban-nho-dieu-hanh.mp3",
+        "audio/nhac-nen/nhay-nhot-tung-bung.mp3"
       ]
     }
   ]
