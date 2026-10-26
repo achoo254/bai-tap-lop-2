@@ -21,6 +21,8 @@ interface Props {
 }
 const { title, noindex = false, showToolbar = true, companionContext } = Astro.props;
 const handwritingAvailable = hasHandwritingFont();
+// Một URL chuẩn cho mỗi trang để Google không coi biến thể (thiếu "/", có tham số) là trùng lặp.
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
@@ -30,6 +32,8 @@ const handwritingAvailable = hasHandwritingFont();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ff9fc0" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
